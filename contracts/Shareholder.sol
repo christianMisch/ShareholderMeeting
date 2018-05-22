@@ -2,10 +2,13 @@ pragma solidity ^0.4.23;
 
 import "./Proposal.sol";
 import "./Question.sol";
+import "./User.sol";
 
-contract Shareholder {
+contract Shareholder is User {
 
     Proposal[] proposals;
+    Question[] questions;
+    
     enum RatingOption {UPVOTE, DOWNVOTE}
 
     struct ShareholderData {

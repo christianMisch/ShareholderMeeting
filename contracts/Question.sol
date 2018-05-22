@@ -1,8 +1,6 @@
 pragma solidity ^0.4.23;
 
 contract Question {
-
-    enum RatingOption {UPVOTE, DOWNVOTE}
      
     uint questionId;
     string content;

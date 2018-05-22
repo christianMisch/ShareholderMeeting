@@ -1,8 +1,14 @@
 pragma solidity ^0.4.23;
 
 import "./VotingStatistic.sol";
+import "./User.sol";
+import "./Question.sol";
 
-contract Director {
+contract Director is User {
+
+    VotingStatistic statistic; 
+    Question[] questions; 
+    Answer[] answers;
 
     struct DirectorData {
         bool isDirector;
@@ -16,8 +22,7 @@ contract Director {
 
     }
 
-    function createMeeting(string meetingDate, uint startTime, uint endTime, 
-        string meetingName, string meetingDescription) public returns (uint meetingId) {
+    function createMeeting(string meetingDate, uint startTime, uint endTime, string meetingName, string meetingDescription) public returns (uint meetingId) {
         
     }
 
