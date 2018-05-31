@@ -9,9 +9,15 @@ contract Director is User {
     VotingStatistic statistic; 
     Question[] questions; 
     Answer[] answers;
+    Proposal[] proposals;
 
-    struct DirectorData {
-        bool isDirector;
+    bool isDirector;
+    address chairperson;
+    mapping (address => User) users;
+
+    constructor(string[] proposalNames) public {
+        chairperson = msg.sender;
+        users[chairperson].weight = 1;
     }
 
     function createAnswer(address userAddress, string content, uint questionId) public {

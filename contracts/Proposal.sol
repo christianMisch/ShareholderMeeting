@@ -8,6 +8,7 @@ contract Proposal {
     bool finished;
     bool proposalPassed;
     uint passedPercent;
+    uint voteCount;
     Vote[] votes;
 
     struct Vote {

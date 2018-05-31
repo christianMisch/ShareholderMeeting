@@ -6,12 +6,11 @@ contract User {
 
     Meeting meeting;
 
-    struct UserData {
-        string userName;
-        string userPassword;
-        address userAddress;
-        bool isAuthorized;
-    }
+    string userName;    
+    string userPassword;
+    address userAddress;
+    bool isAuthorized;
+    uint weight;
 
     function login(address userAddress, string userPassword) public;
 

@@ -8,13 +8,12 @@ contract Shareholder is User {
 
     Proposal[] proposals;
     Question[] questions;
+
+    uint propIndex;
+    bool hasVoted;
+    address delegate;
     
     enum RatingOption {UPVOTE, DOWNVOTE}
-
-    struct ShareholderData {
-        bool isProxy;
-        uint votingPower;
-    }
 
     function vote(address userAddress, uint proposalId) public {
 
