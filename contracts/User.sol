@@ -1,13 +1,12 @@
 pragma solidity ^0.4.23;
 
-import "./Meeting.sol";
 import "./Shareholder.sol";
 
 contract User {
 
-    Meeting meeting;
     mapping (address => Shareholder) users;
 
+    uint userId;
     string userName;    
     string userPassword;
     address userAddress;

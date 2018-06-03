@@ -13,6 +13,14 @@ contract Shareholder is User {
     bool public hasVoted;
     address public delegate;
 
+    struct Question {
+        uint questionId;
+        string content;
+        uint timestamp;
+        uint upvotes;
+        uint downvotes;
+    }
+
     constructor(string userName, string userPassword, address userAddress, bool isAuthorized,
     uint weight, uint _propIndex, bool _hasVoted, address _delegate) 
         User(userName, userPassword, userAddress, isAuthorized, weight) public {
