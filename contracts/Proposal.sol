@@ -11,6 +11,7 @@ contract Proposal {
     uint passedPercent;
     uint public voteCount;
     Vote[] votes;
+    mapping(address => bool) votesOnProposal; 
 
     struct Vote {
         address voterAddress;

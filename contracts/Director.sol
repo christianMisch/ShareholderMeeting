@@ -5,7 +5,7 @@ import "./User.sol";
 
 contract Director is User {
 
-    Meeting meeting;
+    Meeting public meeting;
     VotingStatistic statistic;
     uint minimumQuorum;
 
@@ -25,31 +25,10 @@ contract Director is User {
         _;
     }
 
-    modifier meetingFinished(Meeting m) {
-        require(now > m.meetingEndTime);
-        _;
-    }
-
-    modifier meetingPending(Meeting m) {
-        require(now > meetingStartTime && now < m.meetingEndTime);
-        _;
-    }
-
     struct Answer {
         uint answerId;
         string content;
         uint timestamp; 
-    }
-
-    struct Meeting {
-        uint meetingId;
-        string meetingName;
-        string meetingDescription;
-        string meetingDate;
-        string meetingPlace;
-        uint meetingStartTime;
-        uint meetingEndTime;
-        bool isMeetingFinished;
     }
         
     constructor(string[] proposalNames) public {
@@ -61,6 +40,10 @@ contract Director is User {
         director = newDirector;
     }
 
+    function uploadAuthorizedShareholderList(Shareholder[] _shareholders) public {
+        shareholders = _shareholders;
+    }
+    
     function createAnswer(address userAddress, string newContent, uint questionId) meetingPending(meeting) public {
         Answer storage answer = new Answer({answerId: ++answerId, content: newContent, timestamp: now});
         answers.push(answer);
@@ -90,7 +73,7 @@ contract Director is User {
 
     }
 
-    function createMeeting(string newMeetingDate, string newMeetingPlace, uint newStartTime, uint newEndTime, string newMeetingName, string newMeetingDescription) public returns (uint meetingId) {
+    function createMeeting(string newMeetingDate, string newMeetingPlace, uint newStartTime, uint newEndTime, string newMeetingName, string newMeetingDescription) onlyDirector public returns (uint meetingId) {
         Meeting storage newMeeting = new Meeting({meetingId: ++meetingId, meetingName: newMeetingName, 
             meetingDescription: newMeetingDescription, meetingDate: newMeetingDate, meetingPlace: newMeetingPlace, startTime: newStartTime, endTime: newEndTime});
         meeting = newMeeting;
@@ -140,7 +123,8 @@ contract Director is User {
         }
 
         for (uint j = 0; j < shareholders.length; j++) {
-            statistic.votingPowerMap[shareholders[i].userId] = shareholders[i].weight;
+            statistic.votingPowerMap[shareholders[j].userId] = shareholders[j].weight;
+            statistic.totalVotingPower += shareholders[j].weight;
         }
     }
 }
