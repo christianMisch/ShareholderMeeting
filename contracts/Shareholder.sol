@@ -1,17 +1,15 @@
 pragma solidity ^0.4.23;
 
-import "./Proposal.sol";
 import "./User.sol";
-import {meeting as m} from "./Director.sol";
 
 contract Shareholder is User {
 
-    Proposal[] proposals;
-    Question[] questions;
+    Proposal[] public proposals;
+    Question[] public questions;
 
-    uint propIndex;
+    uint public propIndex;
     address public delegate;
-    bool hasVoted;
+    bool public hasVoted;
 
     struct Question {
         address creator;
@@ -36,17 +34,17 @@ contract Shareholder is User {
     event QuestionUpvote(address invoker, uint numUpvotes);
     event QuestionDownvote(address invoker, uint numDownvotes);
 
-    function vote(address userAddress, uint proposalId) meetingPending() public {
-        Shareholder voter = shareholders[msg.sender];
-        Proposal prop = proposals[proposalId];
-        require(!prop.votesOnProposal[msg.sender], "Already voted");
-        prop.votesOnProposal[msg.sender] = true;
-        voter.propIndex = proposalId;
-        proposals[proposalId].voteCount += voter.weight;
+    function vote(address userAddress, uint proposalId) /*meetingPending(meeting)*/ public {
+        //Shareholder voter = shareholders[msg.sender];
+        //Proposal prop = proposals[proposalId];
+        //require(!prop.votesOnProposal[msg.sender], "Already voted");
+        //prop.votesOnProposal[msg.sender] = true;
+        //voter.propIndex = proposalId;
+        //proposals[proposalId].voteCount += voter.weight;
     }
 
-    function createQuestion(address _creator, string _content) public returns (uint questionId) {
-        Question storage question = new Question();
+    function createQuestion(uint questionId, address _creator, string _content) /*meetingPending(meeting)*/ public returns (uint quesId) {
+        Question storage question = questions[questionId];
         question.questionId = questions.length++;
         question.creator = _creator;
         question.content = _content;
@@ -56,12 +54,12 @@ contract Shareholder is User {
 
         questions.push(question);
 
-        question.questionId;
+        return question.questionId;
 
     }
 
-    function rateQuestion(uint questionId, RatingOption ratingOpt) public {
-        Question storage question = getQuestionById(questionId);
+    function rateQuestion(uint questionId, RatingOption ratingOpt) /*meetingPending(meeting)*/ public {
+        Question storage question = questions[questionId];
         if (ratingOpt == RatingOption.UPVOTE) {
             question.upvotes++;
             emit QuestionUpvote(msg.sender, question.upvotes);
@@ -73,7 +71,7 @@ contract Shareholder is User {
         }
     }
 
-    function getProposalById(uint proposalId) public returns (Proposal prop) {
+    /*function getProposalById(uint proposalId) public returns (Proposal prop) {
         for (uint i = 0; i < proposals.length; i++) {
             if (proposals[i].proposalId == proposalId) {
                 prop = proposals[i];
@@ -89,10 +87,10 @@ contract Shareholder is User {
                 break;
             }
         }
-    }
+    }*/
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
-    function delegateToProxy(address proxyAddress) public {
+    /*function delegateToProxy(address proxyAddress) meetingPending(meeting) public {
         Shareholder sender = shareholders[msg.sender];
         
         require(!shareholders[msg.sender].hasVoted, "The user has already voted");
@@ -113,10 +111,7 @@ contract Shareholder is User {
             delegate.weight += sender.weight;
         }
         	
-    }
-
-    
-
+    }*/
 }
 
 
