@@ -34,6 +34,17 @@ contract Shareholder is User {
     event QuestionUpvote(address invoker, uint numUpvotes);
     event QuestionDownvote(address invoker, uint numDownvotes);
 
+    function addUser() public {
+        if (users[i].role == Role.SHAREHOLDER) {
+            roles[users[i].userAddress] = Role.SHAREHOLDER;
+            numberOfUsers++;
+            users.push(new User({userAddress: userAddress, userId: users.length, role: _role, isAuthorized: true, weight: 0}));
+        } else if (users[i].role == Role.DIRECTOR) {
+            roles[users[i].userAddress] == Role.DIRECTOR;
+            numberOfUsers++;
+        }
+    }
+    
     function vote(address userAddress, uint proposalId) /*meetingPending(meeting)*/ public {
         //Shareholder voter = shareholders[msg.sender];
         //Proposal prop = proposals[proposalId];

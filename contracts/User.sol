@@ -5,13 +5,13 @@ import "./Director.sol";
 
 contract User {
 
-    mapping (address => Shareholder) shareholders;
+    mapping (address => int) userIds;
+    User[] users;
 
     uint userId;
-    string userName;    
-    string userPassword;
     address userAddress;
-    bool public isAuthorized;
+    uint role;
+    bool isAuthorized;
     uint weight;
 
     struct Proposal {
@@ -32,10 +32,10 @@ contract User {
         string voterDecision;
     }
 
-    constructor(string _userName, string _userPassword, address _userAddress, bool _isAuthorized, uint _weight) internal {
-        userName = _userName;
-        userPassword = _userPassword;
+    constructor(uint _userId, address _userAddress, uint _role, bool _isAuthorized, uint _weight) internal {
+        userId = _userId;
         userAddress = _userAddress;
+        role = _role;
         isAuthorized = _isAuthorized;
         weight = _weight;
     }
@@ -44,10 +44,7 @@ contract User {
 
     function logout(address _userAddress) public;
 
-    modifier authorizedUser(User user) {
-        require(user.isAuthorized());
-        _;
-    }
+    function addUser(Role _role) public;
 
     /*modifier meetingFinished(Meeting m) {
         require(now > m.meetingEndTime);

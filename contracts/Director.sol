@@ -3,6 +3,7 @@ pragma solidity ^0.4.23;
 import "./VotingStatistic.sol";
 import "./User.sol";
 import "./Meeting.sol";
+import "./Authentication.sol";
 
 contract Director is User {
 
@@ -15,14 +16,6 @@ contract Director is User {
     Proposal[] proposals;
     Shareholder[] shareholders;
 
-    bool isDirector;
-    address director;
-
-    modifier onlyDirector {
-        require(director == msg.sender);
-        _;
-    }
-
     struct Answer {
         uint answerId;
         string content;
@@ -30,20 +23,26 @@ contract Director is User {
     }
         
     constructor() public {
-        director = msg.sender;
-        isDirector = true;
         //shareholders[director].weight = 1;
     }
 
-    function transferOwnership(address newDirector) public {
-        director = newDirector;
+    function addUser(Role _role) public {
+        if (_role == Role.SHAREHOLDER) {
+            numberOfUsers++;
+            users[msg.sender] = User({userAddress: msg.sender, userId: users.length++, 
+                role: _role, isAuthorized: true, weight: 0});
+        } else if (users[i].role == Role.DIRECTOR) {
+            roles[users[i].userAddress] == Role.DIRECTOR;
+            numberOfUsers++;
+        }
     }
 
-    function uploadAuthorizedShareholderList(Shareholder[] _shareholders) public {
+    function uploadAuthorizedShareholderList(Shareholder[] _shareholders) onlyDirector public {
         shareholders = _shareholders;
     }
     
-    function createAnswer(uint answerId, address userAddress, string newContent, uint questionId) /*meetingPending(meeting)*/ public {
+    function createAnswer(uint answerId, address userAddress, string newContent, uint questionId) 
+        /*meetingPending(meeting) onlyDirector*/ public {
         Answer storage answer = answers[answerId];
         answer.answerId = answers.length++;
         answer.content = newContent;
@@ -51,7 +50,8 @@ contract Director is User {
         answers.push(answer);
     }
 
-    function createProposal(uint proposalId, string name, string description, byte[] options) /*meetingPending(meeting)*/ internal {
+    function createProposal(uint proposalId, string name, string description, byte[] options) 
+        /*meetingPending(meeting) onlyDirector*/ internal {
         Proposal storage proposal = proposals[proposalId];
         proposal.proposalId = proposals.length++;
         proposal.name = name;
@@ -66,7 +66,7 @@ contract Director is User {
 
     }
 
-    function giveVotingRight(address voter) /*meetingPending(meeting)*/ public {
+    function giveVotingRight(address voter) /*meetingPending(meeting) onlyDirector*/ public {
         require(msg.sender == director, "Only director can determine eligablitiy of voting");
         //require(!shareholders[msg.sender].hasVoted(), "The user has already voted");
         //require(shareholders[msg.sender].weight == 0);
@@ -75,7 +75,8 @@ contract Director is User {
 
     }
 
-    function createMeeting(string newMeetingDate, string newMeetingPlace, uint newStartTime, uint newEndTime, string newMeetingName, string newMeetingDescription) onlyDirector internal returns (uint meetingId) {
+    function createMeeting(string newMeetingDate, string newMeetingPlace, uint newStartTime, uint newEndTime, string newMeetingName, string newMeetingDescription) 
+        internal returns (uint meetingId) {
         
         meeting = new Meeting(
             1, 
@@ -125,7 +126,7 @@ contract Director is User {
         isExecuted = true;
     }
  
-    function createVotingStatistics() /*meetingFinished(meeting)*/ public {
+    function createVotingStatistics() meetingFinished(meeting) onlyDirector public {
         statistic = new VotingStatistic();
         
         for (uint i = 0; i < proposals.length; i++) {
