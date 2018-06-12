@@ -1,15 +1,11 @@
 pragma solidity ^0.4.23;
 
 import "./User.sol";
+import "./Authentication.sol";
 
 contract Shareholder is User {
 
-    Proposal[] public proposals;
-    Question[] public questions;
-
-    uint public propIndex;
-    address public delegate;
-    bool public hasVoted;
+    address delegate;
 
     struct Question {
         address creator;
@@ -20,41 +16,40 @@ contract Shareholder is User {
         uint downvotes;
     }
 
-    constructor(string userName, string userPassword, address userAddress, bool isAuthorized,
-    uint weight, address _delegate) User(userName, userPassword, userAddress, isAuthorized, weight) public {
+    constructor(uint userId, address userAddress, Role role, bool isAuthorized) 
+        User(userId, userAddress, role, isAuthorized) public {
             
-        delegate = _delegate;
-        hasVoted = false;
-
+        delegate = address(0);
     }
-    
-    enum RatingOption {UPVOTE, DOWNVOTE}
 
-    event InvalidRatingOption(address invoker);
-    event QuestionUpvote(address invoker, uint numUpvotes);
-    event QuestionDownvote(address invoker, uint numDownvotes);
-
-    function addUser() public {
-        if (users[i].role == Role.SHAREHOLDER) {
-            roles[users[i].userAddress] = Role.SHAREHOLDER;
+    function addUser(address _userAddress, Role _role) public {
+        if (userMap[_userAddress].role() == Role.SHAREHOLDER) {
             numberOfUsers++;
-            users.push(new User({userAddress: userAddress, userId: users.length, role: _role, isAuthorized: true, weight: 0}));
-        } else if (users[i].role == Role.DIRECTOR) {
-            roles[users[i].userAddress] == Role.DIRECTOR;
-            numberOfUsers++;
+            
+            /*userMap[_userAddress] = Shareholder({
+                userId: users.length++,
+                userAddress: _userAddress, 
+                role: _role, 
+                isAuthorized: true
+            });*/
         }
     }
     
-    function vote(address userAddress, uint proposalId) /*meetingPending(meeting)*/ public {
-        //Shareholder voter = shareholders[msg.sender];
-        //Proposal prop = proposals[proposalId];
-        //require(!prop.votesOnProposal[msg.sender], "Already voted");
-        //prop.votesOnProposal[msg.sender] = true;
-        //voter.propIndex = proposalId;
-        //proposals[proposalId].voteCount += voter.weight;
+    /*
+    event InvalidRatingOption(address invoker);
+    event QuestionUpvote(address invoker, uint numUpvotes);
+    event QuestionDownvote(address invoker, uint numDownvotes);
+    
+    function vote(address userAddress, uint proposalId) meetingPending(meeting) public {
+        Shareholder voter = shareholders[msg.sender];
+        Proposal prop = proposals[proposalId];
+        require(!prop.votesOnProposal[msg.sender], "Already voted");
+        prop.votesOnProposal[msg.sender] = true;
+        voter.propIndex = proposalId;
+        proposals[proposalId].voteCount += voter.weight;
     }
 
-    function createQuestion(uint questionId, address _creator, string _content) /*meetingPending(meeting)*/ public returns (uint quesId) {
+    function createQuestion(uint questionId, address _creator, string _content) meetingPending(meeting) public returns (uint quesId) {
         Question storage question = questions[questionId];
         question.questionId = questions.length++;
         question.creator = _creator;
@@ -69,7 +64,7 @@ contract Shareholder is User {
 
     }
 
-    function rateQuestion(uint questionId, RatingOption ratingOpt) /*meetingPending(meeting)*/ public {
+    function rateQuestion(uint questionId, RatingOption ratingOpt) meetingPending(meeting) public {
         Question storage question = questions[questionId];
         if (ratingOpt == RatingOption.UPVOTE) {
             question.upvotes++;
@@ -79,24 +74,6 @@ contract Shareholder is User {
             emit QuestionDownvote(msg.sender, question.downvotes);
         } else {
             emit InvalidRatingOption(msg.sender);
-        }
-    }
-
-    /*function getProposalById(uint proposalId) public returns (Proposal prop) {
-        for (uint i = 0; i < proposals.length; i++) {
-            if (proposals[i].proposalId == proposalId) {
-                prop = proposals[i];
-                break;
-            }
-        }
-    }
-
-    function getQuestionById(uint questionId) public returns (Question ques) {
-        for (uint i = 0; i < questions.length; i++) {
-            if (questions[i].questionId == questionId) {
-                ques = questions[i];
-                break;
-            }
         }
     }*/
 

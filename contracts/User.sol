@@ -1,18 +1,18 @@
 pragma solidity ^0.4.23;
 
-import "./Shareholder.sol";
-import "./Director.sol";
-
 contract User {
 
-    mapping (address => int) userIds;
     User[] users;
+    mapping(address => User) public userMap;
+    uint public numberOfUsers;
 
-    uint userId;
-    address userAddress;
-    uint role;
-    bool isAuthorized;
-    uint weight;
+    enum Role {DIRECTOR, SHAREHOLDER}
+
+    uint public userId;
+    address public userAddress;
+    Role public role;
+    bool public isAuthorized;
+    uint public weight;
 
     struct Proposal {
         uint proposalId;
@@ -32,32 +32,36 @@ contract User {
         string voterDecision;
     }
 
-    constructor(uint _userId, address _userAddress, uint _role, bool _isAuthorized, uint _weight) internal {
+    event UserCreated(uint userId, address userAddress, Role role);
+
+    modifier onlyDirector {
+        require(userMap[msg.sender].role() == Role.DIRECTOR);
+        _;
+
+    }
+
+    modifier onlyShareholder {
+        require(userMap[msg.sender].role() == Role.SHAREHOLDER);
+        _;
+    }
+
+    modifier isAuthenticated {
+        require(userMap[msg.sender].isAuthorized());
+        _;
+    }
+
+    constructor(uint _userId, address _userAddress, Role _role, bool _isAuthorized) public {
         userId = _userId;
         userAddress = _userAddress;
         role = _role;
         isAuthorized = _isAuthorized;
-        weight = _weight;
+        weight = 0;
     }
 
-    function login(address _userAddress, string _userPassword) public;
-
-    function logout(address _userAddress) public;
-
-    function addUser(Role _role) public;
-
-    /*modifier meetingFinished(Meeting m) {
-        require(now > m.meetingEndTime);
-        _;
+    function userExists(address _userAddress) public returns (bool exists) {
+        return true;
     }
 
-    modifier meetingPending(Meeting m) {
-        require(now > m.meetingStartTime && now < m.meetingEndTime);
-        _;
-    }*/
-
-    /*modifier userExists(address userAddress) {
-
-    }*/
+    function addUser(address _userAddress, Role _role) public;
     
 }

@@ -7,42 +7,47 @@ import "./Authentication.sol";
 
 contract Director is User {
 
-    Meeting meeting;
-    VotingStatistic statistic;
     uint minimumQuorum;
-
-    //Question[] questions; 
-    Answer[] answers;
-    Proposal[] proposals;
-    Shareholder[] shareholders;
 
     struct Answer {
         uint answerId;
         string content;
         uint timestamp; 
     }
+
         
-    constructor() public {
-        //shareholders[director].weight = 1;
+    constructor(uint userId, address userAddress, Role role, bool isAuthorized, uint _minimumQuorum) 
+        User(userId, userAddress, role, isAuthorized) public {
+        
+        minimumQuorum = _minimumQuorum;
     }
 
-    function addUser(Role _role) public {
-        if (_role == Role.SHAREHOLDER) {
+    function addUser(address _userAddress, Role _role) public {
+        if (_role == Role.DIRECTOR) {
             numberOfUsers++;
-            users[msg.sender] = User({userAddress: msg.sender, userId: users.length++, 
-                role: _role, isAuthorized: true, weight: 0});
-        } else if (users[i].role == Role.DIRECTOR) {
-            roles[users[i].userAddress] == Role.DIRECTOR;
-            numberOfUsers++;
+
+            if (!userExists(_userAddress)) {
+                Director d = new Director({
+                    userId: users.length++,
+                    userAddress: _userAddress, 
+                    role: _role, 
+                    isAuthorized: true, 
+                    weight: 0
+                });
+
+                users.push(d);
+                userMap[msg.sender] = d;
+                emit UserCreated(d.userId, d.userAddress, d.userRole);
+            }
         }
     }
 
-    function uploadAuthorizedShareholderList(Shareholder[] _shareholders) onlyDirector public {
+    /*function uploadAuthorizedShareholderList(Shareholder[] _shareholders) onlyDirector public {
         shareholders = _shareholders;
     }
     
     function createAnswer(uint answerId, address userAddress, string newContent, uint questionId) 
-        /*meetingPending(meeting) onlyDirector*/ public {
+        meetingPending(meeting) onlyDirector public {
         Answer storage answer = answers[answerId];
         answer.answerId = answers.length++;
         answer.content = newContent;
@@ -51,7 +56,7 @@ contract Director is User {
     }
 
     function createProposal(uint proposalId, string name, string description, byte[] options) 
-        /*meetingPending(meeting) onlyDirector*/ internal {
+        meetingPending(meeting) onlyDirector internal {
         Proposal storage proposal = proposals[proposalId];
         proposal.proposalId = proposals.length++;
         proposal.name = name;
@@ -66,12 +71,12 @@ contract Director is User {
 
     }
 
-    function giveVotingRight(address voter) /*meetingPending(meeting) onlyDirector*/ public {
+    function giveVotingRight(address voter) meetingPending(meeting) onlyDirector public {
         require(msg.sender == director, "Only director can determine eligablitiy of voting");
-        //require(!shareholders[msg.sender].hasVoted(), "The user has already voted");
-        //require(shareholders[msg.sender].weight == 0);
+        require(!shareholders[msg.sender].hasVoted(), "The user has already voted");
+        require(shareholders[msg.sender].weight == 0);
 
-        //shareholders[msg.sender].weight = 1;
+        shareholders[msg.sender].weight = 1;
 
     }
 
@@ -91,30 +96,30 @@ contract Director is User {
         return 1;
     }
 
-    function finishMeeting(Meeting m) /*meetingPending(meeting)*/ public {
+    function finishMeeting(Meeting m) meetingPending(meeting) public {
         require(!m.isMeetingFinished());
-        //m.isMeetingFinished = true;
+        m.isMeetingFinished = true;
     }
 
-    function announceMeeting(Meeting m) /*meetingPending(meeting)*/ public returns(string recordDate, string recordPlace) {
+    function announceMeeting(Meeting m) meetingPending(meeting) public returns(string recordDate, string recordPlace) {
         return (m.meetingDate(), m.meetingPlace());
     }
 
-    function executeProposal(uint proposalId, string voterDecision) /*meetingPending(meeting)*/ public returns(bool isExecuted) {
+    function executeProposal(uint proposalId, string voterDecision) meetingPending(meeting) public returns(bool isExecuted) {
         Proposal storage prop = proposals[proposalId];
 
-        require(!prop.finished /*&& prop.numberOfVotes > minimumQuorum*/);
+        require(!prop.finished && prop.numberOfVotes > minimumQuorum);
         prop.finished = true;
 
         uint approve;
         uint disapprove;
-        /*for (uint i = 0; i < proposals.votes.length; i++) {
+        for (uint i = 0; i < proposals.votes.length; i++) {
             if (prop.votes[i].voterDecision == voterDecision) {
                 ++approve;
             } else {
                 ++disapprove;
             }
-        }*/
+        }
         if (approve > disapprove) {
             prop.proposalPassed = true;
         } else {
@@ -138,5 +143,5 @@ contract Director is User {
             statistic.votingPowerMap[shareholders[j].userId] = shareholders[j].weight;
             statistic.totalVotingPower += shareholders[j].weight;
         }
-    }
+    }*/
 }
