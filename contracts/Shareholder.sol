@@ -1,7 +1,6 @@
 pragma solidity ^0.4.23;
 
 import "./User.sol";
-import "./Authentication.sol";
 
 contract Shareholder is User {
 
@@ -16,23 +15,23 @@ contract Shareholder is User {
         uint downvotes;
     }
 
-    constructor(uint userId, address userAddress, Role role, bool isAuthorized) 
-        User(userId, userAddress, role, isAuthorized) public {
+    constructor(uint userId, address userAddress, bool isDirector, bool isAuthorized) 
+        User(userAddress, false, isAuthorized) public {
             
         delegate = address(0);
     }
 
-    function addUser(address _userAddress, Role _role) public {
-        if (userMap[_userAddress].role() == Role.SHAREHOLDER) {
+    function addUser(address _userAddress, bool _isDirector) public {
+        /*if (users[userId[_userAddress]].isDirector == isDirector) {
             numberOfUsers++;
             
-            /*userMap[_userAddress] = Shareholder({
+            userMap[_userAddress] = Shareholder({
                 userId: users.length++,
                 userAddress: _userAddress, 
                 role: _role, 
                 isAuthorized: true
-            });*/
-        }
+            });
+        }*/
     }
     
     /*
