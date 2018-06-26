@@ -2,10 +2,8 @@ pragma solidity ^0.4.23;
 
 contract User {
 
-    User[] public users;
+   
     Proposal[] public proposals;
-    mapping(address => uint) public userId;
-    uint public numberOfUsers;
 
     address public userAddress;
     bool public isDirector;
@@ -29,8 +27,6 @@ contract User {
         string voterDecision;
     }
 
-    event UserCreated(uint userId, address userAddress, bool isDirector);
-
     modifier onlyDirector {
         require(true);
         _;
@@ -51,14 +47,11 @@ contract User {
         userAddress = _userAddress;
         isDirector = _isDirector;
         isAuthorized = _isAuthorized;
-        weight = 0;
-        userId[msg.sender] = users.length++;  
+        weight = 0;  
     }
 
     function userExists(address _userAddress) public returns (bool exists) {
         return true;
     }
-
-    function addUser(address _userAddress, bool _isDirector) public;
     
 }

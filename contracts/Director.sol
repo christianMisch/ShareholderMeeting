@@ -5,16 +5,8 @@ import "./User.sol";
 
 contract Director is User {
 
-    // minimum quorum for voting
-    uint public minimumQuorum;
-    // activate and deactivate the contract
-    bool private isActive = false;
-    // owner of the contract initializes the AGM
-    address public owner;
     // storing the answers of directors
     Answer[] public answers;
-    // reference to the meeting object
-    Meeting private meeting;
 
     // answer object used by the director
     struct Answer {
@@ -25,63 +17,12 @@ contract Director is User {
         uint timestamp; 
     }
 
-    struct Meeting {
-        uint meetingId;
-        string meetingName;
-        string meetingDescription;
-        string meetingDate;
-        string meetingPlace;
-        uint meetingStartTime;
-        uint meetingEndTime;
-        bool isMeetingFinished; 
-    }
-
     event ProposalCreated(uint propId, address creator);
     event AnswerCreated(uint ansId, address creator);
-
-    modifier onlyOwner {
-        require(owner == msg.sender);
-        _;
-    }
  
-    constructor(address userAddress, bool isAuthorized) 
-        User(userAddress, true, isAuthorized) public {
-        owner = msg.sender;
-        isActive = true;
+    constructor(address userAddress) 
+        User(userAddress, true, true) public {
         weight = 0;
-    }
-
-    // transfer contract ownership to another director
-    function transferOwnership(address _owner) public {
-        owner = _owner;
-    }
-
-    /*function initializeUserAccess(User[] users) internal {
-        for (uint i = 0; i < users.length; i++) {
-            addUser(users[i].userAddress, users[i].isDirector);
-
-            //authenticatedUsers[users[i].userAddress] = true;
-        }
-    }*/
-
-    // add a user to the list of users
-    function addUser(address _userAddress, bool isDirector) public {
-        if (isDirector) {
-            numberOfUsers++;
-
-            if (userId[msg.sender] == 0) {
-                
-                uint id = users.length++;
-                userId[msg.sender] = id;
-                /*users[id] = Director({
-                    userAddress: _userAddress, 
-                    isAuthorized: true
-                });*/
-
-                /*userMap[msg.sender] = d;
-                emit UserCreated(d.userId, d.userAddress, d.userRole);*/
-            }
-        }
     }
 
     // only director is allowed to create an answer
@@ -116,30 +57,6 @@ contract Director is User {
 
     }
 
-    // only owner is allowed to create a meeting
-    function createMeeting(
-        string _meetingDate, 
-        string _meetingPlace, 
-        uint _meetingStartTime, 
-        uint _meetingEndTime, 
-        string _meetingName, 
-        string _meetingDescription) 
-        onlyOwner internal returns (uint meetingId) {
-        
-        meeting = Meeting({
-            meetingId: 1, 
-            meetingName: _meetingName, 
-            meetingDescription: _meetingDescription, 
-            meetingDate: _meetingDate, 
-            meetingPlace: _meetingPlace, 
-            meetingStartTime: _meetingStartTime, 
-            meetingEndTime: _meetingEndTime,
-            isMeetingFinished: false
-        });
-
-        return 1;
-    }
-
     // executes the pending proposal
     function executeProposal(uint proposalId, string voterDecision) public returns(bool isExecuted) {
         Proposal storage prop = proposals[proposalId];
@@ -170,15 +87,6 @@ contract Director is User {
 
     /*function uploadAuthorizedShareholderList(Shareholder[] _shareholders) onlyDirector public {
         shareholders = _shareholders;
-    }
-
-    function giveVotingRight(address voter) meetingPending(meeting) onlyDirector public {
-        require(msg.sender == director, "Only director can determine eligablitiy of voting");
-        require(!shareholders[msg.sender].hasVoted(), "The user has already voted");
-        require(shareholders[msg.sender].weight == 0);
-
-        shareholders[msg.sender].weight = 1;
-
     }
 
     function finishMeeting(Meeting m) meetingPending(meeting) public {

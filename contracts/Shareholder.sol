@@ -15,8 +15,8 @@ contract Shareholder is User {
         uint downvotes;
     }
 
-    constructor(uint userId, address userAddress, bool isDirector, bool isAuthorized) 
-        User(userAddress, false, isAuthorized) public {
+    constructor(address userAddress) 
+        User(userAddress, false, true) public {
             
         delegate = address(0);
     }
