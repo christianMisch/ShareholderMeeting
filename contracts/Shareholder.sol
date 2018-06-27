@@ -1,10 +1,11 @@
 pragma solidity ^0.4.23;
 
 import "./User.sol";
+import {proposals} from "./AGM.sol";
 
 contract Shareholder is User {
 
-    address delegate;
+    address public delegate;
 
     struct Question {
         address creator;
@@ -20,26 +21,12 @@ contract Shareholder is User {
             
         delegate = address(0);
     }
-
-    function addUser(address _userAddress, bool _isDirector) public {
-        /*if (users[userId[_userAddress]].isDirector == isDirector) {
-            numberOfUsers++;
-            
-            userMap[_userAddress] = Shareholder({
-                userId: users.length++,
-                userAddress: _userAddress, 
-                role: _role, 
-                isAuthorized: true
-            });
-        }*/
-    }
     
-    /*
     event InvalidRatingOption(address invoker);
     event QuestionUpvote(address invoker, uint numUpvotes);
     event QuestionDownvote(address invoker, uint numDownvotes);
     
-    function vote(address userAddress, uint proposalId) meetingPending(meeting) public {
+    function vote(address userAddress, uint proposalId) public {
         Shareholder voter = shareholders[msg.sender];
         Proposal prop = proposals[proposalId];
         require(!prop.votesOnProposal[msg.sender], "Already voted");
@@ -74,7 +61,7 @@ contract Shareholder is User {
         } else {
             emit InvalidRatingOption(msg.sender);
         }
-    }*/
+    }
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
     /*function delegateToProxy(address proxyAddress) meetingPending(meeting) public {

@@ -2,30 +2,10 @@ pragma solidity ^0.4.23;
 
 contract User {
 
-   
-    Proposal[] public proposals;
-
     address public userAddress;
     bool public isDirector;
     bool public isAuthorized;
     uint public weight;
-
-    struct Proposal {
-        string name;
-        string description;
-        byte[] options;
-        bool finished;
-        bool proposalPassed;
-        uint passedPercent;
-        uint proposalDeadline;
-        Vote[] votes;
-        mapping(address => bool) votesOnProposal;
-    }
-
-    struct Vote {
-        address voterAddress;
-        string voterDecision;
-    }
 
     modifier onlyDirector {
         require(true);
