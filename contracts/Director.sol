@@ -7,6 +7,7 @@ contract Director is User {
 
     // storing the answers of directors
     Answer[] public answers;
+   
 
     // answer object used by the director
     struct Answer {
@@ -18,10 +19,15 @@ contract Director is User {
     }
 
     event AnswerCreated(uint ansId, address creator);
+
+    modifier onlyDirector {
+        require(this.isDirector());
+        _;
+
+    }
  
     constructor(address userAddress) 
-        User(userAddress, true, true) public {
-        weight = 0;
+        User(userAddress, true) public {
     }
 
     // only director is allowed to create an answer

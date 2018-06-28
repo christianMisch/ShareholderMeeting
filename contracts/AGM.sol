@@ -3,6 +3,7 @@ pragma solidity ^0.4.23;
 import "./User.sol";
 import "./Director.sol";
 import "./Shareholder.sol";
+import "./VotingStatistic.sol";
 //import "github.com/Arachnid/solidity-stringutils/strings.sol";
 
 contract AGM {
@@ -37,7 +38,7 @@ contract AGM {
         bool finished;
         bool proposalPassed;
         uint passedPercent;
-        uint proposalDeadline;
+        uint voteCount;
         Vote[] votes;
         mapping(address => bool) votedOnProposal;
     }
@@ -146,10 +147,10 @@ contract AGM {
         proposal.name = _name;
         proposal.description = _description;
         proposal.options = _options;
-        proposal.proposalDeadline = _proposalDeadline;
         proposal.finished = false;
         proposal.proposalPassed = false;
         proposal.passedPercent = 0;
+        proposal.voteCount = 0;
         
         emit ProposalCreated(proposalId, msg.sender);
     }
@@ -160,7 +161,7 @@ contract AGM {
         Proposal storage prop = proposals[proposalId];
         string[] storage options = proposals[proposalId].options;
 
-        require(!prop.finished && now > prop.proposalDeadline);
+        require(!prop.finished);
 
         
         // iterate over all options to store default options in the map
@@ -196,6 +197,7 @@ contract AGM {
 
         prop.passedPercent = winningOptionCount * 100 / countSum;
         prop.finished = true;
+        delete votingOptions;
 
     }
 
@@ -203,12 +205,13 @@ contract AGM {
         VotingStatistic statistic = new VotingStatistic();
 
         for (uint j = 0; j < users.length; j++) {
-            statistic.votingPower[users[j].userId] = users[j].weight;
-            statistic.totalVotingPower += users[j].weight;
+            statistic.updateVotingPower(users[j].userAddress(), Shareholder(users[j]).weight());
+            //statistic.setTotalVotingPower(statistic.getTotalVotingPower() += users[j].weight);
         }
         for (uint i = 0; i < proposals.length; i++) {
-            statistic.passedProposal[proposals[i].proposalId] = proposals[i].proposalPassed;
-            statistic.proposalPercentage[proposals[i].proposalId] = proposals[i].passedPercent;
+            //statistic.passedProposal[proposals[i].proposalId] = proposals[i].proposalPassed;
+            //statistic.proposalPercentage(proposalId) = proposals[i].passedPercent;
+            //statistic.updateVotingPower();
         }
     }
 
@@ -224,6 +227,9 @@ contract AGM {
         emit Voted(userAddress, proposalId, votingOption);
     }
 
+    function userExists(address userAddress) public returns (bool exists) {
+        return userId[userAddress] != 0;
+    }
 }
 
 /*for (uint k = 0; k < options.length; k++) {

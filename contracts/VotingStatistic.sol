@@ -5,12 +5,32 @@ import "./Shareholder.sol";
 contract VotingStatistic {
 
     // sum of the weights or voting power of all users
-    uint public totalVotingPower;
+    uint private totalVotingPower;
     // how much voting power each uses owns
-    mapping(address => uint) public votingPower;
+    mapping(address => uint) private votingPower;
     // which proposal is passed
-    mapping(uint => bool) public passedProposal;
+    mapping(uint => bool) private passedProposal;
     // with how much persentage each proposal is passed or not
-    mapping(uint => uint) public proposalPercentage;
+    mapping(uint => uint) private proposalPercentage;
+
+    function updateVotingPower(address userAddress, uint weight) public {
+        votingPower[userAddress] = weight;
+    }
+
+    function updatePassedProposal(uint proposalId, bool proposalPassed) public {
+        passedProposal[proposalId] = proposalPassed;
+    }
+
+    function updateProposalPercentage(uint proposalId, uint passedPercentage) public {
+        proposalPercentage[proposalId] = passedPercentage;
+    }
+
+    function setTotalVotingPower(uint newTotalVP) public {
+        totalVotingPower = newTotalVP;
+    }
+
+    function getTotalVotingPower() public returns (uint totalVP) {
+        return totalVotingPower;
+    }
 
 }
