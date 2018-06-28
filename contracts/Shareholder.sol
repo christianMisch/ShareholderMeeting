@@ -1,11 +1,15 @@
 pragma solidity ^0.4.23;
 
 import "./User.sol";
-import {proposals} from "./AGM.sol";
+import "./AGM.sol";
 
 contract Shareholder is User {
 
     address public delegate;
+    Question[] public questions;
+    AGM public agm;
+
+    enum RatingOption {UPVOTE, DOWNVOTE}
 
     struct Question {
         address creator;
@@ -26,31 +30,22 @@ contract Shareholder is User {
     event QuestionUpvote(address invoker, uint numUpvotes);
     event QuestionDownvote(address invoker, uint numDownvotes);
     
-    function vote(address userAddress, uint proposalId) public {
-        Shareholder voter = shareholders[msg.sender];
-        Proposal prop = proposals[proposalId];
-        require(!prop.votesOnProposal[msg.sender], "Already voted");
-        prop.votesOnProposal[msg.sender] = true;
-        voter.propIndex = proposalId;
-        proposals[proposalId].voteCount += voter.weight;
+    function vote(address userAddress, uint proposalId, string votingOption) public {
+        agm.voteOnProposal(userAddress, proposalId, votingOption);
     }
 
-    function createQuestion(uint questionId, address _creator, string _content) meetingPending(meeting) public returns (uint quesId) {
-        Question storage question = questions[questionId];
-        question.questionId = questions.length++;
+    function createQuestion(uint questionId, address _creator, string _content) public returns (uint id) {
+        id = questions.length++;
+        Question storage question = questions[id];
+        question.questionId = id;
         question.creator = _creator;
         question.content = _content;
         question.timestamp = now;
         question.upvotes = 0;
         question.downvotes = 0;
-
-        questions.push(question);
-
-        return question.questionId;
-
     }
 
-    function rateQuestion(uint questionId, RatingOption ratingOpt) meetingPending(meeting) public {
+    function rateQuestion(uint questionId, RatingOption ratingOpt) public {
         Question storage question = questions[questionId];
         if (ratingOpt == RatingOption.UPVOTE) {
             question.upvotes++;

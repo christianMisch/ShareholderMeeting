@@ -13,6 +13,8 @@ contract AGM {
     User[] public users;
     // for initializing the proposals
     Proposal[] public proposals;
+    // store options to every proposal
+    VotingOption[] public votingOptions;
     // stores user's address with corresponsing id
     mapping(address => uint) public userId;
     // total number of users
@@ -37,12 +39,17 @@ contract AGM {
         uint passedPercent;
         uint proposalDeadline;
         Vote[] votes;
-        mapping(address => bool) votesOnProposal;
+        mapping(address => bool) votedOnProposal;
     }
 
     struct Vote {
         address voterAddress;
         string voterDecision;
+    }
+
+    struct VotingOption {
+        string optionName;
+        uint optionCount;
     }
 
     modifier onlyOwner {
@@ -53,10 +60,11 @@ contract AGM {
     event UserCreated(uint userId, address userAddress, bool isDirector);
     event UserRemoved(uint userId, address userAddress, bool isDirector);
     event ProposalCreated(uint propId, address creator);
+    event Voted(address userAddress, uint proposalId, string votingOption);
 
     // transfer contract ownership to another director
     function transferOwnership(address _owner) onlyOwner public {
-        require(users[userId[_owner]].isDirector, "the new owner is not a director");
+        require(users[userId[_owner]].isDirector(), "the new owner is not a director");
         owner = _owner;
     }
 
@@ -68,9 +76,7 @@ contract AGM {
         string _meetingDate,
         string _meetingPlace,
         uint _meetingStartTime,
-        uint _meetingEndTime,
-        bool _isMeetingFinished) public {
-        
+        uint _meetingEndTime) public {
         
         minimumVotingQuorum = _minimumVotingQuorum;
         marginOfVotesForMajority = _marginOfVotesForMajority;
@@ -80,7 +86,6 @@ contract AGM {
         meetingPlace = _meetingPlace;
         meetingStartTime = _meetingStartTime;
         meetingEndTime = _meetingEndTime;
-        isMeetingFinished = _isMeetingFinished;
     }
 
     function addUser(address _userAddress, bool isDirector) public {
@@ -133,7 +138,7 @@ contract AGM {
     }
 
     // only director is allowed to create a proposal
-    function createProposal(string _name, string _description, byte[] _options, uint _proposalDeadline) 
+    function createProposal(string _name, string _description, string[] _options, uint _proposalDeadline) 
         onlyOwner internal returns (uint proposalId) {
 
         proposalId = proposals.length++;
@@ -157,19 +162,30 @@ contract AGM {
 
         require(!prop.finished && now > prop.proposalDeadline);
 
-        mapping(string => uint) optionCount;
-
+        
+        // iterate over all options to store default options in the map
         for (uint k = 0; k < options.length; k++) {
+            uint id = votingOptions.length++;
+            votingOptions[id] = VotingOption({optionName: options[k], optionCount: 0});
+
+            // iterate over all votes to check which voter voted for option k
             for (uint i = 0; i < prop.votes.length; i++) {
-            
+                
                 Vote storage v = prop.votes[i];
                 if (keccak256(v.voterDecision) == keccak256(options[k])) {
-                    optionCount[k]++; 
+                    votingOptions[k].optionCount++; 
                 } 
             }
         }
-
-        (winningOptionCount, countSum) = getWinningOption(optionCount, options);
+        uint winningOptionCount = 0;
+        uint countSum = 0;
+        
+        for (uint j = 0; j < votingOptions.length; j++) {
+            countSum += votingOptions[j].optionCount;
+            if (winningOptionCount < votingOptions[j].optionCount) {
+                winningOptionCount = votingOptions[j].optionCount;
+            }
+        }
 
         if (winningOptionCount > minimumVotingQuorum 
             && (winningOptionCount * 100 / countSum) > marginOfVotesForMajority) {
@@ -180,22 +196,6 @@ contract AGM {
 
         prop.passedPercent = winningOptionCount * 100 / countSum;
         prop.finished = true;
-
-    }
-
-    function getWinningOption(mapping(string => uint) optionCount, string[] options) public returns (
-        uint winningOptionCount, 
-        uint countSum) {
-
-        winningOptionCount = 0;
-        countSum = 0;
-        for (uint i = 0; i < options.length; i++) {
-            countSum += optionCount[options[i]];
-            if (winningOption < optionCount[options[i]]) {
-                winningOption = optionCount[options[i]];
-            }
-        }
-
 
     }
 
@@ -212,4 +212,30 @@ contract AGM {
         }
     }
 
+    function voteOnProposal(address userAddress, uint proposalId, string votingOption) public returns(uint voteId) {
+        Proposal storage prop = proposals[proposalId];
+        
+        require(!prop.votedOnProposal[msg.sender], "The shareholder already voted");
+        
+        voteId = prop.votes.length++;
+        prop.votes[voteId] = Vote({voterAddress: userAddress, voterDecision: votingOption});
+        prop.votedOnProposal[msg.sender] = true;
+        
+        emit Voted(userAddress, proposalId, votingOption);
+    }
+
 }
+
+/*for (uint k = 0; k < options.length; k++) {
+            uint id = optionCount[proposalId].length++;
+            optionCount[proposalId][id] = VotingOption({optionName: options[k], optionCount: 0});
+
+            // iterate over all votes to check which voter voted for option k
+            for (uint i = 0; i < prop.votes.length; i++) {
+                
+                Vote storage v = prop.votes[i];
+                if (keccak256(v.voterDecision) == keccak256(options[k])) {
+                    optionCount[proposalId][k].optionCount++; 
+                } 
+            }
+        }*/ 

@@ -28,8 +28,9 @@ contract Director is User {
     function createAnswer(uint _questionId, address _answerCreator, string _content) 
         onlyDirector public returns (uint answerId)  {
 
-        answerId = answers.length++;
-        Answer storage answer = answers[answerId];
+        uint id = answers.length++;
+        Answer storage answer = answers[id];
+        answer.answerId = id;
         answer.questionId = _questionId;
         answer.answerCreator = _answerCreator;
         answer.content = _content;
