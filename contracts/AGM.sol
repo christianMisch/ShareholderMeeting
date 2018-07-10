@@ -4,20 +4,15 @@ import "./User.sol";
 import "./Director.sol";
 import "./Shareholder.sol";
 import "./VotingStatistic.sol";
+import "./Voter.sol";
 //import "github.com/Arachnid/solidity-stringutils/strings.sol";
 
-contract AGM {
+contract AGM is Voter, User {
 
     // owner of the contract initializes the AGM
     address public owner;
-    // access to all users
-    User[] public users;
-    // for initializing the proposals
-    Proposal[] public proposals;
     // store options to every proposal
     VotingOption[] public votingOptions;
-    // stores user's address with corresponsing id
-    mapping(address => uint) public userId;
     // total number of users
     uint public numberOfUsers;
 
@@ -30,23 +25,6 @@ contract AGM {
     string public meetingPlace;
     uint public meetingStartTime;
     uint public meetingEndTime;
-
-    struct Proposal {
-        string name;
-        string description;
-        string[] options;
-        bool finished;
-        bool proposalPassed;
-        uint passedPercent;
-        uint voteCount;
-        Vote[] votes;
-        mapping(address => bool) votedOnProposal;
-    }
-
-    struct Vote {
-        address voterAddress;
-        string voterDecision;
-    }
 
     struct VotingOption {
         string optionName;
@@ -62,12 +40,6 @@ contract AGM {
     event UserRemoved(uint userId, address userAddress, bool isDirector);
     event ProposalCreated(uint propId, address creator);
     event Voted(address userAddress, uint proposalId, string votingOption);
-
-    // transfer contract ownership to another director
-    function transferOwnership(address _owner) onlyOwner public {
-        require(users[userId[_owner]].isDirector(), "the new owner is not a director");
-        owner = _owner;
-    }
 
     constructor(
         uint _minimumVotingQuorum,
@@ -89,7 +61,13 @@ contract AGM {
         meetingEndTime = _meetingEndTime;
     }
 
-    function addUser(address _userAddress, bool isDirector) public {
+    // transfer contract ownership to another director
+    function transferOwnership(address _owner) onlyOwner public {
+        require(users[userId[_owner]].isDirector(), "the new owner is not a director");
+        owner = _owner;
+    }
+
+    function addUser(address _userAddress, bool isDirector, uint _votingTokens) public {
         uint id = userId[_userAddress];
         if (id == 0) {
             userId[_userAddress] = users.length++;
@@ -100,7 +78,7 @@ contract AGM {
             users[id] = new Director({userAddress: _userAddress});
             emit UserCreated(id, _userAddress, true);
         } else {
-            users[id] = new Shareholder({userAddress: _userAddress});
+            users[id] = new Shareholder({userAddress: _userAddress, votingTokens: _votingTokens});
             emit UserCreated(id, _userAddress, false);
         }
     }
@@ -134,7 +112,7 @@ contract AGM {
         isFinished = true;
     }
 
-    function announceAGM() onlyOwner public returns(string recordDate, string recordPlace) {
+    function announceAGM() onlyOwner public view returns(string recordDate, string recordPlace) {
         return (meetingDate, meetingPlace);
     }
 
@@ -213,22 +191,6 @@ contract AGM {
             //statistic.proposalPercentage(proposalId) = proposals[i].passedPercent;
             //statistic.updateVotingPower();
         }
-    }
-
-    function voteOnProposal(address userAddress, uint proposalId, string votingOption) public returns(uint voteId) {
-        Proposal storage prop = proposals[proposalId];
-        
-        require(!prop.votedOnProposal[msg.sender], "The shareholder already voted");
-        
-        voteId = prop.votes.length++;
-        prop.votes[voteId] = Vote({voterAddress: userAddress, voterDecision: votingOption});
-        prop.votedOnProposal[msg.sender] = true;
-        
-        emit Voted(userAddress, proposalId, votingOption);
-    }
-
-    function userExists(address userAddress) public returns (bool exists) {
-        return userId[userAddress] != 0;
     }
 }
 
