@@ -1,0 +1,1906 @@
+{
+  "contractName": "Voter",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "proposals",
+      "outputs": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "description",
+          "type": "string"
+        },
+        {
+          "name": "finished",
+          "type": "bool"
+        },
+        {
+          "name": "proposalPassed",
+          "type": "bool"
+        },
+        {
+          "name": "passedPercent",
+          "type": "uint256"
+        },
+        {
+          "name": "voteCount",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "name": "getProposalIdByName",
+      "outputs": [
+        {
+          "name": "proposalId",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b506104ef806100206000396000f30060806040526004361061004c576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168063013cf08b14610051578063c505e83614610187575b600080fd5b34801561005d57600080fd5b5061007c60048036038101908080359060200190929190505050610204565b6040518080602001806020018715151515815260200186151515158152602001858152602001848152602001838103835289818151815260200191508051906020019080838360005b838110156100e05780820151818401526020810190506100c5565b50505050905090810190601f16801561010d5780820380516001836020036101000a031916815260200191505b50838103825288818151815260200191508051906020019080838360005b8381101561014657808201518184015260208101905061012b565b50505050905090810190601f1680156101735780820380516001836020036101000a031916815260200191505b509850505050505050505060405180910390f35b34801561019357600080fd5b506101ee600480360381019080803590602001908201803590602001908080601f0160208091040260200160405190810160405280939291908181526020018383808284378201915050505050509192919290505050610399565b6040518082815260200191505060405180910390f35b60008181548110151561021357fe5b9060005260206000209060080201600091509050806000018054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156102bf5780601f10610294576101008083540402835291602001916102bf565b820191906000526020600020905b8154815290600101906020018083116102a257829003601f168201915b505050505090806001018054600181600116156101000203166002900480601f01602080910402602001604051908101604052809291908181526020018280546001816001161561010002031660029004801561035d5780601f106103325761010080835404028352916020019161035d565b820191906000526020600020905b81548152906001019060200180831161034057829003601f168201915b5050505050908060030160009054906101000a900460ff16908060030160019054906101000a900460ff16908060040154908060050154905086565b600080600090505b6000805490508110156104bc576000818154811015156103bd57fe5b906000526020600020906008020160000160405180828054600181600116156101000203166002900480156104295780601f10610407576101008083540402835291820191610429565b820191906000526020600020905b815481529060010190602001808311610415575b5050915050604051809103902060001916836040518082805190602001908083835b602083101515610470578051825260208201915060208101905060208303925061044b565b6001836020036101000a03801982511681845116808217855250505050505090500191505060405180910390206000191614156104af578091506104bd565b80806001019150506103a1565b5b509190505600a165627a7a7230582070fc83ad0536cc72267e7d691b1d11f95d588a99e849fabdaedeb655826988700029",
+  "deployedBytecode": "0x60806040526004361061004c576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168063013cf08b14610051578063c505e83614610187575b600080fd5b34801561005d57600080fd5b5061007c60048036038101908080359060200190929190505050610204565b6040518080602001806020018715151515815260200186151515158152602001858152602001848152602001838103835289818151815260200191508051906020019080838360005b838110156100e05780820151818401526020810190506100c5565b50505050905090810190601f16801561010d5780820380516001836020036101000a031916815260200191505b50838103825288818151815260200191508051906020019080838360005b8381101561014657808201518184015260208101905061012b565b50505050905090810190601f1680156101735780820380516001836020036101000a031916815260200191505b509850505050505050505060405180910390f35b34801561019357600080fd5b506101ee600480360381019080803590602001908201803590602001908080601f0160208091040260200160405190810160405280939291908181526020018383808284378201915050505050509192919290505050610399565b6040518082815260200191505060405180910390f35b60008181548110151561021357fe5b9060005260206000209060080201600091509050806000018054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156102bf5780601f10610294576101008083540402835291602001916102bf565b820191906000526020600020905b8154815290600101906020018083116102a257829003601f168201915b505050505090806001018054600181600116156101000203166002900480601f01602080910402602001604051908101604052809291908181526020018280546001816001161561010002031660029004801561035d5780601f106103325761010080835404028352916020019161035d565b820191906000526020600020905b81548152906001019060200180831161034057829003601f168201915b5050505050908060030160009054906101000a900460ff16908060030160019054906101000a900460ff16908060040154908060050154905086565b600080600090505b6000805490508110156104bc576000818154811015156103bd57fe5b906000526020600020906008020160000160405180828054600181600116156101000203166002900480156104295780601f10610407576101008083540402835291820191610429565b820191906000526020600020905b815481529060010190602001808311610415575b5050915050604051809103902060001916836040518082805190602001908083835b602083101515610470578051825260208201915060208101905060208303925061044b565b6001836020036101000a03801982511681845116808217855250505050505090500191505060405180910390206000191614156104af578091506104bd565b80806001019150506103a1565b5b509190505600a165627a7a7230582070fc83ad0536cc72267e7d691b1d11f95d588a99e849fabdaedeb655826988700029",
+  "sourceMap": "28:756:5:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;28:756:5;;;;;;;",
+  "deployedSourceMap": "28:756:5:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;52:27;;8:9:-1;5:2;;;30:1;27;20:12;5:2;52:27:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;52:27:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;99:1;94:3;90:11;84:18;80:1;75:3;71:11;64:39;52:2;49:1;45:10;40:15;;8:100;;;12:14;52:27:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;518:263;;8:9:-1;5:2;;;30:1;27;20:12;5:2;518:263:5;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;52:27;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o;518:263::-;580:15;613:6;622:1;613:10;;608:166;629:9;:16;;;;625:1;:20;608:166;;;700:9;710:1;700:12;;;;;;;;;;;;;;;;;;;;:17;;690:28;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;671:47;;;681:4;671:15;;;;;;;;;;;;;36:153:-1;66:2;61:3;58:11;51:19;36:153;;;182:3;176:10;171:3;164:23;98:2;93:3;89:12;82:19;;123:2;118:3;114:12;107:19;;148:2;143:3;139:12;132:19;;36:153;;;274:1;267:3;263:2;259:12;254:3;250:22;246:30;315:4;311:9;305:3;299:10;295:26;356:4;350:3;344:10;340:21;389:7;380;377:20;372:3;365:33;3:399;;;671:15:5;;;;;;;;;;;;;;;;:47;;;;667:96;;;746:1;739:8;;;;667:96;647:3;;;;;;;608:166;;;518:263;;;;;:::o",
+  "source": "pragma solidity ^0.4.23;\r\n\r\ncontract Voter {\r\n\r\n    Proposal[] public proposals;\r\n    mapping(address => uint) votingTokens;\r\n    \r\n    struct Proposal {\r\n        string name;\r\n        string description;\r\n        string[] options;\r\n        bool finished;\r\n        bool proposalPassed;\r\n        uint passedPercent;\r\n        uint voteCount;\r\n        Vote[] votes;\r\n        mapping(address => bool) votedOnProposal;\r\n    }\r\n\r\n    struct Vote {\r\n        address voterAddress;\r\n        string voterDecision;\r\n    }\r\n\r\n    function getProposalIdByName(string name) public view returns(uint proposalId) {\r\n        for (uint i = 0; i < proposals.length; i++) {\r\n            if (keccak256(name) == keccak256(proposals[i].name)) {\r\n                return i;\r\n            }\r\n        }\r\n    }\r\n}",
+  "sourcePath": "D:\\Git\\repo\\ShareholderMeeting\\solidity\\contracts\\Voter.sol",
+  "ast": {
+    "absolutePath": "/D/Git/repo/ShareholderMeeting/solidity/contracts/Voter.sol",
+    "exportedSymbols": {
+      "Voter": [
+        1284
+      ]
+    },
+    "id": 1285,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1213,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:5"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 1284,
+        "linearizedBaseContracts": [
+          1284
+        ],
+        "name": "Voter",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 1216,
+            "name": "proposals",
+            "nodeType": "VariableDeclaration",
+            "scope": 1284,
+            "src": "52:27:5",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_array$_t_struct$_Proposal_$1243_storage_$dyn_storage",
+              "typeString": "struct Voter.Proposal[]"
+            },
+            "typeName": {
+              "baseType": {
+                "contractScope": null,
+                "id": 1214,
+                "name": "Proposal",
+                "nodeType": "UserDefinedTypeName",
+                "referencedDeclaration": 1243,
+                "src": "52:8:5",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Proposal_$1243_storage_ptr",
+                  "typeString": "struct Voter.Proposal"
+                }
+              },
+              "id": 1215,
+              "length": null,
+              "nodeType": "ArrayTypeName",
+              "src": "52:10:5",
+              "typeDescriptions": {
+                "typeIdentifier": "t_array$_t_struct$_Proposal_$1243_storage_$dyn_storage_ptr",
+                "typeString": "struct Voter.Proposal[]"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 1220,
+            "name": "votingTokens",
+            "nodeType": "VariableDeclaration",
+            "scope": 1284,
+            "src": "86:37:5",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+              "typeString": "mapping(address => uint256)"
+            },
+            "typeName": {
+              "id": 1219,
+              "keyType": {
+                "id": 1217,
+                "name": "address",
+                "nodeType": "ElementaryTypeName",
+                "src": "94:7:5",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "86:24:5",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                "typeString": "mapping(address => uint256)"
+              },
+              "valueType": {
+                "id": 1218,
+                "name": "uint",
+                "nodeType": "ElementaryTypeName",
+                "src": "105:4:5",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                }
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "canonicalName": "Voter.Proposal",
+            "id": 1243,
+            "members": [
+              {
+                "constant": false,
+                "id": 1222,
+                "name": "name",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "163:11:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1221,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "163:6:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1224,
+                "name": "description",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "185:18:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1223,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "185:6:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1227,
+                "name": "options",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "214:16:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_string_storage_$dyn_storage_ptr",
+                  "typeString": "string[]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "id": 1225,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "214:6:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "id": 1226,
+                  "length": null,
+                  "nodeType": "ArrayTypeName",
+                  "src": "214:8:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_string_storage_$dyn_storage_ptr",
+                    "typeString": "string[]"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1229,
+                "name": "finished",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "241:13:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 1228,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "241:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1231,
+                "name": "proposalPassed",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "265:19:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 1230,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "265:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1233,
+                "name": "passedPercent",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "295:18:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 1232,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "295:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1235,
+                "name": "voteCount",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "324:14:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 1234,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "324:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1238,
+                "name": "votes",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "349:12:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_struct$_Vote_$1248_storage_$dyn_storage_ptr",
+                  "typeString": "struct Voter.Vote[]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "contractScope": null,
+                    "id": 1236,
+                    "name": "Vote",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 1248,
+                    "src": "349:4:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Vote_$1248_storage_ptr",
+                      "typeString": "struct Voter.Vote"
+                    }
+                  },
+                  "id": 1237,
+                  "length": null,
+                  "nodeType": "ArrayTypeName",
+                  "src": "349:6:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_struct$_Vote_$1248_storage_$dyn_storage_ptr",
+                    "typeString": "struct Voter.Vote[]"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1242,
+                "name": "votedOnProposal",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "372:40:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                  "typeString": "mapping(address => bool)"
+                },
+                "typeName": {
+                  "id": 1241,
+                  "keyType": {
+                    "id": 1239,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "380:7:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "372:24:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                    "typeString": "mapping(address => bool)"
+                  },
+                  "valueType": {
+                    "id": 1240,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "391:4:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Proposal",
+            "nodeType": "StructDefinition",
+            "scope": 1284,
+            "src": "136:284:5",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "Voter.Vote",
+            "id": 1248,
+            "members": [
+              {
+                "constant": false,
+                "id": 1245,
+                "name": "voterAddress",
+                "nodeType": "VariableDeclaration",
+                "scope": 1248,
+                "src": "451:20:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 1244,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "451:7:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1247,
+                "name": "voterDecision",
+                "nodeType": "VariableDeclaration",
+                "scope": 1248,
+                "src": "482:20:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1246,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "482:6:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Vote",
+            "nodeType": "StructDefinition",
+            "scope": 1284,
+            "src": "428:82:5",
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1282,
+              "nodeType": "Block",
+              "src": "597:184:5",
+              "statements": [
+                {
+                  "body": {
+                    "id": 1280,
+                    "nodeType": "Block",
+                    "src": "652:122:5",
+                    "statements": [
+                      {
+                        "condition": {
+                          "argumentTypes": null,
+                          "commonType": {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          },
+                          "id": 1275,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftExpression": {
+                            "argumentTypes": null,
+                            "arguments": [
+                              {
+                                "argumentTypes": null,
+                                "id": 1267,
+                                "name": "name",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1250,
+                                "src": "681:4:5",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_string_memory_ptr",
+                                  "typeString": "string memory"
+                                }
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_string_memory_ptr",
+                                  "typeString": "string memory"
+                                }
+                              ],
+                              "id": 1266,
+                              "name": "keccak256",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 1371,
+                              "src": "671:9:5",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_function_sha3_pure$__$returns$_t_bytes32_$",
+                                "typeString": "function () pure returns (bytes32)"
+                              }
+                            },
+                            "id": 1268,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "kind": "functionCall",
+                            "lValueRequested": false,
+                            "names": [],
+                            "nodeType": "FunctionCall",
+                            "src": "671:15:5",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            }
+                          },
+                          "nodeType": "BinaryOperation",
+                          "operator": "==",
+                          "rightExpression": {
+                            "argumentTypes": null,
+                            "arguments": [
+                              {
+                                "argumentTypes": null,
+                                "expression": {
+                                  "argumentTypes": null,
+                                  "baseExpression": {
+                                    "argumentTypes": null,
+                                    "id": 1270,
+                                    "name": "proposals",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 1216,
+                                    "src": "700:9:5",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_array$_t_struct$_Proposal_$1243_storage_$dyn_storage",
+                                      "typeString": "struct Voter.Proposal storage ref[] storage ref"
+                                    }
+                                  },
+                                  "id": 1272,
+                                  "indexExpression": {
+                                    "argumentTypes": null,
+                                    "id": 1271,
+                                    "name": "i",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 1256,
+                                    "src": "710:1:5",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_uint256",
+                                      "typeString": "uint256"
+                                    }
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "nodeType": "IndexAccess",
+                                  "src": "700:12:5",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_struct$_Proposal_$1243_storage",
+                                    "typeString": "struct Voter.Proposal storage ref"
+                                  }
+                                },
+                                "id": 1273,
+                                "isConstant": false,
+                                "isLValue": true,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "memberName": "name",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 1222,
+                                "src": "700:17:5",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_string_storage",
+                                  "typeString": "string storage ref"
+                                }
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_string_storage",
+                                  "typeString": "string storage ref"
+                                }
+                              ],
+                              "id": 1269,
+                              "name": "keccak256",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 1371,
+                              "src": "690:9:5",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_function_sha3_pure$__$returns$_t_bytes32_$",
+                                "typeString": "function () pure returns (bytes32)"
+                              }
+                            },
+                            "id": 1274,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "kind": "functionCall",
+                            "lValueRequested": false,
+                            "names": [],
+                            "nodeType": "FunctionCall",
+                            "src": "690:28:5",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            }
+                          },
+                          "src": "671:47:5",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          }
+                        },
+                        "falseBody": null,
+                        "id": 1279,
+                        "nodeType": "IfStatement",
+                        "src": "667:96:5",
+                        "trueBody": {
+                          "id": 1278,
+                          "nodeType": "Block",
+                          "src": "720:43:5",
+                          "statements": [
+                            {
+                              "expression": {
+                                "argumentTypes": null,
+                                "id": 1276,
+                                "name": "i",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1256,
+                                "src": "746:1:5",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "functionReturnParameters": 1254,
+                              "id": 1277,
+                              "nodeType": "Return",
+                              "src": "739:8:5"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "condition": {
+                    "argumentTypes": null,
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 1262,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "argumentTypes": null,
+                      "id": 1259,
+                      "name": "i",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1256,
+                      "src": "625:1:5",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "<",
+                    "rightExpression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 1260,
+                        "name": "proposals",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1216,
+                        "src": "629:9:5",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_struct$_Proposal_$1243_storage_$dyn_storage",
+                          "typeString": "struct Voter.Proposal storage ref[] storage ref"
+                        }
+                      },
+                      "id": 1261,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "length",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": null,
+                      "src": "629:16:5",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "625:20:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 1281,
+                  "initializationExpression": {
+                    "assignments": [
+                      1256
+                    ],
+                    "declarations": [
+                      {
+                        "constant": false,
+                        "id": 1256,
+                        "name": "i",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 1283,
+                        "src": "613:6:5",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "typeName": {
+                          "id": 1255,
+                          "name": "uint",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "613:4:5",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "id": 1258,
+                    "initialValue": {
+                      "argumentTypes": null,
+                      "hexValue": "30",
+                      "id": 1257,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "622:1:5",
+                      "subdenomination": null,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_0_by_1",
+                        "typeString": "int_const 0"
+                      },
+                      "value": "0"
+                    },
+                    "nodeType": "VariableDeclarationStatement",
+                    "src": "613:10:5"
+                  },
+                  "loopExpression": {
+                    "expression": {
+                      "argumentTypes": null,
+                      "id": 1264,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "UnaryOperation",
+                      "operator": "++",
+                      "prefix": false,
+                      "src": "647:3:5",
+                      "subExpression": {
+                        "argumentTypes": null,
+                        "id": 1263,
+                        "name": "i",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1256,
+                        "src": "647:1:5",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 1265,
+                    "nodeType": "ExpressionStatement",
+                    "src": "647:3:5"
+                  },
+                  "nodeType": "ForStatement",
+                  "src": "608:166:5"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 1283,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "getProposalIdByName",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1251,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1250,
+                  "name": "name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1283,
+                  "src": "547:11:5",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 1249,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "547:6:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "546:13:5"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1254,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1253,
+                  "name": "proposalId",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1283,
+                  "src": "580:15:5",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1252,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "580:4:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "579:17:5"
+            },
+            "scope": 1284,
+            "src": "518:263:5",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 1285,
+        "src": "28:756:5"
+      }
+    ],
+    "src": "0:784:5"
+  },
+  "legacyAST": {
+    "absolutePath": "/D/Git/repo/ShareholderMeeting/solidity/contracts/Voter.sol",
+    "exportedSymbols": {
+      "Voter": [
+        1284
+      ]
+    },
+    "id": 1285,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1213,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:5"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 1284,
+        "linearizedBaseContracts": [
+          1284
+        ],
+        "name": "Voter",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 1216,
+            "name": "proposals",
+            "nodeType": "VariableDeclaration",
+            "scope": 1284,
+            "src": "52:27:5",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_array$_t_struct$_Proposal_$1243_storage_$dyn_storage",
+              "typeString": "struct Voter.Proposal[]"
+            },
+            "typeName": {
+              "baseType": {
+                "contractScope": null,
+                "id": 1214,
+                "name": "Proposal",
+                "nodeType": "UserDefinedTypeName",
+                "referencedDeclaration": 1243,
+                "src": "52:8:5",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_struct$_Proposal_$1243_storage_ptr",
+                  "typeString": "struct Voter.Proposal"
+                }
+              },
+              "id": 1215,
+              "length": null,
+              "nodeType": "ArrayTypeName",
+              "src": "52:10:5",
+              "typeDescriptions": {
+                "typeIdentifier": "t_array$_t_struct$_Proposal_$1243_storage_$dyn_storage_ptr",
+                "typeString": "struct Voter.Proposal[]"
+              }
+            },
+            "value": null,
+            "visibility": "public"
+          },
+          {
+            "constant": false,
+            "id": 1220,
+            "name": "votingTokens",
+            "nodeType": "VariableDeclaration",
+            "scope": 1284,
+            "src": "86:37:5",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+              "typeString": "mapping(address => uint256)"
+            },
+            "typeName": {
+              "id": 1219,
+              "keyType": {
+                "id": 1217,
+                "name": "address",
+                "nodeType": "ElementaryTypeName",
+                "src": "94:7:5",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "86:24:5",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                "typeString": "mapping(address => uint256)"
+              },
+              "valueType": {
+                "id": 1218,
+                "name": "uint",
+                "nodeType": "ElementaryTypeName",
+                "src": "105:4:5",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                }
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "canonicalName": "Voter.Proposal",
+            "id": 1243,
+            "members": [
+              {
+                "constant": false,
+                "id": 1222,
+                "name": "name",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "163:11:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1221,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "163:6:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1224,
+                "name": "description",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "185:18:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1223,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "185:6:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1227,
+                "name": "options",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "214:16:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_string_storage_$dyn_storage_ptr",
+                  "typeString": "string[]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "id": 1225,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "214:6:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "id": 1226,
+                  "length": null,
+                  "nodeType": "ArrayTypeName",
+                  "src": "214:8:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_string_storage_$dyn_storage_ptr",
+                    "typeString": "string[]"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1229,
+                "name": "finished",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "241:13:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 1228,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "241:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1231,
+                "name": "proposalPassed",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "265:19:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 1230,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "265:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1233,
+                "name": "passedPercent",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "295:18:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 1232,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "295:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1235,
+                "name": "voteCount",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "324:14:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 1234,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "324:4:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1238,
+                "name": "votes",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "349:12:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_struct$_Vote_$1248_storage_$dyn_storage_ptr",
+                  "typeString": "struct Voter.Vote[]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "contractScope": null,
+                    "id": 1236,
+                    "name": "Vote",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 1248,
+                    "src": "349:4:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Vote_$1248_storage_ptr",
+                      "typeString": "struct Voter.Vote"
+                    }
+                  },
+                  "id": 1237,
+                  "length": null,
+                  "nodeType": "ArrayTypeName",
+                  "src": "349:6:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_struct$_Vote_$1248_storage_$dyn_storage_ptr",
+                    "typeString": "struct Voter.Vote[]"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1242,
+                "name": "votedOnProposal",
+                "nodeType": "VariableDeclaration",
+                "scope": 1243,
+                "src": "372:40:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                  "typeString": "mapping(address => bool)"
+                },
+                "typeName": {
+                  "id": 1241,
+                  "keyType": {
+                    "id": 1239,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "380:7:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "372:24:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                    "typeString": "mapping(address => bool)"
+                  },
+                  "valueType": {
+                    "id": 1240,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "391:4:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Proposal",
+            "nodeType": "StructDefinition",
+            "scope": 1284,
+            "src": "136:284:5",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "Voter.Vote",
+            "id": 1248,
+            "members": [
+              {
+                "constant": false,
+                "id": 1245,
+                "name": "voterAddress",
+                "nodeType": "VariableDeclaration",
+                "scope": 1248,
+                "src": "451:20:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 1244,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "451:7:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1247,
+                "name": "voterDecision",
+                "nodeType": "VariableDeclaration",
+                "scope": 1248,
+                "src": "482:20:5",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1246,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "482:6:5",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Vote",
+            "nodeType": "StructDefinition",
+            "scope": 1284,
+            "src": "428:82:5",
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1282,
+              "nodeType": "Block",
+              "src": "597:184:5",
+              "statements": [
+                {
+                  "body": {
+                    "id": 1280,
+                    "nodeType": "Block",
+                    "src": "652:122:5",
+                    "statements": [
+                      {
+                        "condition": {
+                          "argumentTypes": null,
+                          "commonType": {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          },
+                          "id": 1275,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftExpression": {
+                            "argumentTypes": null,
+                            "arguments": [
+                              {
+                                "argumentTypes": null,
+                                "id": 1267,
+                                "name": "name",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1250,
+                                "src": "681:4:5",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_string_memory_ptr",
+                                  "typeString": "string memory"
+                                }
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_string_memory_ptr",
+                                  "typeString": "string memory"
+                                }
+                              ],
+                              "id": 1266,
+                              "name": "keccak256",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 1371,
+                              "src": "671:9:5",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_function_sha3_pure$__$returns$_t_bytes32_$",
+                                "typeString": "function () pure returns (bytes32)"
+                              }
+                            },
+                            "id": 1268,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "kind": "functionCall",
+                            "lValueRequested": false,
+                            "names": [],
+                            "nodeType": "FunctionCall",
+                            "src": "671:15:5",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            }
+                          },
+                          "nodeType": "BinaryOperation",
+                          "operator": "==",
+                          "rightExpression": {
+                            "argumentTypes": null,
+                            "arguments": [
+                              {
+                                "argumentTypes": null,
+                                "expression": {
+                                  "argumentTypes": null,
+                                  "baseExpression": {
+                                    "argumentTypes": null,
+                                    "id": 1270,
+                                    "name": "proposals",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 1216,
+                                    "src": "700:9:5",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_array$_t_struct$_Proposal_$1243_storage_$dyn_storage",
+                                      "typeString": "struct Voter.Proposal storage ref[] storage ref"
+                                    }
+                                  },
+                                  "id": 1272,
+                                  "indexExpression": {
+                                    "argumentTypes": null,
+                                    "id": 1271,
+                                    "name": "i",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 1256,
+                                    "src": "710:1:5",
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_uint256",
+                                      "typeString": "uint256"
+                                    }
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "nodeType": "IndexAccess",
+                                  "src": "700:12:5",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_struct$_Proposal_$1243_storage",
+                                    "typeString": "struct Voter.Proposal storage ref"
+                                  }
+                                },
+                                "id": 1273,
+                                "isConstant": false,
+                                "isLValue": true,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "memberName": "name",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 1222,
+                                "src": "700:17:5",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_string_storage",
+                                  "typeString": "string storage ref"
+                                }
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_string_storage",
+                                  "typeString": "string storage ref"
+                                }
+                              ],
+                              "id": 1269,
+                              "name": "keccak256",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 1371,
+                              "src": "690:9:5",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_function_sha3_pure$__$returns$_t_bytes32_$",
+                                "typeString": "function () pure returns (bytes32)"
+                              }
+                            },
+                            "id": 1274,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "kind": "functionCall",
+                            "lValueRequested": false,
+                            "names": [],
+                            "nodeType": "FunctionCall",
+                            "src": "690:28:5",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            }
+                          },
+                          "src": "671:47:5",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          }
+                        },
+                        "falseBody": null,
+                        "id": 1279,
+                        "nodeType": "IfStatement",
+                        "src": "667:96:5",
+                        "trueBody": {
+                          "id": 1278,
+                          "nodeType": "Block",
+                          "src": "720:43:5",
+                          "statements": [
+                            {
+                              "expression": {
+                                "argumentTypes": null,
+                                "id": 1276,
+                                "name": "i",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 1256,
+                                "src": "746:1:5",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "functionReturnParameters": 1254,
+                              "id": 1277,
+                              "nodeType": "Return",
+                              "src": "739:8:5"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "condition": {
+                    "argumentTypes": null,
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 1262,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "argumentTypes": null,
+                      "id": 1259,
+                      "name": "i",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 1256,
+                      "src": "625:1:5",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "<",
+                    "rightExpression": {
+                      "argumentTypes": null,
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 1260,
+                        "name": "proposals",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1216,
+                        "src": "629:9:5",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_struct$_Proposal_$1243_storage_$dyn_storage",
+                          "typeString": "struct Voter.Proposal storage ref[] storage ref"
+                        }
+                      },
+                      "id": 1261,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "length",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": null,
+                      "src": "629:16:5",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "625:20:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 1281,
+                  "initializationExpression": {
+                    "assignments": [
+                      1256
+                    ],
+                    "declarations": [
+                      {
+                        "constant": false,
+                        "id": 1256,
+                        "name": "i",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 1283,
+                        "src": "613:6:5",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "typeName": {
+                          "id": 1255,
+                          "name": "uint",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "613:4:5",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "id": 1258,
+                    "initialValue": {
+                      "argumentTypes": null,
+                      "hexValue": "30",
+                      "id": 1257,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "622:1:5",
+                      "subdenomination": null,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_0_by_1",
+                        "typeString": "int_const 0"
+                      },
+                      "value": "0"
+                    },
+                    "nodeType": "VariableDeclarationStatement",
+                    "src": "613:10:5"
+                  },
+                  "loopExpression": {
+                    "expression": {
+                      "argumentTypes": null,
+                      "id": 1264,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "UnaryOperation",
+                      "operator": "++",
+                      "prefix": false,
+                      "src": "647:3:5",
+                      "subExpression": {
+                        "argumentTypes": null,
+                        "id": 1263,
+                        "name": "i",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 1256,
+                        "src": "647:1:5",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 1265,
+                    "nodeType": "ExpressionStatement",
+                    "src": "647:3:5"
+                  },
+                  "nodeType": "ForStatement",
+                  "src": "608:166:5"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 1283,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "getProposalIdByName",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1251,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1250,
+                  "name": "name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1283,
+                  "src": "547:11:5",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 1249,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "547:6:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "546:13:5"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1254,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1253,
+                  "name": "proposalId",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1283,
+                  "src": "580:15:5",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 1252,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "580:4:5",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "579:17:5"
+            },
+            "scope": 1284,
+            "src": "518:263:5",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 1285,
+        "src": "28:756:5"
+      }
+    ],
+    "src": "0:784:5"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.23+commit.124ca40d.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.0",
+  "updatedAt": "2018-07-12T10:36:59.927Z"
+}
