@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>AGM</title>
+        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    </head>
+    <body>
+        <header>
+            <h1>Annual General Meeting 2018</h1>
+            <p>User: 0xasdfjaslkdjfasfkasdgksgkj</p>
+            <p>Role: Director</p>
+            <form id="login-form">
+                <label id="password-label">
+                    Enter your Participant ID: <input type="password" id="password">
+                </label>
+                <input type="button" value="login" id="login-button">
+            </form>
+            
+        </header>
+        <div class="wrapper">
+            <!-- Sidebar -->
+            <nav id="sidebar">
+                <div class="sidebar-header">
+                    <h3>AGM features</h3>
+                </div>
+        
+                <ul class="list-unstyled components">
+                    <li class="active">
+                        <a href="#home">Home</a>
+                    </li>
+                    <li>
+                        <a href="#voting">Voting</a>
+                    </li>
+                    <li>
+                        <a href="#Q&A">Q&A</a>
+                    </li>
+                    <li>
+                        <a href="#list">Q&A List</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="container">
+            <main class="row">
+                <!--Hier kommt der Template-Inhalt-->
+            </main>
+        </div>
+
+        <template id="home-template">
+            <p>The 1st Annual General Meeting takes place in the ICC in Berlin at 3pm on 31st of august!</p>
+            <p>You will receive your the AGM id for participating in a seperate email. If you did not get the email 
+                please write an email to our service: serviceAGM@gmail.com
+            </p>
+            <p>Here you find a list of the AGM material: </p>
+            <ul>
+                <li>Annual report from 2017</li>
+                <li>AGM agenda</li>
+            </ul>
+        </template>
+
+        <template id="voting-template">
+            <h2>Voting</h2>
+        </template>
+
+        <template id="Q&A-template">
+            <h2>Q&A</h2>
+        </template>
+
+        <template id="Q&A-list-template">
+           <h2>Q&A list</h2> 
+        </template>
+       
+        <footer>
+
+        </footer>
+        <noscript>
+            JavaScript is required to run this app.
+        </noscript>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+    </body>
+</html>
