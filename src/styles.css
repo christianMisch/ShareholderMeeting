@@ -8,12 +8,16 @@ h1 {
     text-align: center;
 }
 
-#login-form {
-    float: right;
-}
-
 header p {
     display: inline;
+}
+
+#login-form {
+    display: inline;
+}
+
+#login-form label {
+    text-align: right;
 }
 
 body {
@@ -42,12 +46,12 @@ a, a:hover, a:focus {
 }
 
 #sidebar .sidebar-header {
-    padding: 20px;
     background: #6d7fcc;
+    margin: 0;
 }
 
 #sidebar ul.components {
-    padding: 20px 0;
+    /*padding: 20px 0;*/
     border-bottom: 1px solid #47748b;
 }
 
@@ -64,4 +68,16 @@ a, a:hover, a:focus {
 #sidebar ul li.active > a {
     color: white;
     background: orange;
+}
+
+article, div {
+    border: 1px solid black;
+}
+
+textarea {
+    display: block;
+}
+
+input[type="reset"], input[type="submit"] {
+    margin-top: 10px;
 }
