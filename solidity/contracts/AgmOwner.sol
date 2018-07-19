@@ -5,7 +5,7 @@ import "./Director.sol";
 import "./Shareholder.sol";
 import "./VotingStatistic.sol";
 import "./Voter.sol";
-//import "github.com/Arachnid/solidity-stringutils/strings.sol";
+import "github.com/Arachnid/solidity-stringutils/strings.sol";
 
 contract AgmOwner is Voter, User {
 
@@ -96,16 +96,6 @@ contract AgmOwner is Voter, User {
         users.length--;
 
         emit UserRemoved(i, _userAddress, remUser.isDirector());
-    }
-
-    // convert the shareholder registry in a list of authorized users
-    function initializeUserAccess(string registry) internal {
-        //string[] parts = registry.split(";");
-        for (uint i = 0; i < users.length; i++) {
-            
-            addUser(users[i].userAddress(), users[i].isDirector(), 0);
-            votingTokens[users[i]] = 0;
-        }
     }
 
     function finishAGM() onlyOwner public {

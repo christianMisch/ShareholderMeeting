@@ -29,4 +29,8 @@ contract Voter {
             }
         }
     }
+
+    function getVotingTokensOfVoter(address userAddress) public view returns(uint votTokens) {
+        return userAddress.balance;
+    }
 }

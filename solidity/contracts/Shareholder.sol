@@ -6,7 +6,7 @@ import "./Voter.sol";
 
 contract Shareholder is User, Voter {
 
-    address delegate;
+    address public delegate;
 
     //mapping(address => Delegate[]) delegations;
     Question[] public questions;
@@ -47,6 +47,7 @@ contract Shareholder is User, Voter {
         Proposal storage prop = proposals[proposalId];
         
         require(!prop.votedOnProposal[msg.sender], "The shareholder already voted");
+        require(delegate == address(0), "Proxy is not allowed to vote");
 
         uint voteId = prop.votes.length++;
         prop.votes[voteId] = Vote({voterAddress: userAddress, voterDecision: votingOption});
@@ -78,9 +79,19 @@ contract Shareholder is User, Voter {
         }
     }
 
+    function denominateVotingTokens() public view {
+
+    }
+
+    function getVoterWeight(address userAddress) public returns(uint weight) {
+        // get only shareholders 
+        // for loop to sum up all the balances of shareholders who delegated to userAddress
+        // sum up the own balance of the userAddress if he did not vote
+    }
+
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
     function delegateToProxy(address proxyAddress, uint _votingTokens, bool partialDelegation) public {
-        require(votingTokens[msg.sender] >= _votingTokens);
+        require(votingTokens[msg.sender] >= _votingTokens, "Sender does not own enough voting tokens");
         require(proxyAddress != msg.sender, "Self-delegation is not allowed");
         require(userExists(proxyAddress), "Proxy is not a registered user");
         require(userExists(msg.sender), "the user account is not registered");
@@ -88,11 +99,10 @@ contract Shareholder is User, Voter {
         // partial voting, delegate a part of his token to multiple proxies
         // so far it's simple delegation: only whole number of voting token can be delegated to one proxy
 
-        delegate = proxyAddress;
-       
-        
-        
+        delegate = proxyAddress;   
     }
+
+
 }
 
 
