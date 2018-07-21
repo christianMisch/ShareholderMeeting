@@ -5,7 +5,6 @@ import "./Director.sol";
 import "./Shareholder.sol";
 import "./VotingStatistic.sol";
 import "./Voter.sol";
-import "github.com/Arachnid/solidity-stringutils/strings.sol";
 
 contract AgmOwner is Voter, User {
 
@@ -108,11 +107,12 @@ contract AgmOwner is Voter, User {
     }
 
     // only director is allowed to create a proposal
-    function createProposal(string _name, string _description, string[] _options, uint _proposalDeadline) 
-        onlyOwner internal returns (uint proposalId) {
+    function createProposal(string _name, string _description, string[] _options) 
+        onlyOwner internal {
 
-        proposalId = proposals.length++;
-        Proposal storage proposal = proposals[proposalId];
+        uint propId = proposals.length++;
+        Proposal storage proposal = proposals[propId];
+        proposal.proposalId = propId;
         proposal.name = _name;
         proposal.description = _description;
         proposal.options = _options;
@@ -121,7 +121,7 @@ contract AgmOwner is Voter, User {
         proposal.passedPercent = 0;
         proposal.voteCount = 0;
         
-        emit ProposalCreated(proposalId, msg.sender);
+        emit ProposalCreated(propId, msg.sender);
     }
 
     // executes the pending proposal
@@ -174,13 +174,13 @@ contract AgmOwner is Voter, User {
         VotingStatistic statistic = new VotingStatistic();
 
         for (uint j = 0; j < users.length; j++) {
-            statistic.updateVotingPower(users[j].userAddress(), votingTokens[msg.sender]);
-            //statistic.setTotalVotingPower(statistic.getTotalVotingPower() += users[j].weight);
+            statistic.updateVotingPower(users[j].userAddress(), votingTokens[users[j].userAddress()]);
+            uint totalVotPow = statistic.getTotalVotingPower();
+            statistic.setTotalVotingPower(totalVotPow + votingTokens[users[j].userAddress()]);
         }
         for (uint i = 0; i < proposals.length; i++) {
-            //statistic.passedProposal[proposals[i].proposalId] = proposals[i].proposalPassed;
-            //statistic.proposalPercentage(proposalId) = proposals[i].passedPercent;
-            //statistic.updateVotingPower();
+            statistic.updatePassedProposal(proposals[i].proposalId, proposals[i].proposalPassed);
+            statistic.updateProposalPercentage(proposalId, proposals[i].passedPercent);
         }
     }
 }

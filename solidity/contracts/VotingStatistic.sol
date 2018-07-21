@@ -29,7 +29,7 @@ contract VotingStatistic {
         totalVotingPower = newTotalVP;
     }
 
-    function getTotalVotingPower() public returns (uint totalVP) {
+    function getTotalVotingPower() public view returns (uint totalVP) {
         return totalVotingPower;
     }
 

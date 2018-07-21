@@ -2,17 +2,19 @@ pragma solidity ^0.4.23;
 
 contract User {
 
-    // access to all users
+    // stores all users
     User[] public users;
     // stores user's address with corresponding id
     mapping(address => uint) public userId;
 
     address public userAddress;
     bool public isDirector;
+    bool public hasVoted;
 
     constructor(address _userAddress, bool _isDirector) public {
         userAddress = _userAddress;
         isDirector = _isDirector;
+        hasVoted = false;
     }
 
     function userExists(address _userAddress) public view returns (bool exists) {

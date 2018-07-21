@@ -10,6 +10,7 @@ contract Shareholder is User, Voter {
 
     //mapping(address => Delegate[]) delegations;
     Question[] public questions;
+    Shareholder[] public shareholders;
 
     enum RatingOption {UPVOTE, DOWNVOTE}
 
@@ -55,7 +56,7 @@ contract Shareholder is User, Voter {
         emit Voted(userAddress, proposalId, votingOption);
     }
 
-    function createQuestion(uint questionId, address _creator, string _content) public returns (uint id) {
+    function createQuestion(address _creator, string _content) public returns (uint id) {
         id = questions.length++;
         Question storage question = questions[id];
         question.questionId = id;
@@ -79,14 +80,33 @@ contract Shareholder is User, Voter {
         }
     }
 
-    function denominateVotingTokens() public view {
+    /*function denominateVotingTokens() public view {
 
+    }*/
+
+    function getVoterWeight(address _userAddress) public view returns(uint weight) {
+        weight = 0;
+        for (uint i = 0; i < shareholders.length; i++) {
+            if (shareholders[i].delegate() == _userAddress) {
+                weight += votingTokens[shareholders[i].userAddress()];
+            }
+
+            if (shareholders[i].userAddress() == _userAddress && shareholders[i].delegate() == address(0)) {
+                weight += votingTokens[_userAddress];
+            }
+        }     
     }
 
-    function getVoterWeight(address userAddress) public returns(uint weight) {
-        // get only shareholders 
-        // for loop to sum up all the balances of shareholders who delegated to userAddress
-        // sum up the own balance of the userAddress if he did not vote
+    function isShareholder(address _userAddress) public view returns (bool isSharehold) {
+        return !users[userId[_userAddress]].isDirector(); 
+    }
+
+    function getShareholderList() internal returns (Shareholder[]) {  
+        for (uint i = 0; i < users.length; i++) {
+            if (isShareholder(users[i].userAddress())) {
+                shareholders.push(Shareholder(users[i]));
+            }
+        }
     }
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
@@ -98,6 +118,11 @@ contract Shareholder is User, Voter {
         require(delegate == address(0), "user already has delegated to another proxy");
         // partial voting, delegate a part of his token to multiple proxies
         // so far it's simple delegation: only whole number of voting token can be delegated to one proxy
+
+        // subtract tokens from sender and add them to proxy
+        uint tokens = votingTokens[msg.sender];
+        votingTokens[msg.sender] = 0;
+        votingTokens[proxyAddress] += tokens;
 
         delegate = proxyAddress;   
     }

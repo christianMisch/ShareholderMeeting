@@ -6,6 +6,7 @@ contract Voter {
     mapping(address => uint) votingTokens;
     
     struct Proposal {
+        uint proposalId;
         string name;
         string description;
         string[] options;
@@ -31,6 +32,6 @@ contract Voter {
     }
 
     function getVotingTokensOfVoter(address userAddress) public view returns(uint votTokens) {
-        return userAddress.balance;
+        return votingTokens[userAddress];
     }
 }
