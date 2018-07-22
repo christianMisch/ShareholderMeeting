@@ -32,7 +32,7 @@ contract Director is User {
 
     // only director is allowed to create an answer
     function createAnswer(uint _questionId, address _answerCreator, string _content) 
-        onlyDirector public returns (uint answerId)  {
+        onlyDirector private returns (uint answerId)  {
 
         uint id = answers.length++;
         Answer storage answer = answers[id];

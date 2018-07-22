@@ -9,15 +9,20 @@ contract User {
 
     address public userAddress;
     bool public isDirector;
-    bool public hasVoted;
 
-    constructor(address _userAddress, bool _isDirector) public {
+    event UserExists(bool exists);
+
+    constructor(address _userAddress, bool _isDirector) internal {
         userAddress = _userAddress;
         isDirector = _isDirector;
-        hasVoted = false;
     }
 
-    function userExists(address _userAddress) public view returns (bool exists) {
-        return userId[_userAddress] != 0;
+    function userExists(address _userAddress) internal returns (bool exists) {
+        exists = userId[_userAddress] != 0;
+
+        emit UserExists(exists); 
+        return exists;
+
+
     }
 }

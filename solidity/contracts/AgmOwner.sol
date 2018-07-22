@@ -39,6 +39,9 @@ contract AgmOwner is Voter, User {
     event UserRemoved(uint userId, address userAddress, bool isDirector);
     event ProposalCreated(uint propId, address creator);
     event Voted(address userAddress, uint proposalId, string votingOption);
+    event AgmFinished(bool isFinished);
+    event ProposalExecuted(uint proposalId, bool proposalPassed, uint passedPercentage, VotingOption[] options);
+    event OwnershipTransferedTo(address newOwner);
 
     constructor(
         uint _minimumVotingQuorum,
@@ -61,12 +64,14 @@ contract AgmOwner is Voter, User {
     }
 
     // transfer contract ownership to another director
-    function transferOwnership(address _owner) onlyOwner public {
+    function transferOwnership(address _owner) onlyOwner private {
         require(users[userId[_owner]].isDirector(), "the new owner is not a director");
         owner = _owner;
+
+        emit OwnershipTransferedTo(_owner);
     }
 
-    function addUser(address _userAddress, bool isDirector, uint votingTok) public {
+    function addUser(address _userAddress, bool isDirector, uint votingTok) private {
         uint id = userId[_userAddress];
         if (id == 0) {
             userId[_userAddress] = users.length++;
@@ -82,7 +87,7 @@ contract AgmOwner is Voter, User {
         }
     }
 
-    function removeUser(address _userAddress) public {
+    function removeUser(address _userAddress) private {
         require(userId[_userAddress] != 0, "User does not exist");
 
         uint i = userId[_userAddress];
@@ -97,18 +102,21 @@ contract AgmOwner is Voter, User {
         emit UserRemoved(i, _userAddress, remUser.isDirector());
     }
 
-    function finishAGM() onlyOwner public {
+    function finishAGM() onlyOwner private {
         require(!isFinished, "AGM has already been finished");
         isFinished = true;
+
+        emit AgmFinished(isFinished);
+
     }
 
-    function announceAGM() onlyOwner public view returns(string recordDate, string recordPlace) {
+    function announceAGM() onlyOwner private view returns(string recordDate, string recordPlace) {
         return (meetingDate, meetingPlace);
     }
 
     // only director is allowed to create a proposal
     function createProposal(string _name, string _description, string[] _options) 
-        onlyOwner internal {
+        onlyOwner private {
 
         uint propId = proposals.length++;
         Proposal storage proposal = proposals[propId];
@@ -116,7 +124,6 @@ contract AgmOwner is Voter, User {
         proposal.name = _name;
         proposal.description = _description;
         proposal.options = _options;
-        proposal.finished = false;
         proposal.proposalPassed = false;
         proposal.passedPercent = 0;
         proposal.voteCount = 0;
@@ -125,12 +132,12 @@ contract AgmOwner is Voter, User {
     }
 
     // executes the pending proposal
-    function executeProposal(uint proposalId) public {
+    function executeProposal(uint proposalId) private {
         
         Proposal storage prop = proposals[proposalId];
         string[] storage options = proposals[proposalId].options;
 
-        require(!prop.finished);
+        require(now > meetingEndTime, "meeting has not finished yet");
 
         
         // iterate over all options to store default options in the map
@@ -165,12 +172,14 @@ contract AgmOwner is Voter, User {
         }
 
         prop.passedPercent = winningOptionCount * 100 / countSum;
-        prop.finished = true;
+
         delete votingOptions;
+
+        emit ProposalExecuted(proposalId, prop.proposalPassed, prop.passedPercent, votingOptions);
 
     }
 
-    function calculateVotingStatistic(uint proposalId) public {
+    function calculateVotingStatistic(uint proposalId) private {
         VotingStatistic statistic = new VotingStatistic();
 
         for (uint j = 0; j < users.length; j++) {

@@ -23,10 +23,10 @@ contract Shareholder is User, Voter {
         uint downvotes;
     }
 
-    struct Delegate {
+    /*struct Delegate {
         address proxy;
         uint votingTok;
-    }
+    }*/
 
     modifier onlyShareholder {
         require(votingTokens[msg.sender] > 0);
@@ -42,9 +42,12 @@ contract Shareholder is User, Voter {
     event InvalidRatingOption(address invoker);
     event QuestionUpvote(address invoker, uint numUpvotes);
     event QuestionDownvote(address invoker, uint numDownvotes);
+    event QuestionCreated(uint questionId, address creator);
     event Voted(address invoker, uint proposalId, string votingOption);
+    event VoterWeight(address userAddress, uint weight);
+    event DelegatedFrom(address sender, uint votingTokens, address proxy);
 
-    function vote(address userAddress, uint proposalId, string votingOption) public {
+    function vote(address userAddress, uint proposalId, string votingOption) private {
         Proposal storage prop = proposals[proposalId];
         
         require(!prop.votedOnProposal[msg.sender], "The shareholder already voted");
@@ -53,10 +56,11 @@ contract Shareholder is User, Voter {
         uint voteId = prop.votes.length++;
         prop.votes[voteId] = Vote({voterAddress: userAddress, voterDecision: votingOption});
         prop.votedOnProposal[msg.sender] = true;    
+        
         emit Voted(userAddress, proposalId, votingOption);
     }
 
-    function createQuestion(address _creator, string _content) public returns (uint id) {
+    function createQuestion(address _creator, string _content) private returns (uint id) {
         id = questions.length++;
         Question storage question = questions[id];
         question.questionId = id;
@@ -65,9 +69,11 @@ contract Shareholder is User, Voter {
         question.timestamp = now;
         question.upvotes = 0;
         question.downvotes = 0;
+
+        emit QuestionCreated(id, _creator);
     }
 
-    function rateQuestion(uint questionId, RatingOption ratingOpt) public {
+    function rateQuestion(uint questionId, RatingOption ratingOpt) private {
         Question storage question = questions[questionId];
         if (ratingOpt == RatingOption.UPVOTE) {
             question.upvotes++;
@@ -84,7 +90,7 @@ contract Shareholder is User, Voter {
 
     }*/
 
-    function getVoterWeight(address _userAddress) public view returns(uint weight) {
+    function getVoterWeight(address _userAddress) private returns(uint weight) {
         weight = 0;
         for (uint i = 0; i < shareholders.length; i++) {
             if (shareholders[i].delegate() == _userAddress) {
@@ -94,14 +100,16 @@ contract Shareholder is User, Voter {
             if (shareholders[i].userAddress() == _userAddress && shareholders[i].delegate() == address(0)) {
                 weight += votingTokens[_userAddress];
             }
-        }     
+        }
+
+        emit VoterWeight(_userAddress, weight);     
     }
 
     function isShareholder(address _userAddress) public view returns (bool isSharehold) {
         return !users[userId[_userAddress]].isDirector(); 
     }
 
-    function getShareholderList() internal returns (Shareholder[]) {  
+    function getShareholderList() public returns (Shareholder[]) {  
         for (uint i = 0; i < users.length; i++) {
             if (isShareholder(users[i].userAddress())) {
                 shareholders.push(Shareholder(users[i]));
@@ -110,8 +118,8 @@ contract Shareholder is User, Voter {
     }
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
-    function delegateToProxy(address proxyAddress, uint _votingTokens, bool partialDelegation) public {
-        require(votingTokens[msg.sender] >= _votingTokens, "Sender does not own enough voting tokens");
+    function delegateToProxy(address proxyAddress, bool partialDelegation) private {
+        require(votingTokens[msg.sender] > 0, "Sender does not own enough voting tokens");
         require(proxyAddress != msg.sender, "Self-delegation is not allowed");
         require(userExists(proxyAddress), "Proxy is not a registered user");
         require(userExists(msg.sender), "the user account is not registered");
@@ -124,7 +132,9 @@ contract Shareholder is User, Voter {
         votingTokens[msg.sender] = 0;
         votingTokens[proxyAddress] += tokens;
 
-        delegate = proxyAddress;   
+        delegate = proxyAddress; 
+
+        emit DelegatedFrom(msg.sender, tokens, proxyAddress);  
     }
 
 
