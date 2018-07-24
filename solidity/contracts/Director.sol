@@ -31,14 +31,14 @@ contract Director is User {
     }
 
     // only director is allowed to create an answer
-    function createAnswer(uint _questionId, address _answerCreator, string _content) 
-        onlyDirector private returns (uint answerId)  {
+    function createAnswer(uint _questionId, string _content) 
+        onlyDirector public returns (uint answerId)  {
 
         uint id = answers.length++;
         Answer storage answer = answers[id];
         answer.answerId = id;
         answer.questionId = _questionId;
-        answer.answerCreator = _answerCreator;
+        answer.answerCreator = msg.sender;
         answer.content = _content;
         answer.timestamp = now;
 

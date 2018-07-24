@@ -35,7 +35,8 @@ contract Shareholder is User, Voter {
 
     constructor(address userAddress, uint _votingTokens) 
         User(userAddress, false) public {
-            
+        
+        votingTokens[userAddress] = _votingTokens;
         delegate = address(0);
     }
     
