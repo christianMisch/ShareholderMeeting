@@ -1,5 +1,5 @@
 const AgmOwner = artifacts.require('./AgmOwner.sol');
-const AgmOwnerDeployer = require('./utils/AgmOwnerDeployer')(AgmOwner);
+const AgmOwnerDeployer = require('./utils/AgmOwnerDeployer.js')(AgmOwner);
 
 const should = require('should');
 const expect = require('expect');

@@ -5,7 +5,6 @@ import "./Director.sol";
 import "./Shareholder.sol";
 import "./VotingStatistic.sol";
 import "./Voter.sol";
-//import "github.com/Arachnid/solidity-stringutils/strings.sol";
 
 contract AgmOwner is Voter, User {
 
@@ -40,6 +39,9 @@ contract AgmOwner is Voter, User {
     event UserRemoved(uint userId, address userAddress, bool isDirector);
     event ProposalCreated(uint propId, address creator);
     event Voted(address userAddress, uint proposalId, string votingOption);
+    event AgmFinished(bool isFinished);
+    event ProposalExecuted(uint proposalId, bool proposalPassed, uint passedPercentage, VotingOption[] options);
+    event OwnershipTransferedTo(address newOwner);
 
     constructor(
         uint _minimumVotingQuorum,
@@ -62,12 +64,14 @@ contract AgmOwner is Voter, User {
     }
 
     // transfer contract ownership to another director
-    function transferOwnership(address _owner) onlyOwner public {
+    function transferOwnership(address _owner) onlyOwner private {
         require(users[userId[_owner]].isDirector(), "the new owner is not a director");
         owner = _owner;
+
+        emit OwnershipTransferedTo(_owner);
     }
 
-    function addUser(address _userAddress, bool isDirector, uint votingTok) public {
+    function addUser(address _userAddress, bool isDirector, uint votingTok) private {
         uint id = userId[_userAddress];
         if (id == 0) {
             userId[_userAddress] = users.length++;
@@ -83,7 +87,7 @@ contract AgmOwner is Voter, User {
         }
     }
 
-    function removeUser(address _userAddress) public {
+    function removeUser(address _userAddress) private {
         require(userId[_userAddress] != 0, "User does not exist");
 
         uint i = userId[_userAddress];
@@ -98,49 +102,42 @@ contract AgmOwner is Voter, User {
         emit UserRemoved(i, _userAddress, remUser.isDirector());
     }
 
-    // convert the shareholder registry in a list of authorized users
-    function initializeUserAccess(string registry) internal {
-        //string[] parts = registry.split(";");
-        for (uint i = 0; i < users.length; i++) {
-            
-            addUser(users[i].userAddress(), users[i].isDirector(), 0);
-            votingTokens[users[i]] = 0;
-        }
-    }
-
-    function finishAGM() onlyOwner public {
+    function finishAGM() onlyOwner private {
         require(!isFinished, "AGM has already been finished");
         isFinished = true;
+
+        emit AgmFinished(isFinished);
+
     }
 
-    function announceAGM() onlyOwner public view returns(string recordDate, string recordPlace) {
+    function announceAGM() onlyOwner private view returns(string recordDate, string recordPlace) {
         return (meetingDate, meetingPlace);
     }
 
     // only director is allowed to create a proposal
-    function createProposal(string _name, string _description, string[] _options, uint _proposalDeadline) 
-        onlyOwner internal returns (uint proposalId) {
+    function createProposal(string _name, string _description, string[] _options) 
+        onlyOwner private {
 
-        proposalId = proposals.length++;
-        Proposal storage proposal = proposals[proposalId];
+        uint propId = proposals.length++;
+        Proposal storage proposal = proposals[propId];
+        proposal.proposalId = propId;
         proposal.name = _name;
         proposal.description = _description;
         proposal.options = _options;
-        proposal.finished = false;
         proposal.proposalPassed = false;
         proposal.passedPercent = 0;
         proposal.voteCount = 0;
         
-        emit ProposalCreated(proposalId, msg.sender);
+        emit ProposalCreated(propId, msg.sender);
     }
 
     // executes the pending proposal
-    function executeProposal(uint proposalId) public {
+    function executeProposal(uint proposalId) private {
         
         Proposal storage prop = proposals[proposalId];
         string[] storage options = proposals[proposalId].options;
 
-        require(!prop.finished);
+        require(now > meetingEndTime, "meeting has not finished yet");
 
         
         // iterate over all options to store default options in the map
@@ -175,36 +172,24 @@ contract AgmOwner is Voter, User {
         }
 
         prop.passedPercent = winningOptionCount * 100 / countSum;
-        prop.finished = true;
+
         delete votingOptions;
+
+        emit ProposalExecuted(proposalId, prop.proposalPassed, prop.passedPercent, votingOptions);
 
     }
 
-    function calculateVotingStatistic(uint proposalId) public {
+    function calculateVotingStatistic(uint proposalId) private {
         VotingStatistic statistic = new VotingStatistic();
 
         for (uint j = 0; j < users.length; j++) {
-            statistic.updateVotingPower(users[j].userAddress(), votingTokens[msg.sender]);
-            //statistic.setTotalVotingPower(statistic.getTotalVotingPower() += users[j].weight);
+            statistic.updateVotingPower(users[j].userAddress(), votingTokens[users[j].userAddress()]);
+            uint totalVotPow = statistic.getTotalVotingPower();
+            statistic.setTotalVotingPower(totalVotPow + votingTokens[users[j].userAddress()]);
         }
         for (uint i = 0; i < proposals.length; i++) {
-            //statistic.passedProposal[proposals[i].proposalId] = proposals[i].proposalPassed;
-            //statistic.proposalPercentage(proposalId) = proposals[i].passedPercent;
-            //statistic.updateVotingPower();
+            statistic.updatePassedProposal(proposals[i].proposalId, proposals[i].proposalPassed);
+            statistic.updateProposalPercentage(proposalId, proposals[i].passedPercent);
         }
     }
 }
-
-/*for (uint k = 0; k < options.length; k++) {
-            uint id = optionCount[proposalId].length++;
-            optionCount[proposalId][id] = VotingOption({optionName: options[k], optionCount: 0});
-
-            // iterate over all votes to check which voter voted for option k
-            for (uint i = 0; i < prop.votes.length; i++) {
-                
-                Vote storage v = prop.votes[i];
-                if (keccak256(v.voterDecision) == keccak256(options[k])) {
-                    optionCount[proposalId][k].optionCount++; 
-                } 
-            }
-        }*/ 
