@@ -32,7 +32,7 @@ contract Director is User {
 
     // only director is allowed to create an answer
     function createAnswer(uint _questionId, string _content) 
-        onlyDirector public returns (uint answerId)  {
+        /*onlyDirector*/ public returns (uint answerId)  {
 
         uint id = answers.length++;
         Answer storage answer = answers[id];
@@ -43,5 +43,9 @@ contract Director is User {
         answer.timestamp = now;
 
         emit AnswerCreated(answerId, msg.sender);
+    }
+
+    function getNumOfAnswers() public view returns (uint length) {
+        return answers.length;
     }
 }

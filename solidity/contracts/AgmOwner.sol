@@ -148,10 +148,10 @@ contract AgmOwner is Voter, User {
             // iterate over all votes to check which voter voted for option k
             for (uint i = 0; i < prop.votes.length; i++) {
                 
-                Vote storage v = prop.votes[i];
+                /*Vote storage v = prop.votes[i];
                 if (keccak256(v.voterDecision) == keccak256(options[k])) {
                     votingOptions[k].optionCount++; 
-                } 
+                } */
             }
         }
         uint winningOptionCount = 0;
