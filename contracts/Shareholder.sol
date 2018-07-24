@@ -1,15 +1,18 @@
 pragma solidity ^0.4.23;
 
 import "./User.sol";
+import "./AGM.sol";
+import "./Voter.sol";
 
-contract Shareholder is User {
+contract Shareholder is User, Voter {
 
-    Proposal[] public proposals;
+    address public delegate;
+    //bool public hasVoted;
+    uint public votingTokens;
+
     Question[] public questions;
 
-    uint public propIndex;
-    address public delegate;
-    bool public hasVoted;
+    enum RatingOption {UPVOTE, DOWNVOTE}
 
     struct Question {
         address creator;
@@ -20,45 +23,47 @@ contract Shareholder is User {
         uint downvotes;
     }
 
-    constructor(string userName, string userPassword, address userAddress, bool isAuthorized,
-    uint weight, address _delegate) User(userName, userPassword, userAddress, isAuthorized, weight) public {
-            
-        delegate = _delegate;
-        hasVoted = false;
+    modifier onlyShareholder {
+        require(!this.isDirector());
+        _;
+    }
 
+    constructor(address userAddress, uint _votingTokens) 
+        User(userAddress, false) public {
+            
+        delegate = address(0);
+        //hasVoted = false;
+        votingTokens = _votingTokens;
     }
     
-    enum RatingOption {UPVOTE, DOWNVOTE}
-
     event InvalidRatingOption(address invoker);
     event QuestionUpvote(address invoker, uint numUpvotes);
     event QuestionDownvote(address invoker, uint numDownvotes);
+    event Voted(address invoker, uint proposalId, string votingOption);
 
-    function vote(address userAddress, uint proposalId) /*meetingPending(meeting)*/ public {
-        //Shareholder voter = shareholders[msg.sender];
-        //Proposal prop = proposals[proposalId];
-        //require(!prop.votesOnProposal[msg.sender], "Already voted");
-        //prop.votesOnProposal[msg.sender] = true;
-        //voter.propIndex = proposalId;
-        //proposals[proposalId].voteCount += voter.weight;
+    function vote(address userAddress, uint proposalId, string votingOption) public {
+        Proposal storage prop = proposals[proposalId];
+        
+        require(!prop.votedOnProposal[msg.sender], "The shareholder already voted");
+
+        uint voteId = prop.votes.length++;
+        prop.votes[voteId] = Vote({voterAddress: userAddress, voterDecision: votingOption});
+        prop.votedOnProposal[msg.sender] = true;    
+        emit Voted(userAddress, proposalId, votingOption);
     }
 
-    function createQuestion(uint questionId, address _creator, string _content) /*meetingPending(meeting)*/ public returns (uint quesId) {
-        Question storage question = questions[questionId];
-        question.questionId = questions.length++;
+    function createQuestion(uint questionId, address _creator, string _content) public returns (uint id) {
+        id = questions.length++;
+        Question storage question = questions[id];
+        question.questionId = id;
         question.creator = _creator;
         question.content = _content;
         question.timestamp = now;
         question.upvotes = 0;
         question.downvotes = 0;
-
-        questions.push(question);
-
-        return question.questionId;
-
     }
 
-    function rateQuestion(uint questionId, RatingOption ratingOpt) /*meetingPending(meeting)*/ public {
+    function rateQuestion(uint questionId, RatingOption ratingOpt) public {
         Question storage question = questions[questionId];
         if (ratingOpt == RatingOption.UPVOTE) {
             question.upvotes++;
@@ -71,47 +76,23 @@ contract Shareholder is User {
         }
     }
 
-    /*function getProposalById(uint proposalId) public returns (Proposal prop) {
-        for (uint i = 0; i < proposals.length; i++) {
-            if (proposals[i].proposalId == proposalId) {
-                prop = proposals[i];
-                break;
-            }
-        }
-    }
-
-    function getQuestionById(uint questionId) public returns (Question ques) {
-        for (uint i = 0; i < questions.length; i++) {
-            if (questions[i].questionId == questionId) {
-                ques = questions[i];
-                break;
-            }
-        }
-    }*/
-
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
-    /*function delegateToProxy(address proxyAddress) meetingPending(meeting) public {
-        Shareholder sender = shareholders[msg.sender];
+    function delegateToProxy(address proxyAddress, uint votingTokens) public {
+        Shareholder sender = Shareholder(users[userId[msg.sender]]);
+        //Shareholder proxy = Shareholder(users[userId[proxyAddress]]);
         
-        require(!shareholders[msg.sender].hasVoted, "The user has already voted");
+        //require(!users(userId(msg.sender)).hasVoted, "The user has already voted");
         require(proxyAddress != msg.sender, "Self-delegation is not allowed");
-
-        if (shareholders[proxyAddress] != address(0)) {
-            proxyAddress = shareholders[msg.sender].delegate;
-            require(proxyAddress != msg.sender);
-        }
-
-        sender.hasVoted = true;
-        sender.delegate = proxyAddress;
-        Shareholder delegate_ = shareholders[proxyAddress];
-
-        if (delegate_.hasVoted) {
-            proposals[delegate_.propIndex].voteCount += sender.weight;
-        } else {
-            delegate.weight += sender.weight;
-        }
-        	
-    }*/
+        require(userExists(proxyAddress), "Proxy is not a registered user");
+        require(userExists(msg.sender), "the user account is not registered");
+        require(delegate == address(0), "user already has delegated to another proxy");
+        // partial voting, delegate a part of his token to multiple proxies
+        // so far it's simple delegation: only whole number of voting token can be delegated to one proxy
+        //if (!proxy.hasVoted()) {
+        //sender.delegate = proxyAddress;
+        //proxy.weight() += sender.weight();	
+        //}
+    }
 }
 
 

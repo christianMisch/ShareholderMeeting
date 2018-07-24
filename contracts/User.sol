@@ -1,66 +1,21 @@
 pragma solidity ^0.4.23;
 
-import "./Shareholder.sol";
-import "./Director.sol";
-
 contract User {
 
-    mapping (address => Shareholder) shareholders;
+    // access to all users
+    User[] public users;
+    // stores user's address with corresponding id
+    mapping(address => uint) public userId;
 
-    uint userId;
-    string userName;    
-    string userPassword;
-    address userAddress;
-    bool public isAuthorized;
-    uint weight;
+    address public userAddress;
+    bool public isDirector;
 
-    struct Proposal {
-        uint proposalId;
-        string name;
-        string description;
-        byte[] options;
-        bool finished;
-        bool proposalPassed;
-        uint passedPercent;
-        uint voteCount;
-        Vote[] votes;
-        mapping(address => bool) votesOnProposal;
-    }
-
-    struct Vote {
-        address voterAddress;
-        string voterDecision;
-    }
-
-    constructor(string _userName, string _userPassword, address _userAddress, bool _isAuthorized, uint _weight) internal {
-        userName = _userName;
-        userPassword = _userPassword;
+    constructor(address _userAddress, bool _isDirector) public {
         userAddress = _userAddress;
-        isAuthorized = _isAuthorized;
-        weight = _weight;
+        isDirector = _isDirector;
     }
 
-    function login(address _userAddress, string _userPassword) public;
-
-    function logout(address _userAddress) public;
-
-    modifier authorizedUser(User user) {
-        require(user.isAuthorized());
-        _;
+    function userExists(address _userAddress) public view returns (bool exists) {
+        return userId[_userAddress] != 0;
     }
-
-    /*modifier meetingFinished(Meeting m) {
-        require(now > m.meetingEndTime);
-        _;
-    }
-
-    modifier meetingPending(Meeting m) {
-        require(now > m.meetingStartTime && now < m.meetingEndTime);
-        _;
-    }*/
-
-    /*modifier userExists(address userAddress) {
-
-    }*/
-    
 }
