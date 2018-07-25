@@ -5,9 +5,10 @@ import "./Director.sol";
 import "./Shareholder.sol";
 import "./VotingStatistic.sol";
 import "./Voter.sol";
+import "../lib/solidity-stringutils/src/strings.sol";
 
 contract AgmOwner is Voter, User {
-
+    using strings for *;
     // owner of the contract initializes the AGM
     address public owner;
     // store options to every proposal
@@ -64,14 +65,14 @@ contract AgmOwner is Voter, User {
     }
 
     // transfer contract ownership to another director
-    function transferOwnership(address _owner) onlyOwner private {
+    function transferOwnership(address _owner) onlyOwner public {
         require(users[userId[_owner]].isDirector(), "the new owner is not a director");
         owner = _owner;
 
         emit OwnershipTransferedTo(_owner);
     }
 
-    function addUser(address _userAddress, bool isDirector, uint votingTok) private {
+    function addUser(address _userAddress, bool isDirector, uint votingTok) public {
         uint id = userId[_userAddress];
         if (id == 0) {
             userId[_userAddress] = users.length++;
@@ -87,7 +88,7 @@ contract AgmOwner is Voter, User {
         }
     }
 
-    function removeUser(address _userAddress) private {
+    function removeUser(address _userAddress) public {
         require(userId[_userAddress] != 0, "User does not exist");
 
         uint i = userId[_userAddress];
@@ -102,7 +103,7 @@ contract AgmOwner is Voter, User {
         emit UserRemoved(i, _userAddress, remUser.isDirector());
     }
 
-    function finishAGM() onlyOwner private {
+    function finishAGM() onlyOwner public {
         require(!isFinished, "AGM has already been finished");
         isFinished = true;
 
@@ -110,13 +111,13 @@ contract AgmOwner is Voter, User {
 
     }
 
-    function announceAGM() onlyOwner private view returns(string recordDate, string recordPlace) {
+    function announceAGM() onlyOwner public view returns(string recordDate, string recordPlace) {
         return (meetingDate, meetingPlace);
     }
 
     // only director is allowed to create a proposal
-    function createProposal(string _name, string _description, string[] _options) 
-        onlyOwner private {
+    function createProposal(string _name, string _description, string _options) 
+        onlyOwner public {
 
         uint propId = proposals.length++;
         Proposal storage proposal = proposals[propId];
@@ -132,10 +133,15 @@ contract AgmOwner is Voter, User {
     }
 
     // executes the pending proposal
-    function executeProposal(uint proposalId) private {
+    function executeProposal(uint proposalId) public {
         
         Proposal storage prop = proposals[proposalId];
-        string[] storage options = proposals[proposalId].options;
+        var optionString = proposals[proposalId].options.toSlice();
+        var delim = ";".toSlice();
+        var options = new string[](optionString.count(delim) + 1);
+        for (uint l = 0; l < options.length; l++) {
+            options[l] = optionString.split(delim).toString();
+        }
 
         require(now > meetingEndTime, "meeting has not finished yet");
 
@@ -179,7 +185,7 @@ contract AgmOwner is Voter, User {
 
     }
 
-    function calculateVotingStatistic(uint proposalId) private {
+    function calculateVotingStatistic(uint proposalId) public {
         VotingStatistic statistic = new VotingStatistic();
 
         for (uint j = 0; j < users.length; j++) {

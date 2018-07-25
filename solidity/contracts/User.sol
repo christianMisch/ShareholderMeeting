@@ -12,7 +12,7 @@ contract User {
 
     event UserExists(bool exists);
 
-    constructor(address _userAddress, bool _isDirector) internal {
+    constructor(address _userAddress, bool _isDirector) public {
         userAddress = _userAddress;
         isDirector = _isDirector;
     }

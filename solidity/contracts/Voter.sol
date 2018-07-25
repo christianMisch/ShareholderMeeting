@@ -9,7 +9,7 @@ contract Voter {
         uint proposalId;
         string name;
         string description;
-        string[] options;
+        string options;
         bool proposalPassed;
         uint passedPercent;
         uint voteCount;
