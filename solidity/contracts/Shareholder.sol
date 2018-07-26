@@ -106,7 +106,7 @@ contract Shareholder is User, Voter {
         emit VoterWeight(_userAddress, weight);     
     }
 
-    function isShareholder(address _userAddress) public view returns (bool isSharehold) {
+    /*function isShareholder(address _userAddress) public view returns (bool isSharehold) {
         return !users[userId[_userAddress]].isDirector(); 
     }
 
@@ -116,14 +116,14 @@ contract Shareholder is User, Voter {
                 shareholders.push(Shareholder(users[i]));
             }
         }
-    }
+    }*/
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
     function delegateToProxy(address proxyAddress, bool partialDelegation) private {
         require(votingTokens[msg.sender] > 0, "Sender does not own enough voting tokens");
         require(proxyAddress != msg.sender, "Self-delegation is not allowed");
-        require(userExists(proxyAddress), "Proxy is not a registered user");
-        require(userExists(msg.sender), "the user account is not registered");
+        //require(userExists(proxyAddress), "Proxy is not a registered user");
+        //require(userExists(msg.sender), "the user account is not registered");
         require(delegate == address(0), "user already has delegated to another proxy");
         // partial voting, delegate a part of his token to multiple proxies
         // so far it's simple delegation: only whole number of voting token can be delegated to one proxy
