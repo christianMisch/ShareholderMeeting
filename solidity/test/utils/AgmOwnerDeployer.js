@@ -11,8 +11,9 @@ const defaultData = {
   
   
   module.exports = (AgmOwner) => {
-    return () => {
+    return (ownerAdr) => {
         const data = Object.assign({}, defaultData);
+        data.owner = ownerAdr;
         return AgmOwner.new(
           data.minimumVotingQuorum, 
           data.marginOfVotesForMajority, 

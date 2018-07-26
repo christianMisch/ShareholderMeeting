@@ -17,7 +17,7 @@ contract User {
         isDirector = _isDirector;
     }
 
-    function userExists(address _userAddress) internal returns (bool exists) {
+    function userExists(address _userAddress) public returns (bool exists) {
         exists = userId[_userAddress] != 0;
 
         emit UserExists(exists); 

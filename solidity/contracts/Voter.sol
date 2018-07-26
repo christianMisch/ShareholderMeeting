@@ -22,7 +22,7 @@ contract Voter {
         string voterDecision;
     }
 
-    function getProposalIdByName(string name) internal view returns(uint proposalId) {
+    function getProposalIdByName(string name) internal returns(uint proposalId) {
         for (uint i = 0; i < proposals.length; i++) {
             if (keccak256(name) == keccak256(proposals[i].name)) {
                 return i;
