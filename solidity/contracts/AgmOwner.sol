@@ -10,8 +10,8 @@ contract AgmOwner is User, Voter {
     VotingOption[] public votingOptions;
     // total number of users
     uint public numberOfUsers;
-
     bool public isFinished = false;
+
     uint public minimumVotingQuorum;
     uint public marginOfVotesForMajority;
     string public meetingName;
@@ -71,8 +71,8 @@ contract AgmOwner is User, Voter {
     function addUser(address _userAddress, bool isDirector, uint votingTok) public {
         uint id = userId[_userAddress];
         if (id == 0) {
-            userId[_userAddress] = users.length++;
             id = users.length++;
+            userId[_userAddress] = id;
         }
 
         if (isDirector) {
@@ -82,6 +82,7 @@ contract AgmOwner is User, Voter {
             users[id] = new Shareholder({userAddress: _userAddress, _votingTokens: votingTok});
             emit UserCreated(id, _userAddress, false);
         }
+        numberOfUsers++;
     }
 
     function removeUser(address _userAddress) public {
@@ -89,12 +90,14 @@ contract AgmOwner is User, Voter {
 
         uint i = userId[_userAddress];
         User remUser = users[i];
+        delete users[i];
 
-        for (; i < users.length; i++) {
+        for (; i < users.length - 1; i++) {
             users[i] = users[i+1];
         }
-        delete users[users.length - 1];
+        
         users.length--;
+        numberOfUsers--;
 
         emit UserRemoved(i, _userAddress, remUser.isDirector());
     }
@@ -111,7 +114,7 @@ contract AgmOwner is User, Voter {
 
     }
 
-    function announceAGM() onlyOwner public view returns(string recordDate, string recordPlace) {
+    function announceAGM() onlyOwner public view returns (string recordDate, string recordPlace) {
         return (meetingDate, meetingPlace);
     }
 

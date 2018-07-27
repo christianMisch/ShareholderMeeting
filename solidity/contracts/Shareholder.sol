@@ -61,20 +61,20 @@ contract Shareholder is User, Voter {
         emit Voted(userAddress, proposalId, votingOption);
     }
 
-    function createQuestion(address _creator, string _content) private returns (uint id) {
+    function createQuestion(string _content) public returns (uint id) {
         id = questions.length++;
         Question storage question = questions[id];
         question.questionId = id;
-        question.creator = _creator;
+        question.creator = msg.sender;
         question.content = _content;
         question.timestamp = now;
         question.upvotes = 0;
         question.downvotes = 0;
 
-        emit QuestionCreated(id, _creator);
+        emit QuestionCreated(id, msg.sender);
     }
 
-    function rateQuestion(uint questionId, RatingOption ratingOpt) private {
+    function rateQuestion(uint questionId, RatingOption ratingOpt) public {
         Question storage question = questions[questionId];
         if (ratingOpt == RatingOption.UPVOTE) {
             question.upvotes++;
@@ -87,11 +87,28 @@ contract Shareholder is User, Voter {
         }
     }
 
+    function getNumOfQuestions() public view returns (uint length) {
+        return questions.length;
+    }
+
+    function getQuestion(uint questionId) public view returns (
+        address _creator,
+        uint _questionId,
+        string _content,
+        uint _timestamp,
+        uint _upvotes,
+        uint _downvotes
+    ) {
+        Question storage question = questions[questionId];
+        return
+            (question.creator, question.questionId, question.content, question.timestamp, question.upvotes, question.downvotes);
+    }
+
     /*function denominateVotingTokens() public view {
 
     }*/
 
-    function getVoterWeight(address _userAddress) private returns(uint weight) {
+    function getVoterWeight(address _userAddress) public returns (uint weight) {
         weight = 0;
         for (uint i = 0; i < shareholders.length; i++) {
             if (shareholders[i].delegate() == _userAddress) {
@@ -106,7 +123,7 @@ contract Shareholder is User, Voter {
         emit VoterWeight(_userAddress, weight);     
     }
 
-    /*function isShareholder(address _userAddress) public view returns (bool isSharehold) {
+    function isShareholder(address _userAddress) public view returns (bool isSharehold) {
         return !users[userId[_userAddress]].isDirector(); 
     }
 
@@ -116,7 +133,7 @@ contract Shareholder is User, Voter {
                 shareholders.push(Shareholder(users[i]));
             }
         }
-    }*/
+    }
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
     function delegateToProxy(address proxyAddress, bool partialDelegation) private {

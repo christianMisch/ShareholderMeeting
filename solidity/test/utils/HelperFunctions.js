@@ -18,18 +18,26 @@ const proposalFields = [
     'votedOnProposal'
 ]
 
+const questionFields = [
+    'creator',
+    'questionId',
+    'content',
+    'timestamp',
+    'upvotes',
+    'downvotes'
+]
+
 module.exports = (contract) => {
 
-    
-
-    async function getFormattedAnswer(id, type) {
+    async function getFormattedObj(id, type) {
         let rawData;
+        console.log('switch');
 
         switch (type) {
             case 'answer':
-                rawData = await contract.getAnswer.call(answerId);
+                rawData = await contract.getAnswer.call(id);
                 
-                if (answerRaw.length != answerFields.length) {
+                if (rawData.length != answerFields.length) {
                     throw new Error("The proposal doesn't have the correct format. Please check the properties");
                 }
                 const answerFormatted = {};
@@ -39,9 +47,9 @@ module.exports = (contract) => {
                 return answerFormatted;
 
             case 'proposal':
-                rawData = await contract.getProposal.call(answerId);
+                rawData = await contract.getProposal.call(id);
                 
-                if (answerRaw.length != proposalFields.length) {
+                if (rawData.length != proposalFields.length) {
                     throw new Error("The proposal doesn't have the correct format. Please check the properties");
                 }
                 const proposalFormatted = {};
@@ -49,10 +57,22 @@ module.exports = (contract) => {
                     proposalFormatted[proposalFields[i]] = rawData[i];
                 }
                 return proposalFormatted;
+            
+            case 'question':
+                rawData = await contract.getQuestion.call(id);
+                    
+                if (rawData.length != questionFields.length) {
+                    throw new Error("The proposal doesn't have the correct format. Please check the properties");
+                }
+                const questionFormatted = {};
+                for (let i = 0; i < questionFields.length; i++) {
+                    questionFormatted[questionFields[i]] = rawData[i];
+                }
+                return questionFormatted;
 
         }
         
     }
 
-    return {getFormattedAnswer: getFormattedAnswer};
+    return {getFormattedObj: getFormattedObj};
 }
