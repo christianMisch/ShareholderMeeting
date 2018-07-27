@@ -48,14 +48,14 @@ contract Shareholder is User, Voter {
     event VoterWeight(address userAddress, uint weight);
     event DelegatedFrom(address sender, uint votingTokens, address proxy);
 
-    function vote(address userAddress, uint proposalId, string votingOption) private {
+    function vote(uint proposalId, string votingOption) public {
         Proposal storage prop = proposals[proposalId];
         
-        require(!prop.votedOnProposal[msg.sender], "The shareholder already voted");
-        require(delegate == address(0), "Proxy is not allowed to vote");
+        /*require(!prop.votedOnProposal[msg.sender], "The shareholder already voted");
+        require(delegate == address(0), "Proxy is not allowed to vote");*/
 
         uint voteId = prop.votes.length++;
-        prop.votes[voteId] = Vote({voterAddress: userAddress, voterDecision: votingOption});
+        prop.votes[voteId] = Vote({voterAddress: msg.sender, voterDecision: votingOption});
         prop.votedOnProposal[msg.sender] = true;    
         
         emit Voted(userAddress, proposalId, votingOption);

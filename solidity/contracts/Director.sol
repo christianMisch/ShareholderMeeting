@@ -48,4 +48,17 @@ contract Director is User {
     function getNumOfAnswers() public view returns (uint length) {
         return answers.length;
     }
+
+    function getAnswer(uint answerId) public view returns (
+        uint _answerId,
+        uint _questionId,
+        address _answerCreator,
+        string _content,
+        uint _timestamp
+    ) {
+
+        Answer storage answer = answers[answerId];
+        return 
+            (answer.answerId, answer.questionId, answer.answerCreator, answer.content, answer.timestamp);
+    }
 }

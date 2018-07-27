@@ -3,13 +3,9 @@ pragma solidity ^0.4.23;
 import "./User.sol";
 import "./Shareholder.sol";
 import "./Director.sol";
-import "../lib/solidity-stringutils/src/strings.sol";
 
 contract AgmOwner is User, Voter {
-    using strings for *;
 
-    // owner of the contract initializes the AGM
-    address public owner;
     // store options to every proposal
     VotingOption[] public votingOptions;
     // total number of users
@@ -31,7 +27,7 @@ contract AgmOwner is User, Voter {
     }
 
     modifier onlyOwner {
-        require(owner == msg.sender);
+        require(userAddress == msg.sender);
         _;
     }
 
@@ -51,9 +47,10 @@ contract AgmOwner is User, Voter {
         string _meetingDate,
         string _meetingPlace,
         uint _meetingStartTime,
-        uint _meetingEndTime) public {
+        uint _meetingEndTime) 
+            
+            User(msg.sender, true) public {
         
-        owner = msg.sender;
         minimumVotingQuorum = _minimumVotingQuorum;
         marginOfVotesForMajority = _marginOfVotesForMajority;
         meetingName = _meetingName;
@@ -66,7 +63,7 @@ contract AgmOwner is User, Voter {
 
     // transfer contract ownership to another director
     function transferOwnership(address _owner) onlyOwner public {
-        owner = _owner;
+        userAddress = _owner;
 
         emit OwnershipTransferedTo(_owner);
     }
@@ -120,9 +117,9 @@ contract AgmOwner is User, Voter {
 
     // only director is allowed to create a proposal
     function createProposal(string _name, string _description, string _options) 
-        onlyOwner public {
+        onlyOwner public returns(uint propId) {
 
-        uint propId = proposals.length++;
+        propId = proposals.length++;
         Proposal storage proposal = proposals[propId];
         proposal.proposalId = propId;
         proposal.name = _name;
