@@ -3,10 +3,12 @@ pragma solidity ^0.4.23;
 import "./User.sol";
 import "./AgmOwner.sol";
 import "./Voter.sol";
+import "./State.sol";
 
 contract Shareholder is User, Voter {
 
     address public delegate;
+    State public state;
 
     //mapping(address => Delegate[]) delegations;
     Question[] public questions;
@@ -33,9 +35,10 @@ contract Shareholder is User, Voter {
         _;
     }
 
-    constructor(address userAddress, uint _votingTokens) 
+    constructor(address userAddress, uint _votingTokens, State _state) 
         User(userAddress, false) public {
         
+        state = _state;
         votingTokens[userAddress] = _votingTokens;
         delegate = address(0);
     }
@@ -47,6 +50,7 @@ contract Shareholder is User, Voter {
     event Voted(address invoker, uint proposalId, string votingOption);
     event VoterWeight(address userAddress, uint weight);
     event DelegatedFrom(address sender, uint votingTokens, address proxy);
+    event Log();
 
     function vote(uint proposalId, string votingOption) public {
         Proposal storage prop = proposals[proposalId];
@@ -115,7 +119,8 @@ contract Shareholder is User, Voter {
                 weight += votingTokens[shareholders[i].userAddress()];
             }
 
-            if (shareholders[i].userAddress() == _userAddress && shareholders[i].delegate() == address(0)) {
+            if (shareholders[i].delegate() == address(0)) {
+                emit Log();
                 weight += votingTokens[_userAddress];
             }
         }
@@ -138,16 +143,17 @@ contract Shareholder is User, Voter {
     }
 
     function isShareholder(address _userAddress) public view returns (bool isSharehold) {
-        return !users[userId[_userAddress]].isDirector(); 
+        return !state.getUser(_userAddress).isDirector(); 
     }
 
-    function getShareholderList() public returns (Shareholder[]) {  
+    /*function getShareholderList() public returns (Shareholder[]) {  
+        User[] storage users = owner.users;
         for (uint i = 0; i < users.length; i++) {
-            if (isShareholder(users[i].userAddress())) {
-                shareholders.push(Shareholder(users[i]));
+            if (isShareholder(owner.users[i].userAddress())) {
+                shareholders.push(Shareholder(owner.users[i]));
             }
         }
-    }
+    }*/
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
     function delegateToProxy(address proxyAddress, bool partialDelegation) private {

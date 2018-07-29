@@ -3,13 +3,15 @@ pragma solidity ^0.4.23;
 import "./User.sol";
 import "./Shareholder.sol";
 import "./Director.sol";
+import "./State.sol";
 
 contract AgmOwner is User, Voter {
 
+    State public state = new State();
+
     // store options to every proposal
     VotingOption[] public votingOptions;
-    // total number of users
-    uint public numberOfUsers;
+
     bool public isFinished = false;
 
     uint public minimumVotingQuorum;
@@ -31,8 +33,6 @@ contract AgmOwner is User, Voter {
         _;
     }
 
-    event UserCreated(uint userId, address userAddress, bool isDirector);
-    event UserRemoved(uint userId, address userAddress, bool isDirector);
     event ProposalCreated(uint propId, address creator);
     event Voted(address userAddress, uint proposalId, string votingOption);
     event AgmFinished(bool isFinished);
@@ -66,45 +66,6 @@ contract AgmOwner is User, Voter {
         userAddress = _owner;
 
         emit OwnershipTransferedTo(_owner);
-    }
-
-    function addUser(address _userAddress, bool isDirector, uint votingTok) public {
-        uint id = userId[_userAddress];
-        if (id == 0) {
-            id = users.length++;
-            userId[_userAddress] = id;
-        }
-
-        if (isDirector) {
-            users[id] = new Director({userAddress: _userAddress});
-            emit UserCreated(id, _userAddress, true);
-        } else {
-            users[id] = new Shareholder({userAddress: _userAddress, _votingTokens: votingTok});
-            emit UserCreated(id, _userAddress, false);
-        }
-        numberOfUsers++;
-    }
-
-    function removeUser(address _userAddress) public {
-        //require(userId[_userAddress] != 0, "User does not exist");
-
-        uint i = userId[_userAddress];
-        User remUser = users[i];
-        delete users[i];
-
-        for (; i < users.length - 1; i++) {
-            users[i] = users[i+1];
-            userId[users[i].userAddress()] = i;
-        }
-        
-        users.length--;
-        numberOfUsers--;
-
-        emit UserRemoved(i, _userAddress, remUser.isDirector());
-    }
-
-    function getNumOfUsers() public view returns (uint length) {
-        return users.length;
     }
 
     function finishAGM() onlyOwner public {

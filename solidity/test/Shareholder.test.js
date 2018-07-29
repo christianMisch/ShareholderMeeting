@@ -1,7 +1,7 @@
 const Director = artifacts.require('./Director.sol');
 const Shareholder = artifacts.require('./Shareholder.sol');
 const AgmOwner = artifacts.require('./AgmOwner.sol');
-const AgmOwnerDeployer = require('./utils/AgmOwnerDeployer.js')(AgmOwner);
+//const AgmOwnerDeployer = require('./utils/AgmOwnerDeployer.js')(AgmOwner);
 
 const should = require('should');
 const expect = require('expect');
@@ -62,7 +62,6 @@ contract('Shareholder', async (accounts) => {
         await contract.rateQuestion.sendTransaction(0, 0);
         expect(+await contract.getNumOfQuestions.call()).toBe(1);
         let questObj = await helper.getFormattedObj(0, 'question');
-        console.log(questObj);
         expect(questObj.creator).toBe(accounts[0]);
         expect(+questObj.questionId).toBe(0);
         expect(questObj.content).toBe('question1');
@@ -72,11 +71,14 @@ contract('Shareholder', async (accounts) => {
     })
 
     it('should return a list with only shareholders', async () => {
-        let owner = AgmOwner.new(3, 50, 'Siemens AGM 2018', 'Annual General Meeting 2018', '01.01.2018', 'ICC Berlin', 0, 240);
-        await owner.addUser.sendTransaction(accounts[0], true, 10);
-        await owner.addUser.sendTransaction(accounts[0], true, 20);
-        await owner.addUser.sendTransaction(accounts[0], false, 100);
-        await owner.addUser.sendTransaction(accounts[0], false, 200);
+        let o = await AgmOwner.new(3, 50, 'Siemens AGM 2018', 'Annual General Meeting 2018', '01.01.2018', 'ICC Berlin', 0, 240);
+        // same count from owner and shareholder view, access the same user array
+        //let sh = await Shareholder.new(accounts[1], 1000);
+        await agmOwner.addUser.sendTransaction(accounts[0], true, 10);
+        await agmOwner.addUser.sendTransaction(accounts[1], true, 20);
+        await agmOwner.addUser.sendTransaction(accounts[2], false, 100);
+        await agmOwner.addUser.sendTransaction(accounts[3], false, 200);
+        expect(+await agmOwner.getNumOfUsers.call()).toBe(4);
     })
 
     /*it('should output the shareholder weight', async () => {

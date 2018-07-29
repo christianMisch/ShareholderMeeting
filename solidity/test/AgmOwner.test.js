@@ -9,9 +9,11 @@ const expect = require('expect');
 contract('AgmOwner', function(accounts) {
     let contract;
     let helper;
+    let test;
 
     beforeEach(async () => {
         contract = await AgmOwnerDeployer(accounts[0]);
+        test = await Shareholder.deployed();
         helper = await require('./utils/HelperFunctions.js')(contract);
     })
 
@@ -86,5 +88,14 @@ contract('AgmOwner', function(accounts) {
         let announceObj = await contract.announceAGM.call({from: accounts[0]});
         expect(announceObj[0]).toBe('01.01.2018');
         expect(announceObj[1]).toBe('ICC Berlin');
+    })
+
+    it('should make the identical proposal array available to all shareholders and the owner', async () => {
+        await contract.createProposal.sendTransaction("election1", "new board shall be elected", "A,B,C");
+        await contract.createProposal.sendTransaction("election2", "new board shall be elected", "A,B");
+        await contract.createProposal.sendTransaction("election3", "new board shall be elected", "A,C");
+        expect(+await contract.getNumOfProposals.call()).toBe(3);
+        //let sh = await Shareholder.new(accounts[1], 1000);
+        expect(+await test.getNumOfProposals.call()).toBe(3);
     })
 });
