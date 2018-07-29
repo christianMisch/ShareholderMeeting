@@ -13,9 +13,9 @@ contract('Shareholder', async (accounts) => {
 
     beforeEach(async () => {
         //agmOwner = await AgmOwnerDeployer(accounts[0]);
-        shareholder = await Shareholder.deployed();
+        contract = await Shareholder.deployed();
         agmOwner = await AgmOwner.deployed();
-        helper = await require('./utils/HelperFunctions.js')(shareholder);
+        helper = await require('./utils/HelperFunctions.js')(contract);
     });
 
     it('should create a new shareholder instance', async () => {
@@ -58,11 +58,17 @@ contract('Shareholder', async (accounts) => {
     })
 
     it('should be possible to rate a question', async () => {
-        let sh = await Shareholder.new(accounts[1], 1000);
-        await sh.createQuestion.sendTransaction("question1");
-        await sh.rateQuestion.sendTransaction(0, 0);
-        console.log(await sh.getQuestion.call(0));
-        //expect(await (sh.getQuestion.call(0)[4])).toBe(1);
+        await contract.createQuestion.sendTransaction("question1");
+        await contract.rateQuestion.sendTransaction(0, 0);
+        expect(+await contract.getNumOfQuestions.call()).toBe(1);
+        let questObj = await helper.getFormattedObj(0, 'question');
+        console.log(questObj);
+        expect(questObj.creator).toBe(accounts[0]);
+        expect(+questObj.questionId).toBe(0);
+        expect(questObj.content).toBe('question1');
+        expect(+questObj.timestamp).toBeGreaterThan(0);
+        expect(+questObj.upvotes).toBe(0);
+        expect(+questObj.downvotes).toBe(1);
     })
 
     it('should return a list with only shareholders', async () => {

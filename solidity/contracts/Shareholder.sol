@@ -12,7 +12,7 @@ contract Shareholder is User, Voter {
     Question[] public questions;
     Shareholder[] public shareholders;
 
-    enum RatingOption {UPVOTE, DOWNVOTE}
+    enum RatingOption {DOWNVOTE, UPVOTE}
 
     struct Question {
         address creator;
@@ -29,7 +29,7 @@ contract Shareholder is User, Voter {
     }*/
 
     modifier onlyShareholder {
-        require(votingTokens[msg.sender] > 0);
+        require((!this.isDirector()) && (votingTokens[msg.sender] > 0));
         _;
     }
 
@@ -121,6 +121,20 @@ contract Shareholder is User, Voter {
         }
 
         emit VoterWeight(_userAddress, weight);     
+    }
+
+    function getShareholder(uint shareholderId) public view returns (
+        address _userAddress,
+        bool _isDirector,
+        address _delegate
+    ) {
+        Shareholder sh = shareholders[shareholderId];
+        return
+            (sh.userAddress(), sh.isDirector(), sh.delegate());
+    }
+
+    function getNumOfShareholders() public view returns (uint length) {
+        return shareholders.length;
     }
 
     function isShareholder(address _userAddress) public view returns (bool isSharehold) {

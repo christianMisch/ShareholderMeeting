@@ -94,6 +94,7 @@ contract AgmOwner is User, Voter {
 
         for (; i < users.length - 1; i++) {
             users[i] = users[i+1];
+            userId[users[i].userAddress()] = i;
         }
         
         users.length--;

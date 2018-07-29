@@ -20,17 +20,24 @@ contract('Director', async (accounts) => {
 
     });
 
-    /*it('should create three new answer', async () => {
+    it('should create three new answer', async () => {
         await contract.createAnswer.sendTransaction(0, "answer1");
         await contract.createAnswer.sendTransaction(0, "answer2");
         await contract.createAnswer.sendTransaction(0, "answer3");
         expect(+await contract.getNumOfAnswers.call()).toBe(3);
-        //console.log(helper.getFormattedAnswer);
-        let answObj = await helper.getFormattedAnswer.call(0);
-        console.log(answObj);
-        //expect(await contract.answers.call(0).questionId()).toBe(0);
-        //expect(await contract.answers[0].questionId()).toBe("answer1");
-    });*/
+        let answObj = await helper.getFormattedObj(0, 'answer');
+        let sndAnsObj = await helper.getFormattedObj(1, 'answer');
+        
+        expect(+answObj.answerId).toBe(0);
+        expect(+answObj.questionId).toBe(0);
+        expect(answObj.content).toBe('answer1');
+        expect(+answObj.timestamp).toBeGreaterThan(0);
+        
+        expect(+sndAnsObj.answerId).toBe(1);
+        expect(+sndAnsObj.questionId).toBe(0);
+        expect(sndAnsObj.content).toBe('answer2');
+        expect(+sndAnsObj.timestamp).toBeGreaterThan(0);
+    });
 
     it('should ensure that only directors can create answers', async () => {
         let sh = Shareholder.deployed();
@@ -38,7 +45,6 @@ contract('Director', async (accounts) => {
             should.fail(sh.createAnswer(0, "answer5"));
         } catch (error) {
             expect(error.message).toContain('sh.createAnswer is not a function');
-        }
-        
+        }  
     })
 });

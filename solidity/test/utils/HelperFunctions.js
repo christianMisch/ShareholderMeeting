@@ -13,9 +13,7 @@ const proposalFields = [
     'options',
     'proposalPassed',
     'passedPercent',
-    'voteCount',
-    'votes',
-    'votedOnProposal'
+    'voteCount'
 ]
 
 const questionFields = [
@@ -31,7 +29,6 @@ module.exports = (contract) => {
 
     async function getFormattedObj(id, type) {
         let rawData;
-        console.log('switch');
 
         switch (type) {
             case 'answer':
@@ -69,7 +66,6 @@ module.exports = (contract) => {
                     questionFormatted[questionFields[i]] = rawData[i];
                 }
                 return questionFormatted;
-
         }
         
     }

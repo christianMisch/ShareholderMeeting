@@ -17,6 +17,10 @@ contract User {
         isDirector = _isDirector;
     }
 
+    function getNumOfUsers() public view returns (uint length) {
+        return users.length;
+    }
+
     /*function userExists(address _userAddress) public returns (bool exists) {
         exists = userId[_userAddress] != 0;
 
