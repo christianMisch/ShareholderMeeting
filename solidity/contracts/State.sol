@@ -35,7 +35,7 @@ contract State {
             users[id] = new Director({userAddress: _userAddress});
             emit UserCreated(id, _userAddress, true);
         } else {
-            users[id] = new Shareholder({userAddress: _userAddress, _votingTokens: votingTok, state: _state});
+            //users[id] = new Shareholder({userAddress: _userAddress, _votingTokens: votingTok, state: _state});
             emit UserCreated(id, _userAddress, false);
         }
         numberOfUsers++;
