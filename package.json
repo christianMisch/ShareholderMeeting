@@ -7,7 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "rebuild:contracts": "del soldity/build && cd solidity && truffle migrate --reset --compile-all && del ../src/artifacts/ && copy build/contracts ../src/artifacts/"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
   },
   "dependencies": {
     "truffle-artifactor": "^3.0.7",
+    "truffle-contract": "^3.0.6",
     "web3": "^1.0.0-beta.35"
   }
 }

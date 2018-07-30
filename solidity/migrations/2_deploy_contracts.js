@@ -12,9 +12,4 @@ module.exports = function(deployer, network, accounts) {
     deployer.deploy(AgmOwner, 3, 50, 'Siemens AGM 2018', 'Annual General Meeting 2018', '01.01.2018', 'ICC Berlin', 0, 240);
     deployer.deploy(Director, accounts[1]);
     deployer.deploy(Voter);
-
-    artifactor.save(Shareholder, '../src/artifacts/Shareholder.sol.js');
-
-
-    
 }
