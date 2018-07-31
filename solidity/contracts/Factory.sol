@@ -10,15 +10,15 @@ contract Factory is ProposalData {
     Proposal[] public proposals;
     mapping(address => uint) public votingWeights;
 
-    function createNewShareholder(address _userAddress, uint votingTok) public view returns (Shareholder) {
+    function createNewShareholder(address _userAddress, uint votingTok) public returns (Shareholder) {
         return new Shareholder(_userAddress, votingTok, this);
     }
 
-    function createNewDirector(address adr) public view returns (Director) {
-        new Director(adr);
+    function createNewDirector(address _userAddress) public returns (Director) {
+        return new Director(_userAddress);
     }
 
-    function createNewProposal(string _name, string _description, string _options) public view returns (uint propId) {
+    function createNewProposal(string _name, string _description, string _options) public returns (uint propId) {
         propId = proposals.length++;
         Proposal storage proposal = proposals[propId];
         proposal.proposalId = propId;

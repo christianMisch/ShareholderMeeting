@@ -7,7 +7,7 @@ import "./Factory.sol";
 
 contract AgmOwner is User {
 
-    Factory fac = new Factory();
+    Factory public fac;
     // total number of users
     uint public numberOfUsers;
     // stores all users
@@ -55,7 +55,8 @@ contract AgmOwner is User {
         string _meetingDate,
         string _meetingPlace,
         uint _meetingStartTime,
-        uint _meetingEndTime) 
+        uint _meetingEndTime
+    ) 
             
             User(msg.sender, true) public {
         
@@ -67,6 +68,10 @@ contract AgmOwner is User {
         meetingPlace = _meetingPlace;
         meetingStartTime = _meetingStartTime;
         meetingEndTime = _meetingEndTime;
+    }
+
+    function setFactory(Factory _fac) public {
+        fac = _fac;
     }
 
     // transfer contract ownership to another director

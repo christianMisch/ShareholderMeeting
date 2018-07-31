@@ -7,7 +7,7 @@ import "./ProposalData.sol";
 
 contract Shareholder is User, ProposalData {
 
-    Factory fac;
+    Factory public fac;
 
     address public delegate;
     
@@ -37,14 +37,6 @@ contract Shareholder is User, ProposalData {
         _;
     }
 
-    constructor(address userAddress, uint _votingWeight, Factory _fac) 
-        User(userAddress, false) public {
-        
-        fac.setVotingWeight(userAddress, _votingWeight);
-        delegate = address(0);
-        fac = _fac;
-    }
-    
     event InvalidRatingOption(address invoker);
     event QuestionUpvote(address invoker, uint numUpvotes);
     event QuestionDownvote(address invoker, uint numDownvotes);
@@ -52,9 +44,16 @@ contract Shareholder is User, ProposalData {
     event Voted(address invoker, uint proposalId, string votingOption);
     event VoterWeight(address userAddress, uint weight);
     event DelegatedFrom(address sender, uint votingTokens, address proxy);
-    event Log();
+    
+    constructor(address userAddress, uint _votingWeight, Factory _fac) 
+        User(userAddress, false) public {
+        
+        fac = _fac;
+        fac.setVotingWeight(userAddress, _votingWeight);
+        delegate = address(0);
+    }
 
-    function vote(uint proposalId, string votingOption) public {
+    /*function vote(uint proposalId, string votingOption) public {
         fac.setVote(proposalId, votingOption);
         
         emit Voted(userAddress, proposalId, votingOption);
@@ -103,9 +102,9 @@ contract Shareholder is User, ProposalData {
             (question.creator, question.questionId, question.content, question.timestamp, question.upvotes, question.downvotes);
     }
 
-    /*function denominateVotingTokens() public view {
+    function denominateVotingTokens() public view {
 
-    }*/
+    }
 
     function getVoterWeight(address _userAddress) public returns (uint weight) {
         weight = 0;
@@ -147,7 +146,7 @@ contract Shareholder is User, ProposalData {
                 shareholders.push(Shareholder(owner.users[i]));
             }
         }
-    }*/
+    }
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
     function delegateToProxy(address proxyAddress, bool partialDelegation) private {
@@ -167,7 +166,7 @@ contract Shareholder is User, ProposalData {
         delegate = proxyAddress; 
 
         emit DelegatedFrom(msg.sender, tokens, proxyAddress);  
-    }
+    }*/
 
 
 }

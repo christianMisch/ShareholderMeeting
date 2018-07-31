@@ -1,5 +1,6 @@
 const AgmOwner = artifacts.require('./AgmOwner.sol');
 const Shareholder = artifacts.require('./Shareholder.sol');
+const Factory = artifacts.require('./Factory.sol');
 const AgmOwnerDeployer = require('./utils/AgmOwnerDeployer.js')(AgmOwner);
 
 
@@ -9,15 +10,15 @@ const expect = require('expect');
 contract('AgmOwner', function(accounts) {
     let contract;
     let helper;
-    let test;
+    let shareholder;
 
     beforeEach(async () => {
-        contract = await AgmOwnerDeployer(accounts[0]);
-        test = await Shareholder.deployed();
+        contract = await AgmOwner.deployed();
+        shareholder = await Shareholder.deployed();
         helper = await require('./utils/HelperFunctions.js')(contract);
     })
 
-    it('should transfer ownership to another director only if the sender is the deployer of the contract', async function() {
+    /*it('should transfer ownership to another director only if the sender is the deployer of the contract', async function() {
         await contract.transferOwnership.sendTransaction(accounts[1], {from: accounts[0]});
         expect(await contract.userAddress()).toBe(accounts[1]);
     })
@@ -40,7 +41,7 @@ contract('AgmOwner', function(accounts) {
         let sh = await Shareholder.deployed();
         console.log(+await sh.getNumOfUsers.call());
         await sh.getShareholderList.sendTransaction();
-        console.log(+await sh.getNumOfShareholders.call());*/
+        console.log(+await sh.getNumOfShareholders.call());
     })
 
     it('should create shareholders and directors and remove users', async () => {
@@ -55,7 +56,7 @@ contract('AgmOwner', function(accounts) {
         expect(+await contract.numberOfUsers()).toBe(0);
     })
 
-    it('should create a proposal', async () => {
+    /*it('should create a proposal', async () => {
         await contract.createProposal.sendTransaction("election", "new board shall be elected", "A,B,C");
         expect(+await contract.getNumOfProposals.call()).toBe(1);
         let propObj = await helper.getFormattedObj(0, 'proposal');
@@ -90,12 +91,23 @@ contract('AgmOwner', function(accounts) {
         expect(announceObj[1]).toBe('ICC Berlin');
     })
 
-    it('should make the identical proposal array available to all shareholders and the owner', async () => {
+    /*it('should make the identical proposal array available to all shareholders and the owner', async () => {
         await contract.createProposal.sendTransaction("election1", "new board shall be elected", "A,B,C");
         await contract.createProposal.sendTransaction("election2", "new board shall be elected", "A,B");
         await contract.createProposal.sendTransaction("election3", "new board shall be elected", "A,C");
         expect(+await contract.getNumOfProposals.call()).toBe(3);
         //let sh = await Shareholder.new(accounts[1], 1000);
         expect(+await test.getNumOfProposals.call()).toBe(3);
+    })*/
+
+    it('should ensure that AgmOwner and shareholders interact with the same proposals', async () => {
+        console.log(await contract.createProposal.sendTransaction("election1", "new board shall be elected", "A,B,C", {from: accounts[0]}));
+        let numOfProposalsInAgmOwner = +await Factory.at(await contract.fac()).getNumOfProposals.call();
+        let numOfProposalsInShareholder = +await Factory.at(await shareholder.fac()).getNumOfProposals.call();
+        console.log(await contract.fac())
+        console.log(await shareholder.fac())
+        expect(numOfProposalsInAgmOwner).toBe(numOfProposalsInShareholder);
+        
+        //expect(await contract.fac.getNumOfProposals.call()).toBe(1);
     })
 });
