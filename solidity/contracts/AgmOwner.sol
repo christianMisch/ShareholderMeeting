@@ -3,11 +3,17 @@ pragma solidity ^0.4.23;
 import "./User.sol";
 import "./Shareholder.sol";
 import "./Director.sol";
-import "./State.sol";
+import "./Factory.sol";
 
-contract AgmOwner is User, Voter {
+contract AgmOwner is User {
 
-    State public state = new State();
+    Factory fac = new Factory();
+    // total number of users
+    uint public numberOfUsers;
+    // stores all users
+    User[] public users;
+    // stores user's address with corresponding id
+    mapping(address => uint) public userId;
 
     // store options to every proposal
     VotingOption[] public votingOptions;
@@ -38,6 +44,8 @@ contract AgmOwner is User, Voter {
     event AgmFinished(bool isFinished);
     event ProposalExecuted(uint proposalId, bool proposalPassed, uint passedPercentage, VotingOption[] options);
     event OwnershipTransferedTo(address newOwner);
+    event UserCreated(uint userId, address userAddress, bool isDirector);
+    event UserRemoved(uint userId, address userAddress, bool isDirector);
 
     constructor(
         uint _minimumVotingQuorum,
@@ -68,6 +76,54 @@ contract AgmOwner is User, Voter {
         emit OwnershipTransferedTo(_owner);
     }
 
+    function addUser(address _userAddress, bool isDirector, uint votingTok) public {
+        uint id = userId[_userAddress];
+        if (id == 0) {
+            id = users.length++;
+            userId[_userAddress] = id;
+        }
+
+        if (isDirector) {
+            Director d = fac.createNewDirector(_userAddress);
+            users[id] = d;
+            
+            emit UserCreated(id, _userAddress, true);
+        
+        } else {
+            Shareholder s = fac.createNewShareholder(_userAddress, votingTok);
+            users[id] = s;
+            
+            emit UserCreated(id, _userAddress, false);
+        }
+        numberOfUsers++;
+    }
+
+    function removeUser(address _userAddress) public {
+        //require(userId[_userAddress] != 0, "User does not exist");
+
+        uint i = userId[_userAddress];
+        User remUser = users[i];
+        delete users[i];
+
+        for (; i < users.length - 1; i++) {
+            users[i] = users[i+1];
+            userId[users[i].userAddress()] = i;
+        }
+        
+        users.length--;
+        numberOfUsers--;
+
+        emit UserRemoved(i, _userAddress, remUser.isDirector());
+    }
+
+    function getNumOfUsers() public view returns (uint length) {
+        return users.length;
+    }
+
+    function getUser(address _userAddress) public view returns (User u) {
+        return users[userId[_userAddress]];
+    }
+
     function finishAGM() onlyOwner public {
         require(!isFinished, "AGM has already been finished");
         isFinished = true;
@@ -84,17 +140,10 @@ contract AgmOwner is User, Voter {
     function createProposal(string _name, string _description, string _options) 
         onlyOwner public returns(uint propId) {
 
-        propId = proposals.length++;
-        Proposal storage proposal = proposals[propId];
-        proposal.proposalId = propId;
-        proposal.name = _name;
-        proposal.description = _description;
-        proposal.options = _options;
-        proposal.proposalPassed = false;
-        proposal.passedPercent = 0;
-        proposal.voteCount = 0;
-        
+        propId = fac.createNewProposal(_name, _description, _options);
         emit ProposalCreated(propId, msg.sender);
+
+        return propId;
     }
 
     // executes the pending proposal

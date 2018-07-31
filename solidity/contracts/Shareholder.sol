@@ -2,13 +2,15 @@ pragma solidity ^0.4.23;
 
 import "./User.sol";
 import "./AgmOwner.sol";
-import "./Voter.sol";
-import "./State.sol";
+import "./Factory.sol";
+import "./ProposalData.sol";
 
-contract Shareholder is User, Voter {
+contract Shareholder is User, ProposalData {
+
+    Factory fac;
 
     address public delegate;
-    State public state;
+    
 
     //mapping(address => Delegate[]) delegations;
     Question[] public questions;
@@ -31,15 +33,16 @@ contract Shareholder is User, Voter {
     }*/
 
     modifier onlyShareholder {
-        require((!this.isDirector()) && (votingTokens[msg.sender] > 0));
+        require((!this.isDirector()) && (fac.votingWeights(msg.sender) > 0));
         _;
     }
 
-    constructor(address userAddress, uint _votingTokens) 
+    constructor(address userAddress, uint _votingWeight, Factory _fac) 
         User(userAddress, false) public {
         
-        votingTokens[userAddress] = _votingTokens;
+        fac.setVotingWeight(userAddress, _votingWeight);
         delegate = address(0);
+        fac = _fac;
     }
     
     event InvalidRatingOption(address invoker);
@@ -52,14 +55,7 @@ contract Shareholder is User, Voter {
     event Log();
 
     function vote(uint proposalId, string votingOption) public {
-        Proposal storage prop = proposals[proposalId];
-        
-        /*require(!prop.votedOnProposal[msg.sender], "The shareholder already voted");
-        require(delegate == address(0), "Proxy is not allowed to vote");*/
-
-        uint voteId = prop.votes.length++;
-        prop.votes[voteId] = Vote({voterAddress: msg.sender, voterDecision: votingOption});
-        prop.votedOnProposal[msg.sender] = true;    
+        fac.setVote(proposalId, votingOption);
         
         emit Voted(userAddress, proposalId, votingOption);
     }
@@ -115,12 +111,11 @@ contract Shareholder is User, Voter {
         weight = 0;
         for (uint i = 0; i < shareholders.length; i++) {
             if (shareholders[i].delegate() == _userAddress) {
-                weight += votingTokens[shareholders[i].userAddress()];
+                weight += fac.votingWeights(shareholders[i].userAddress());
             }
 
-            if (shareholders[i].delegate() == address(0)) {
-                emit Log();
-                weight += votingTokens[_userAddress];
+            if (shareholders[i].userAddress() == _userAddress && shareholders[i].delegate() == address(0)) {
+                weight += fac.votingWeights(shareholders[i].userAddress());
             }
         }
 
@@ -141,9 +136,9 @@ contract Shareholder is User, Voter {
         return shareholders.length;
     }
 
-    function isShareholder(address _userAddress) public view returns (bool isSharehold) {
-        return !state.getUser(_userAddress).isDirector(); 
-    }
+    /*function isShareholder(address _userAddress) public view returns (bool isSharehold) {
+        return !owner.users[_userAddress].isDirector(); 
+    }*/
 
     /*function getShareholderList() public returns (Shareholder[]) {  
         User[] storage users = owner.users;
@@ -156,7 +151,7 @@ contract Shareholder is User, Voter {
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
     function delegateToProxy(address proxyAddress, bool partialDelegation) private {
-        require(votingTokens[msg.sender] > 0, "Sender does not own enough voting tokens");
+        require(fac.votingWeights(msg.sender) > 0, "Sender does not own enough voting tokens");
         require(proxyAddress != msg.sender, "Self-delegation is not allowed");
         //require(userExists(proxyAddress), "Proxy is not a registered user");
         //require(userExists(msg.sender), "the user account is not registered");
@@ -165,9 +160,9 @@ contract Shareholder is User, Voter {
         // so far it's simple delegation: only whole number of voting token can be delegated to one proxy
 
         // subtract tokens from sender and add them to proxy
-        uint tokens = votingTokens[msg.sender];
-        votingTokens[msg.sender] = 0;
-        votingTokens[proxyAddress] += tokens;
+        uint tokens = fac.votingWeights(msg.sender);
+        fac.setVotingWeight(msg.sender, 0);
+        fac.setVotingWeight(proxyAddress, fac.votingWeights(proxyAddress) + tokens);
 
         delegate = proxyAddress; 
 
