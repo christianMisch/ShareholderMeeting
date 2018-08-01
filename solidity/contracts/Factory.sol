@@ -11,6 +11,9 @@ contract Factory is ProposalData {
     Proposal[] public proposals;
     mapping(address => uint) public votingWeights;
 
+    event Log();
+    event Test();
+
     function createNewShareholder(address _userAddress, uint votingTok) public returns (Shareholder) {
         Shareholder sh = new Shareholder(_userAddress, votingTok, this);
         shareholders.push(sh);
@@ -73,6 +76,27 @@ contract Factory is ProposalData {
             voterWeight: votingWeights[msg.sender]}
         );
         prop.votedOnProposal[msg.sender] = true;
+        prop.voteCount++;
+    }
+
+    function getVote(uint proposalID, address voter) public returns (address user, string option, uint weight) {
+        Proposal storage proposal = proposals[proposalID];
+
+        for (uint i = 0; i < proposal.votes.length; ++i) {
+            Vote storage v = proposal.votes[i];
+
+            if (v.voterAddress == voter) {
+                emit Log();
+                return (v.voterAddress, v.voterDecision, v.voterWeight);
+            }
+        }
+        emit Test();
+        return (address(0), "", 0);
+    }
+
+    function getNumOfVotes(uint proposalId) public view returns (uint length) {
+        Proposal storage proposal = proposals[proposalId];
+        return proposal.votes.length;
     }
 
     function setVotingWeight(address userAddress, uint weight) public {
@@ -91,5 +115,9 @@ contract Factory is ProposalData {
 
     function getNumOfShareholders() public view returns (uint length) {
         return shareholders.length;
+    }
+
+    function getShareholderList() public view returns (Shareholder[]) {  
+        return shareholders;
     }
 }

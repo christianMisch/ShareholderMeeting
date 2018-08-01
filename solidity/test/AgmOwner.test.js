@@ -19,8 +19,7 @@ contract('AgmOwner', async (accounts) => {
         factoryAddress = (await Factory.deployed()).address;
         contract = await AgmOwnerDeployer(accounts[0], factoryAddress);
         shareholder = await Shareholder.deployed();
-        test = (await Factory.at(await contract.fac()))
-        helper = await require('./utils/HelperFunctions.js')(test);
+        helper = await require('./utils/HelperFunctions.js')(factory);
         //expect(+await factory.getNumOfProposals.call()).toBe(0);
     })
 
@@ -116,8 +115,10 @@ contract('AgmOwner', async (accounts) => {
         expect(numOfProposalsInShareholder).toBe(2);
     })
 
-    it('should ensure that AgmOwner and shareholder access the same user list', async () => {
-        await contract.addUser.sendTransaction(accounts[2], true, 0);
-        expect(await contract.getNumOfUsers.call()).toBe(1);
+    it('should ensure that number of proposals for a new deployed Factory is 0', async () => {
+        let newOwner = await AgmOwnerDeployer(accounts[0], 'use a valid contract address here...');
+        let numOfProposalsInAgmOwner = +await Factory.at(await newOwner.fac()).getNumOfProposals.call();
+        expect(await factory.getNumOfProposals.call()).toBe(2);
+        expect(+await Factory.at(await newOwner.fac()).getNumOfProposals.call()).toBe(0);
     })
 });

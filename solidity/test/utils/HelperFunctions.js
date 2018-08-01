@@ -27,14 +27,14 @@ const questionFields = [
     'downvotes'
 ]
 
-module.exports = (factory) => {
+module.exports = (factory, contract) => {
 
     async function getFormattedObj(id, type) {
         let rawData;
 
         switch (type) {
             case 'answer':
-                rawData = await factory.getAnswer.call(id);
+                rawData = await contract.getAnswer.call(id);
                 
                 if (rawData.length != answerFields.length) {
                     throw new Error("The proposal doesn't have the correct format. Please check the properties");
@@ -58,7 +58,7 @@ module.exports = (factory) => {
                 return proposalFormatted;
             
             case 'question':
-                rawData = await factory.getQuestion.call(id);
+                rawData = await contract.getQuestion.call(id);
                     
                 if (rawData.length != questionFields.length) {
                     throw new Error("The proposal doesn't have the correct format. Please check the properties");

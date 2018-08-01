@@ -122,19 +122,6 @@ contract Shareholder is User, ProposalData {
         emit VoterWeight(_userAddress, weight);     
     }
 
-    /*function isShareholder(address _userAddress) public view returns (bool isSharehold) {
-        return !owner.users[_userAddress].isDirector(); 
-    }
-
-    function getShareholderList() public returns (Shareholder[]) {  
-        User[] storage users = owner.users;
-        for (uint i = 0; i < users.length; i++) {
-            if (isShareholder(owner.users[i].userAddress())) {
-                shareholders.push(Shareholder(owner.users[i]));
-            }
-        }
-    }
-
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
     function delegateToProxy(address proxyAddress, bool partialDelegation) private {
         require(fac.votingWeights(msg.sender) > 0, "Sender does not own enough voting tokens");
@@ -146,14 +133,14 @@ contract Shareholder is User, ProposalData {
         // so far it's simple delegation: only whole number of voting token can be delegated to one proxy
 
         // subtract tokens from sender and add them to proxy
-        uint tokens = fac.votingWeights(msg.sender);
+        uint senderWeight = fac.votingWeights(msg.sender);
         fac.setVotingWeight(msg.sender, 0);
-        fac.setVotingWeight(proxyAddress, fac.votingWeights(proxyAddress) + tokens);
+        fac.setVotingWeight(proxyAddress, fac.votingWeights(proxyAddress) + senderWeight);
 
         delegate = proxyAddress; 
 
-        emit DelegatedFrom(msg.sender, tokens, proxyAddress);  
-    }*/
+        emit DelegatedFrom(msg.sender, senderWeight, proxyAddress);  
+    }
 
 
 }
