@@ -10,9 +10,10 @@ const defaultData = {
   }
   
   module.exports = (AgmOwner) => {
-    return (ownerAdr) => {
+    return (ownerAdr, factory) => {
         const data = Object.assign({}, defaultData);
         data.owner = ownerAdr;
+        data.fac = factory;
         
         return AgmOwner.new(
           data.minimumVotingQuorum, 
@@ -22,7 +23,8 @@ const defaultData = {
           data.meetingDate, 
           data.meetingPlace, 
           data.meetingStartTime, 
-          data.meetingEndTime
+          data.meetingEndTime,
+          data.fac
       );
     }
       

@@ -14,7 +14,6 @@ contract AgmOwner is User {
     User[] public users;
     // stores user's address with corresponding id
     mapping(address => uint) public userId;
-
     // store options to every proposal
     VotingOption[] public votingOptions;
 
@@ -55,7 +54,8 @@ contract AgmOwner is User {
         string _meetingDate,
         string _meetingPlace,
         uint _meetingStartTime,
-        uint _meetingEndTime
+        uint _meetingEndTime,
+        Factory _fac
     ) 
             
             User(msg.sender, true) public {
@@ -68,9 +68,6 @@ contract AgmOwner is User {
         meetingPlace = _meetingPlace;
         meetingStartTime = _meetingStartTime;
         meetingEndTime = _meetingEndTime;
-    }
-
-    function setFactory(Factory _fac) public {
         fac = _fac;
     }
 

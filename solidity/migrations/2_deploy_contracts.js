@@ -25,10 +25,11 @@ module.exports = function(deployer, network, accounts) {
             '01.01.2018', 
             'ICC Berlin', 
             0, 
-            240
+            240,
+            f.address
         );
-    }).then(function(owner) {
-        owner.setFactory(f.address);
+
+    }).then(function() {
         console.log('address:      ' + f.address);
     });
 

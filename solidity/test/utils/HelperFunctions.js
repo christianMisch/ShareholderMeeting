@@ -1,3 +1,5 @@
+const Factory = artifacts.require("./Factory.sol");
+
 const answerFields = [
     'answerId',
     'questionId',
@@ -25,14 +27,14 @@ const questionFields = [
     'downvotes'
 ]
 
-module.exports = (contract) => {
+module.exports = (factory) => {
 
     async function getFormattedObj(id, type) {
         let rawData;
 
         switch (type) {
             case 'answer':
-                rawData = await contract.getAnswer.call(id);
+                rawData = await factory.getAnswer.call(id);
                 
                 if (rawData.length != answerFields.length) {
                     throw new Error("The proposal doesn't have the correct format. Please check the properties");
@@ -44,7 +46,7 @@ module.exports = (contract) => {
                 return answerFormatted;
 
             case 'proposal':
-                rawData = await contract.getProposal.call(id);
+                rawData = await factory.getProposal.call(id);
                 
                 if (rawData.length != proposalFields.length) {
                     throw new Error("The proposal doesn't have the correct format. Please check the properties");
@@ -56,7 +58,7 @@ module.exports = (contract) => {
                 return proposalFormatted;
             
             case 'question':
-                rawData = await contract.getQuestion.call(id);
+                rawData = await factory.getQuestion.call(id);
                     
                 if (rawData.length != questionFields.length) {
                     throw new Error("The proposal doesn't have the correct format. Please check the properties");
@@ -70,5 +72,11 @@ module.exports = (contract) => {
         
     }
 
-    return {getFormattedObj: getFormattedObj};
+    async function getFactory(contract) {
+       let fac = await Factory.at(await contract.fac());
+       return fac;
+    }
+
+    return {getFormattedObj: getFormattedObj,
+            getFactory: getFactory};
 }

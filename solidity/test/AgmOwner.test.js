@@ -7,18 +7,24 @@ const AgmOwnerDeployer = require('./utils/AgmOwnerDeployer.js')(AgmOwner);
 const should = require('should');
 const expect = require('expect');
 
-contract('AgmOwner', function(accounts) {
+contract('AgmOwner', async (accounts) => {
     let contract;
     let helper;
     let shareholder;
+    let factory;
+    let factoryAddress;
 
     beforeEach(async () => {
-        contract = await AgmOwner.deployed();
+        factory = await Factory.deployed();
+        factoryAddress = (await Factory.deployed()).address;
+        contract = await AgmOwnerDeployer(accounts[0], factoryAddress);
         shareholder = await Shareholder.deployed();
-        helper = await require('./utils/HelperFunctions.js')(contract);
+        test = (await Factory.at(await contract.fac()))
+        helper = await require('./utils/HelperFunctions.js')(test);
+        //expect(+await factory.getNumOfProposals.call()).toBe(0);
     })
 
-    /*it('should transfer ownership to another director only if the sender is the deployer of the contract', async function() {
+    it('should transfer ownership to another director only if the sender is the deployer of the contract', async function() {
         await contract.transferOwnership.sendTransaction(accounts[1], {from: accounts[0]});
         expect(await contract.userAddress()).toBe(accounts[1]);
     })
@@ -37,11 +43,10 @@ contract('AgmOwner', function(accounts) {
         await contract.addUser.sendTransaction(accounts[2], false, 30);
         expect(+await contract.getNumOfUsers.call()).toBe(3);
         expect(+await contract.numberOfUsers()).toBe(3);
-        /* shareholder and owner have same number of users
-        let sh = await Shareholder.deployed();
-        console.log(+await sh.getNumOfUsers.call());
-        await sh.getShareholderList.sendTransaction();
-        console.log(+await sh.getNumOfShareholders.call());
+        //shareholder and owner have same number of users
+        //console.log(+await shareholder.getNumOfUsers.call());
+        //await sh.getShareholderList.sendTransaction();
+        //console.log(+await sh.getNumOfShareholders.call());
     })
 
     it('should create shareholders and directors and remove users', async () => {
@@ -58,7 +63,7 @@ contract('AgmOwner', function(accounts) {
 
     /*it('should create a proposal', async () => {
         await contract.createProposal.sendTransaction("election", "new board shall be elected", "A,B,C");
-        expect(+await contract.getNumOfProposals.call()).toBe(1);
+        expect(+await factory.getNumOfProposals.call()).toBe(1);
         let propObj = await helper.getFormattedObj(0, 'proposal');
         expect(+propObj.proposalId).toBe(0);
         expect(propObj.name).toBe('election');
@@ -67,7 +72,7 @@ contract('AgmOwner', function(accounts) {
         expect(propObj.proposalPassed).toBe(false);
         expect(+propObj.passedPercent).toBe(0);
         expect(+propObj.voteCount).toBe(0);
-    })
+    })*/
 
     it('should ensure that only the owner can create a proposal', async () => {
         try {
@@ -91,23 +96,28 @@ contract('AgmOwner', function(accounts) {
         expect(announceObj[1]).toBe('ICC Berlin');
     })
 
-    /*it('should make the identical proposal array available to all shareholders and the owner', async () => {
+    it('should ensure that AgmOwner and shareholders interact with the same proposals', async () => {
         await contract.createProposal.sendTransaction("election1", "new board shall be elected", "A,B,C");
         await contract.createProposal.sendTransaction("election2", "new board shall be elected", "A,B");
-        await contract.createProposal.sendTransaction("election3", "new board shall be elected", "A,C");
-        expect(+await contract.getNumOfProposals.call()).toBe(3);
-        //let sh = await Shareholder.new(accounts[1], 1000);
-        expect(+await test.getNumOfProposals.call()).toBe(3);
-    })*/
-
-    it('should ensure that AgmOwner and shareholders interact with the same proposals', async () => {
-        console.log(await contract.createProposal.sendTransaction("election1", "new board shall be elected", "A,B,C", {from: accounts[0]}));
         let numOfProposalsInAgmOwner = +await Factory.at(await contract.fac()).getNumOfProposals.call();
         let numOfProposalsInShareholder = +await Factory.at(await shareholder.fac()).getNumOfProposals.call();
-        console.log(await contract.fac())
-        console.log(await shareholder.fac())
-        expect(numOfProposalsInAgmOwner).toBe(numOfProposalsInShareholder);
+        console.log('AgmOwner factory: ' + await contract.fac())
+        console.log('Shareholder factory: ' + await shareholder.fac())
         
-        //expect(await contract.fac.getNumOfProposals.call()).toBe(1);
+        expect(numOfProposalsInAgmOwner).toBe(numOfProposalsInShareholder);
+        expect(+await factory.getNumOfProposals.call()).toBe(2);
+    })
+
+    it('number of proposals is not set to 0 because the preceding proposals are stored in Factory', async () => {
+        expect(+await factory.getNumOfProposals.call()).toBe(2);
+        let numOfProposalsInAgmOwner = +await Factory.at(await contract.fac()).getNumOfProposals.call();
+        let numOfProposalsInShareholder = +await Factory.at(await shareholder.fac()).getNumOfProposals.call();
+        expect(numOfProposalsInAgmOwner).toBe(2);
+        expect(numOfProposalsInShareholder).toBe(2);
+    })
+
+    it('should ensure that AgmOwner and shareholder access the same user list', async () => {
+        await contract.addUser.sendTransaction(accounts[2], true, 0);
+        expect(await contract.getNumOfUsers.call()).toBe(1);
     })
 });

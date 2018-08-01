@@ -7,11 +7,14 @@ import "./ProposalData.sol";
 
 contract Factory is ProposalData {
 
+    Shareholder[] public shareholders;
     Proposal[] public proposals;
     mapping(address => uint) public votingWeights;
 
     function createNewShareholder(address _userAddress, uint votingTok) public returns (Shareholder) {
-        return new Shareholder(_userAddress, votingTok, this);
+        Shareholder sh = new Shareholder(_userAddress, votingTok, this);
+        shareholders.push(sh);
+        return sh;
     }
 
     function createNewDirector(address _userAddress) public returns (Director) {
@@ -75,7 +78,18 @@ contract Factory is ProposalData {
     function setVotingWeight(address userAddress, uint weight) public {
         votingWeights[userAddress] = weight;
     }
-    
 
-   
+    function getShareholder(uint shareholderId) public view returns (
+        address _userAddress,
+        bool _isDirector,
+        address _delegate
+    ) {
+        Shareholder sh = shareholders[shareholderId];
+        return
+            (sh.userAddress(), sh.isDirector(), sh.delegate());
+    }
+
+    function getNumOfShareholders() public view returns (uint length) {
+        return shareholders.length;
+    }
 }

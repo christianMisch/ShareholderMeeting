@@ -14,7 +14,6 @@ contract Shareholder is User, ProposalData {
 
     //mapping(address => Delegate[]) delegations;
     Question[] public questions;
-    Shareholder[] public shareholders;
 
     enum RatingOption {DOWNVOTE, UPVOTE}
 
@@ -53,7 +52,7 @@ contract Shareholder is User, ProposalData {
         delegate = address(0);
     }
 
-    /*function vote(uint proposalId, string votingOption) public {
+    function vote(uint proposalId, string votingOption) public {
         fac.setVote(proposalId, votingOption);
         
         emit Voted(userAddress, proposalId, votingOption);
@@ -102,44 +101,32 @@ contract Shareholder is User, ProposalData {
             (question.creator, question.questionId, question.content, question.timestamp, question.upvotes, question.downvotes);
     }
 
-    function denominateVotingTokens() public view {
+    /*function denominateVotingTokens() public view {
 
-    }
+    }*/
 
     function getVoterWeight(address _userAddress) public returns (uint weight) {
         weight = 0;
-        for (uint i = 0; i < shareholders.length; i++) {
-            if (shareholders[i].delegate() == _userAddress) {
-                weight += fac.votingWeights(shareholders[i].userAddress());
+        for (uint i = 0; i < fac.getNumOfShareholders(); i++) {
+            
+            (address currAddress,,address _delegate) = fac.getShareholder(i);
+            if (_delegate == _userAddress) {
+                weight += fac.votingWeights(currAddress);
             }
 
-            if (shareholders[i].userAddress() == _userAddress && shareholders[i].delegate() == address(0)) {
-                weight += fac.votingWeights(shareholders[i].userAddress());
+            if (currAddress == _userAddress && _delegate == address(0)) {
+                weight += fac.votingWeights(currAddress);
             }
         }
 
         emit VoterWeight(_userAddress, weight);     
     }
 
-    function getShareholder(uint shareholderId) public view returns (
-        address _userAddress,
-        bool _isDirector,
-        address _delegate
-    ) {
-        Shareholder sh = shareholders[shareholderId];
-        return
-            (sh.userAddress(), sh.isDirector(), sh.delegate());
-    }
-
-    function getNumOfShareholders() public view returns (uint length) {
-        return shareholders.length;
-    }
-
     /*function isShareholder(address _userAddress) public view returns (bool isSharehold) {
         return !owner.users[_userAddress].isDirector(); 
-    }*/
+    }
 
-    /*function getShareholderList() public returns (Shareholder[]) {  
+    function getShareholderList() public returns (Shareholder[]) {  
         User[] storage users = owner.users;
         for (uint i = 0; i < users.length; i++) {
             if (isShareholder(owner.users[i].userAddress())) {
