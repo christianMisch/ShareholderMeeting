@@ -8,23 +8,14 @@ import "./ProposalData.sol";
 contract Shareholder is User, ProposalData {
 
     Factory public fac;
+    QandA public qa;
 
     address public delegate;
     
 
     //mapping(address => Delegate[]) delegations;
-    Question[] public questions;
 
     enum RatingOption {DOWNVOTE, UPVOTE}
-
-    struct Question {
-        address creator;
-        uint questionId;
-        string content;
-        uint timestamp;
-        uint upvotes;
-        uint downvotes;
-    }
 
     /*struct Delegate {
         address proxy;
@@ -36,18 +27,16 @@ contract Shareholder is User, ProposalData {
         _;
     }
 
-    event InvalidRatingOption(address invoker);
-    event QuestionUpvote(address invoker, uint numUpvotes);
-    event QuestionDownvote(address invoker, uint numDownvotes);
     event QuestionCreated(uint questionId, address creator);
     event Voted(address invoker, uint proposalId, string votingOption);
     event VoterWeight(address userAddress, uint weight);
-    event DelegatedFrom(address sender, uint votingTokens, address proxy);
+    event DelegatedFrom(address sender, uint senderWeight, address proxy, uint proxyWeight);
     
-    constructor(address userAddress, uint _votingWeight, Factory _fac) 
+    constructor(address userAddress, uint _votingWeight, Factory _fac, QandA _qa) 
         User(userAddress, false) public {
         
         fac = _fac;
+        qa = _qa;
         fac.setVotingWeight(userAddress, _votingWeight);
         delegate = address(0);
     }
@@ -58,47 +47,15 @@ contract Shareholder is User, ProposalData {
         emit Voted(userAddress, proposalId, votingOption);
     }
 
-    function createQuestion(string _content) public returns (uint id) {
-        id = questions.length++;
-        Question storage question = questions[id];
-        question.questionId = id;
-        question.creator = msg.sender;
-        question.content = _content;
-        question.timestamp = now;
-        question.upvotes = 0;
-        question.downvotes = 0;
+    function createQuestion(string _content) public returns (uint questId) {
 
-        emit QuestionCreated(id, msg.sender);
+        questId = qa.createNewQuestion(_content);
+
+        emit QuestionCreated(questId, msg.sender);
     }
 
     function rateQuestion(uint questionId, RatingOption ratingOpt) public {
-        Question storage question = questions[questionId];
-        if (ratingOpt == RatingOption.UPVOTE) {
-            question.upvotes++;
-            emit QuestionUpvote(msg.sender, question.upvotes);
-        } else if (ratingOpt == RatingOption.DOWNVOTE) {
-            question.downvotes++;
-            emit QuestionDownvote(msg.sender, question.downvotes);
-        } else {
-            emit InvalidRatingOption(msg.sender);
-        }
-    }
-
-    function getNumOfQuestions() public view returns (uint length) {
-        return questions.length;
-    }
-
-    function getQuestion(uint questionId) public view returns (
-        address _creator,
-        uint _questionId,
-        string _content,
-        uint _timestamp,
-        uint _upvotes,
-        uint _downvotes
-    ) {
-        Question storage question = questions[questionId];
-        return
-            (question.creator, question.questionId, question.content, question.timestamp, question.upvotes, question.downvotes);
+        qa.setRating(questionId, uint(ratingOpt));
     }
 
     /*function denominateVotingTokens() public view {
@@ -123,7 +80,7 @@ contract Shareholder is User, ProposalData {
     }
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
-    function delegateToProxy(address proxyAddress, bool partialDelegation) private {
+    function delegateToProxy(address proxyAddress/*bool partialDelegation*/) public {
         require(fac.votingWeights(msg.sender) > 0, "Sender does not own enough voting tokens");
         require(proxyAddress != msg.sender, "Self-delegation is not allowed");
         //require(userExists(proxyAddress), "Proxy is not a registered user");
@@ -135,11 +92,12 @@ contract Shareholder is User, ProposalData {
         // subtract tokens from sender and add them to proxy
         uint senderWeight = fac.votingWeights(msg.sender);
         fac.setVotingWeight(msg.sender, 0);
-        fac.setVotingWeight(proxyAddress, fac.votingWeights(proxyAddress) + senderWeight);
+        uint newWeight = fac.votingWeights(proxyAddress) + senderWeight;
+        fac.setVotingWeight(proxyAddress, newWeight);
 
         delegate = proxyAddress; 
 
-        emit DelegatedFrom(msg.sender, senderWeight, proxyAddress);  
+        emit DelegatedFrom(msg.sender, senderWeight, proxyAddress, newWeight);  
     }
 
 

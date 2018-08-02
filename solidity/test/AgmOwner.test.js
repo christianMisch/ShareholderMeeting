@@ -1,6 +1,7 @@
 const AgmOwner = artifacts.require('./AgmOwner.sol');
 const Shareholder = artifacts.require('./Shareholder.sol');
 const Factory = artifacts.require('./Factory.sol');
+const QandA = artifacts.require('./QandA.sol');
 const AgmOwnerDeployer = require('./utils/AgmOwnerDeployer.js')(AgmOwner);
 
 
@@ -12,14 +13,14 @@ contract('AgmOwner', async (accounts) => {
     let helper;
     let shareholder;
     let factory;
-    let factoryAddress;
+    let qa;
 
     beforeEach(async () => {
         factory = await Factory.deployed();
-        factoryAddress = (await Factory.deployed()).address;
-        contract = await AgmOwnerDeployer(accounts[0], factoryAddress);
+        qa = await QandA.deployed();
+        contract = await AgmOwnerDeployer(accounts[0], factory.address);
         shareholder = await Shareholder.deployed();
-        helper = await require('./utils/HelperFunctions.js')(factory);
+        helper = await require('./utils/HelperFunctions.js')(factory,_);
         //expect(+await factory.getNumOfProposals.call()).toBe(0);
     })
 
@@ -37,9 +38,9 @@ contract('AgmOwner', async (accounts) => {
     })
 
     it('should create a new shareholder and add him to the AGM list', async () => {
-        await contract.addUser.sendTransaction(accounts[1], false, 10000);
-        await contract.addUser.sendTransaction(accounts[1], false, 20);
-        await contract.addUser.sendTransaction(accounts[2], false, 30);
+        await contract.addUser.sendTransaction(accounts[1], false, 10000, qa.address);
+        await contract.addUser.sendTransaction(accounts[1], false, 20, qa.address);
+        await contract.addUser.sendTransaction(accounts[2], false, 30, qa.address);
         expect(+await contract.getNumOfUsers.call()).toBe(3);
         expect(+await contract.numberOfUsers()).toBe(3);
         //shareholder and owner have same number of users
@@ -49,8 +50,8 @@ contract('AgmOwner', async (accounts) => {
     })
 
     it('should create shareholders and directors and remove users', async () => {
-        await contract.addUser.sendTransaction(accounts[2], true, 0);
-        await contract.addUser.sendTransaction(accounts[3], false, 1000);
+        await contract.addUser.sendTransaction(accounts[2], true, 0, qa.address);
+        await contract.addUser.sendTransaction(accounts[3], false, 1000, qa.address);
         expect(+await contract.numberOfUsers()).toBe(2);
         expect(+await contract.userId.call(accounts[2])).toBe(0);
         expect(+await contract.userId.call(accounts[3])).toBe(1);
@@ -116,9 +117,12 @@ contract('AgmOwner', async (accounts) => {
     })
 
     it('should ensure that number of proposals for a new deployed Factory is 0', async () => {
-        let newOwner = await AgmOwnerDeployer(accounts[0], 'use a valid contract address here...');
-        let numOfProposalsInAgmOwner = +await Factory.at(await newOwner.fac()).getNumOfProposals.call();
-        expect(await factory.getNumOfProposals.call()).toBe(2);
-        expect(+await Factory.at(await newOwner.fac()).getNumOfProposals.call()).toBe(0);
+        // new factory with new address -> previous created proposals are not stored
+        let newFact = await Factory.new();
+        let newOwner = await AgmOwnerDeployer(accounts[0], newFact.address);
+        let newOwnerFac = await helper.getFactory(newOwner);
+        let numOfProposalsInAgmOwner = +await newOwnerFac.getNumOfProposals.call();
+        expect(+await factory.getNumOfProposals.call()).toBe(2);
+        expect(numOfProposalsInAgmOwner).toBe(0);
     })
 });

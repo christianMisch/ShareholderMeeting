@@ -4,6 +4,7 @@ import "./User.sol";
 import "./Director.sol";
 import "./Shareholder.sol";
 import "./ProposalData.sol";
+import "./QandA.sol";
 
 contract Factory is ProposalData {
 
@@ -14,14 +15,14 @@ contract Factory is ProposalData {
     event Log();
     event Test();
 
-    function createNewShareholder(address _userAddress, uint votingTok) public returns (Shareholder) {
-        Shareholder sh = new Shareholder(_userAddress, votingTok, this);
+    function createNewShareholder(address _userAddress, uint votingTok, QandA qa) public returns (Shareholder) {
+        Shareholder sh = new Shareholder(_userAddress, votingTok, this, qa);
         shareholders.push(sh);
         return sh;
     }
 
-    function createNewDirector(address _userAddress) public returns (Director) {
-        return new Director(_userAddress);
+    function createNewDirector(address _userAddress, QandA qa) public returns (Director) {
+        return new Director(_userAddress, qa);
     }
 
     function createNewProposal(string _name, string _description, string _options) public returns (uint propId) {
@@ -79,18 +80,18 @@ contract Factory is ProposalData {
         prop.voteCount++;
     }
 
-    function getVote(uint proposalID, address voter) public returns (address user, string option, uint weight) {
+    function getVote(uint proposalID, address voter) public view returns (address user, string option, uint weight) {
         Proposal storage proposal = proposals[proposalID];
 
-        for (uint i = 0; i < proposal.votes.length; ++i) {
+        for (uint i = 0; i < proposal.votes.length; i++) {
             Vote storage v = proposal.votes[i];
 
-            if (v.voterAddress == voter) {
-                emit Log();
+            if (true) {
+                //emit Log();
                 return (v.voterAddress, v.voterDecision, v.voterWeight);
             }
         }
-        emit Test();
+        //emit Test();
         return (address(0), "", 0);
     }
 

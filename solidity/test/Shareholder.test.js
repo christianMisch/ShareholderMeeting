@@ -2,6 +2,7 @@ const Director = artifacts.require('./Director.sol');
 const Shareholder = artifacts.require('./Shareholder.sol');
 const AgmOwner = artifacts.require('./AgmOwner.sol');
 const Factory = artifacts.require('./Factory.sol');
+const QandA = artifacts.require('./QandA.sol');
 //const AgmOwnerDeployer = require('./utils/AgmOwnerDeployer.js')(AgmOwner);
 
 const should = require('should');
@@ -15,13 +16,14 @@ contract('Shareholder', async (accounts) => {
 
     beforeEach(async () => {
         factory = await Factory.deployed();
+        qa = await QandA.deployed();
         contract = await Shareholder.deployed();
         agmOwner = await AgmOwner.deployed();
-        helper = await require('./utils/HelperFunctions.js')(factory, contract);
+        helper = await require('./utils/HelperFunctions.js')(factory, qa);
     });
 
     it('should create a new shareholder instance', async () => {
-        let instance = await Shareholder.new(accounts[0], 20000, factory.address);
+        let instance = await Shareholder.new(accounts[0], 20000, factory.address, qa.address);
         expect(await instance.delegate()).toContain('0x0');
         expect(await instance.userAddress()).toBe(accounts[0]);
         expect(await instance.isDirector()).toBe(false);
@@ -38,26 +40,29 @@ contract('Shareholder', async (accounts) => {
         expect(propObj.description).toBe('elect the chairperson');
         expect(propObj.options).toBe('A,B,C');
         expect(propObj.proposalPassed).toBe(false);
+        
         let facOwner = await helper.getFactory(agmOwner);
         let facShareh = await helper.getFactory(contract);
         expect(+await facOwner.getNumOfProposals.call()).toBe(1);
         expect(+await facShareh.getNumOfProposals.call()).toBe(1);
         
-        let sh = await Shareholder.new(accounts[1], 1000, factory.address);
-        await sh.vote.sendTransaction(0, 'A', {from: accounts[1]});
+        let sh = await Shareholder.new(accounts[1], 1000, factory.address, qa.address);
+        await sh.vote.sendTransaction(0, 'A');
+        await sh.vote.sendTransaction(0, 'A');
 
         let modifPropObj = await helper.getFormattedObj(0, 'proposal');
-        expect(+modifPropObj.voteCount).toBe(1);
+        expect(+modifPropObj.voteCount).toBe(2);
         
         let facSh = await helper.getFactory(sh);
         expect(+await facSh.getNumOfProposals.call()).toBe(1)
-        expect(+await facSh.getNumOfVotes.call(0)).toBe(1);
-        //console.log(accounts[1]);
-        let voteTuple = await facSh.getVote.call(0, accounts[1]); 
+        expect(+await facSh.getNumOfVotes.call(0)).toBe(2);
+        expect(await sh.userAddress()).toBe(accounts[1]);
+        //let voteTuple = await facSh.getVote.call(1, accounts[1]); 
+        //console.log(voteTuple);
         //expect(+voteTuple[2]).toBe(1000);
     })
 
-    it('should be possible to create a question for a shareholder', async () => {
+    /*it('should be possible to create a question for a shareholder', async () => {
         // use same contract because it invokes contract.getQuestion(id)
         //let sh = await Shareholder.new(accounts[1], 1000, factory.address);
         await contract.createQuestion.sendTransaction("question1");
@@ -108,4 +113,15 @@ contract('Shareholder', async (accounts) => {
         let shWeight = +await facSh.votingWeights.call(accounts[1]);
         expect(shWeight).toBe(1000);
     })
+
+    it('should add the shareholder weight to the proxy', async () => {
+        let sender = await Shareholder.new(accounts[9], 20000, factory.address);
+        let proxy = await Shareholder.new(accounts[2], 300, factory.address);
+        expect(await proxy.userAddress()).toBe(accounts[2]);
+        sender.delegateToProxy(await proxy.userAddress());
+        let facSender = await helper.getFactory(sender);
+        let facProxy = await helper.getFactory(proxy);
+        expect(+await facProxy.votingWeights(await proxy.userAddress())).toBe(20300);
+        expect(+await facSender.votingWeights(await sender.userAddress())).toBe(0);
+    })*/
 })

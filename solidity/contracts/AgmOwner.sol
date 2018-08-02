@@ -78,7 +78,7 @@ contract AgmOwner is User {
         emit OwnershipTransferedTo(_owner);
     }
 
-    function addUser(address _userAddress, bool isDirector, uint votingTok) public {
+    function addUser(address _userAddress, bool isDirector, uint votingTok, QandA qa) public {
         uint id = userId[_userAddress];
         if (id == 0) {
             id = users.length++;
@@ -86,13 +86,13 @@ contract AgmOwner is User {
         }
 
         if (isDirector) {
-            Director d = fac.createNewDirector(_userAddress);
+            Director d = fac.createNewDirector(_userAddress, qa);
             users[id] = d;
             
             emit UserCreated(id, _userAddress, true);
         
         } else {
-            Shareholder s = fac.createNewShareholder(_userAddress, votingTok);
+            Shareholder s = fac.createNewShareholder(_userAddress, votingTok, qa);
             users[id] = s;
             
             emit UserCreated(id, _userAddress, false);

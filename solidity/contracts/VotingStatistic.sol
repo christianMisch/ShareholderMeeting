@@ -2,13 +2,6 @@ pragma solidity ^0.4.23;
 
 import "./Shareholder.sol";
 
-/*
-
-import "./Director.sol";
-import "./Shareholder.sol";
-import "./VotingStatistic.sol";
-import "./Voter.sol"; */
-
 contract VotingStatistic {
 
     // sum of the weights or voting power of all users
@@ -36,7 +29,7 @@ contract VotingStatistic {
         totalVotingPower = newTotalVP;
     }
 
-    function getTotalVotingPower() public returns (uint totalVP) {
+    function getTotalVotingPower() public view returns (uint totalVP) {
         return totalVotingPower;
     }
 
@@ -54,7 +47,4 @@ contract VotingStatistic {
             statistic.updateProposalPercentage(proposalId, proposals[i].passedPercent);
         }
     } */
-
-    /*
-    */ 
 }
