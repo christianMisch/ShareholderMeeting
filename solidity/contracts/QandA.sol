@@ -48,23 +48,23 @@ contract QandA {
         return answers.length;
     }
 
-    function createNewAnswer(uint _questionId, string _content) public returns(uint answId) {
+    function createNewAnswer(uint _questionId, string _content, address sender) public returns(uint answId) {
 
         answId = answers.length++;
         Answer storage answer = answers[answId];
         answer.answerId = answId;
         answer.questionId = _questionId;
-        answer.answerCreator = msg.sender;
+        answer.answerCreator = sender;
         answer.content = _content;
         answer.timestamp = now;
     }
 
-    function createNewQuestion(string _content) public returns (uint questId) {
+    function createNewQuestion(string _content, address sender) public returns (uint questId) {
 
         questId = questions.length++;
         Question storage question = questions[questId];
         question.questionId = questId;
-        question.creator = msg.sender;
+        question.creator = sender;
         question.content = _content;
         question.timestamp = now;
         question.upvotes = 0;
@@ -88,7 +88,7 @@ contract QandA {
             (question.creator, question.questionId, question.content, question.timestamp, question.upvotes, question.downvotes);
     }
 
-    function setRating(uint questionId, uint ratingOpt) public view {
+    function setRating(uint questionId, uint ratingOpt) public {
 
         Question storage question = questions[questionId];
         if (ratingOpt == 1) {

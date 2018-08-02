@@ -1,4 +1,5 @@
 const Factory = artifacts.require("./Factory.sol");
+const QandA = artifacts.require('./QandA.sol');
 
 const answerFields = [
     'answerId',
@@ -77,6 +78,12 @@ module.exports = (factory, qa) => {
        return fac;
     }
 
+    async function getQandA(contract) {
+       let qa = await QandA.at(await contract.qa());
+       return qa; 
+    }
+
     return {getFormattedObj: getFormattedObj,
-            getFactory: getFactory};
+            getFactory: getFactory,
+            getQandA: getQandA};
 }

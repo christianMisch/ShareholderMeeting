@@ -26,7 +26,7 @@ contract Director is User {
     function createAnswer(uint _questionId, string _content) 
         onlyDirector public returns (uint answerId)  {
 
-        answerId = qa.createNewAnswer(_questionId, _content);
+        answerId = qa.createNewAnswer(_questionId, _content, msg.sender);
 
         emit AnswerCreated(answerId, msg.sender);
     }

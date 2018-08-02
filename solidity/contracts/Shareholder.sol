@@ -31,6 +31,7 @@ contract Shareholder is User, ProposalData {
     event Voted(address invoker, uint proposalId, string votingOption);
     event VoterWeight(address userAddress, uint weight);
     event DelegatedFrom(address sender, uint senderWeight, address proxy, uint proxyWeight);
+    event ShareholderCreated(address userAddress, uint votingWeight, address delegate);
     
     constructor(address userAddress, uint _votingWeight, Factory _fac, QandA _qa) 
         User(userAddress, false) public {
@@ -39,6 +40,8 @@ contract Shareholder is User, ProposalData {
         qa = _qa;
         fac.setVotingWeight(userAddress, _votingWeight);
         delegate = address(0);
+
+        emit ShareholderCreated(userAddress, fac.votingWeights(userAddress), delegate);
     }
 
     function vote(uint proposalId, string votingOption) public {
@@ -49,7 +52,7 @@ contract Shareholder is User, ProposalData {
 
     function createQuestion(string _content) public returns (uint questId) {
 
-        questId = qa.createNewQuestion(_content);
+        questId = qa.createNewQuestion(_content, msg.sender);
 
         emit QuestionCreated(questId, msg.sender);
     }
