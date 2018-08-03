@@ -11,16 +11,16 @@ contract Shareholder is User, ProposalData {
     QandA public qa;
 
     address public delegate;
-    
-
-    //mapping(address => Delegate[]) delegations;
+    uint[] public votingDenominations;
+    Delegate[] public delegations;
+    mapping (uint => address) public ratings;
 
     enum RatingOption {DOWNVOTE, UPVOTE}
 
-    /*struct Delegate {
+    struct Delegate {
         address proxy;
-        uint votingTok;
-    }*/
+        uint votingWeight;
+    }
 
     modifier onlyShareholder {
         require((!this.isDirector()) && (fac.votingWeights(msg.sender) > 0));
@@ -30,7 +30,8 @@ contract Shareholder is User, ProposalData {
     event QuestionCreated(uint questionId, address creator);
     event Voted(address invoker, uint proposalId, string votingOption);
     event VoterWeight(address userAddress, uint weight);
-    event DelegatedFrom(address sender, uint senderWeight, address proxy, uint proxyWeight);
+    event PartialDelegationFrom(address sender, uint senderWeight, address proxy, uint proxyWeight);
+    event SimpleDelegationFrom(address sender, uint senderWeight, address proxy, uint proxyWeight);
     event ShareholderCreated(address userAddress, uint votingWeight, address delegate);
     
     constructor(address userAddress, uint _votingWeight, Factory _fac, QandA _qa) 
@@ -58,12 +59,24 @@ contract Shareholder is User, ProposalData {
     }
 
     function rateQuestion(uint questionId, RatingOption ratingOpt) public {
+        require(ratings[questionId] != msg.sender, "sender has already rated this question");
         qa.setRating(questionId, uint(ratingOpt));
+        ratings[questionId] = msg.sender;
     }
 
-    /*function denominateVotingTokens() public view {
-
-    }*/
+    function denominateVotingTokens(uint numOfThousandWeights, uint divider) public {
+        uint voterWeight = fac.votingWeights(msg.sender);
+        if (divider == 0) {
+            for (uint i = 0; i < numOfThousandWeights; i++) {
+                votingDenominations.push(1000);
+            }
+        } else {
+            uint dividedWeight = voterWeight / divider;
+            for (uint j = 0; j < divider; j++) {
+                votingDenominations.push(dividedWeight);
+            }
+        }
+    }
 
     function getVoterWeight(address _userAddress) public returns (uint weight) {
         weight = 0;
@@ -83,24 +96,44 @@ contract Shareholder is User, ProposalData {
     }
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
-    function delegateToProxy(address proxyAddress/*bool partialDelegation*/) public {
+    function delegateToProxy(address proxyAddress, bool partialDelegation, uint voteBlockIndex) public {
         require(fac.votingWeights(msg.sender) > 0, "Sender does not own enough voting tokens");
         require(proxyAddress != msg.sender, "Self-delegation is not allowed");
         //require(userExists(proxyAddress), "Proxy is not a registered user");
         //require(userExists(msg.sender), "the user account is not registered");
-        require(delegate == address(0), "user already has delegated to another proxy");
-        // partial voting, delegate a part of his token to multiple proxies
-        // so far it's simple delegation: only whole number of voting token can be delegated to one proxy
+        //require(delegate == address(0), "user already has delegated to another proxy");
 
-        // subtract tokens from sender and add them to proxy
         uint senderWeight = fac.votingWeights(msg.sender);
-        fac.setVotingWeight(msg.sender, 0);
-        uint newWeight = fac.votingWeights(proxyAddress) + senderWeight;
-        fac.setVotingWeight(proxyAddress, newWeight);
+        if (partialDelegation) {
+            // partial voting, delegate a voting weight block of his total voting weight to one proxy
+            uint targetVoteWeight = votingDenominations[voteBlockIndex];
+            // deletes voting weight block in the weight array and deletes the entry with swapping elements if required
+            delete votingDenominations[voteBlockIndex];
 
-        delegate = proxyAddress; 
+            for (; voteBlockIndex < votingDenominations.length - 1; voteBlockIndex++) {
+                votingDenominations[voteBlockIndex] = votingDenominations[voteBlockIndex+1];
+            }
+        
+            votingDenominations.length--; 
 
-        emit DelegatedFrom(msg.sender, senderWeight, proxyAddress, newWeight);  
+            fac.setVotingWeight(msg.sender, senderWeight - targetVoteWeight);
+            uint newWeightWithPartDeleg = fac.votingWeights(proxyAddress) + targetVoteWeight;
+            fac.setVotingWeight(proxyAddress, newWeightWithPartDeleg);
+            
+            delegations.push(Delegate(proxyAddress, targetVoteWeight));
+
+            emit PartialDelegationFrom(msg.sender, senderWeight, proxyAddress, targetVoteWeight);
+        } else {
+
+            // subtract tokens from sender and add them to proxy
+            fac.setVotingWeight(msg.sender, 0);
+            uint newWeight = fac.votingWeights(proxyAddress) + senderWeight;
+            fac.setVotingWeight(proxyAddress, newWeight);
+
+            delegations.push(Delegate(proxyAddress, senderWeight)); 
+
+            emit SimpleDelegationFrom(msg.sender, senderWeight, proxyAddress, newWeight);
+        }  
     }
 
 

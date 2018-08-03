@@ -99,7 +99,7 @@ contract('Shareholder', async (accounts) => {
         await contract.createQuestion.sendTransaction("question1", {from: accounts[0]});
         expect(await contract.userAddress()).toBe(accounts[0]);
         await contract.rateQuestion.sendTransaction(0, 0, {from: accounts[0]});
-        // invoked twice contract.createQuestion() so far
+        
         let qa = await helper.getQandA(contract);
         expect(+await qa.getNumOfQuestions.call()).toBe(2);
         let questObj = await helper.getFormattedObj(0, 'question');
@@ -143,5 +143,31 @@ contract('Shareholder', async (accounts) => {
         let facProxy = await helper.getFactory(proxy);
         expect(+await facProxy.votingWeights(await proxy.userAddress())).toBe(3);
         expect(+await facSender.votingWeights(await sender.userAddress())).toBe(0);
+    })
+
+    it('should ensure that a shareholder can only rate at most once on a question', async () => {
+        let newQARef = await QandA.new();
+        let rater = await Shareholder.new(accounts[4], 1000, factory.address, newQARef.address);
+        let otherRater = await Shareholder.new(accounts[2], 2, factory.address, newQARef.address);
+
+        let qaRater = await helper.getQandA(rater);
+        let qaOthRat = await helper.getQandA(otherRater);
+
+        await rater.createQuestion.sendTransaction('how many vacation days can we claim?');
+        let numOfQuestionsInRater = await qaRater.getNumOfQuestions.call();
+        let numOfQuestionsInOtherRat = await qaOthRat.getNumOfQuestions.call();
+        
+        expect(+numOfQuestionsInRater).toBe(1);
+        expect(+numOfQuestionsInOtherRat).toBe(1);
+
+        await rater.rateQuestion.sendTransaction(0, 1);
+        await otherRater.rateQuestion.sendTransaction(0, 0);
+
+        try {
+            should.fail(await rater.rateQuestion.sendTransaction(0, 1));
+        } catch (error) {
+            expect(error.message).toContain('revert');
+        }
+        
     })
 })

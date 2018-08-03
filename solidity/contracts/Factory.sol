@@ -41,14 +41,6 @@ contract Factory is ProposalData {
         return proposals.length;
     }
 
-    function getProposalIdByName(string name) public view returns(uint proposalId) {
-        for (uint i = 0; i < proposals.length; i++) {
-            if (keccak256(name) == keccak256(proposals[i].name)) {
-                return i;
-            }
-        }
-    }
-
     function getProposal(uint proposalId) public view returns (
         uint _proposalId,
         string _name,
