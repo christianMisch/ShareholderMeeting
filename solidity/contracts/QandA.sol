@@ -10,7 +10,8 @@ contract QandA {
         uint questionId;
         address answerCreator;
         string content;
-        uint timestamp; 
+        uint timestamp;
+        string ipfs_hash; 
     }
 
     struct Question {
@@ -20,6 +21,7 @@ contract QandA {
         uint timestamp;
         uint upvotes;
         uint downvotes;
+        string ipfs_hash;
     }
 
     // storing the answers of directors

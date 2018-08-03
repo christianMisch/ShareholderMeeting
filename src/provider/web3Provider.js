@@ -1,5 +1,5 @@
-//import web3 from 'web3';
-var web3 = require('web3');
+import web3 from './web3.js';
+//var web3 = require('web3');
 
 function initializeWeb3() {
     if (typeof web3 !== 'undefined') {
