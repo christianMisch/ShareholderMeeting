@@ -13,7 +13,7 @@ contract('Director', async (accounts) => {
     beforeEach(async () => {
         contract = await Director.deployed();
         qa = await QandA.deployed();
-        helper = await require('./utils/HelperFunctions.js')(_, qa); 
+        helper = await require('./utils/HelperFunctions.js')(_,qa); 
     });
 
     it('should create a new director', async () => {

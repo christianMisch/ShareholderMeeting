@@ -64,17 +64,27 @@ contract Shareholder is User, ProposalData {
         ratings[questionId] = msg.sender;
     }
 
-    function denominateVotingTokens(uint numOfThousandWeights, uint divider) public {
+    function denominateVotingTokens(uint numOfBlockWeights, uint divider, uint factor) public {
+        
         uint voterWeight = fac.votingWeights(msg.sender);
-        if (divider == 0) {
-            for (uint i = 0; i < numOfThousandWeights; i++) {
-                votingDenominations.push(1000);
+        
+        if (factor != 0 && numOfBlockWeights != 0) {
+            require(voterWeight > factor * 1000 * numOfBlockWeights, "sender hasn't enough voting weight for factor-based denomination");
+            for (uint i = 0; i < numOfBlockWeights; i++) {
+                votingDenominations.push(factor * 1000);
             }
-        } else {
+        } else if (numOfBlockWeights == 0 && factor == 0 && divider != 0) {
             uint dividedWeight = voterWeight / divider;
             for (uint j = 0; j < divider; j++) {
                 votingDenominations.push(dividedWeight);
             }
+        } else if (numOfBlockWeights != 0 && divider == 0 && factor == 0) {
+            require(voterWeight > 1000 * numOfBlockWeights, "sender doesn't have enough voting weight");
+            for (uint k = 0; k < numOfBlockWeights; k++) {
+                votingDenominations.push(1000);
+            }
+        } else {
+            revert("Denomination failed. Please check the params for correct denomination");
         }
     }
 
@@ -107,16 +117,18 @@ contract Shareholder is User, ProposalData {
         if (partialDelegation) {
             // partial voting, delegate a voting weight block of his total voting weight to one proxy
             uint targetVoteWeight = votingDenominations[voteBlockIndex];
-            // deletes voting weight block in the weight array and deletes the entry with swapping elements if required
+            // deletes voting weight block in the weight array
             delete votingDenominations[voteBlockIndex];
 
+            /*
+            // deletes the entry with swapping elements if required
             for (; voteBlockIndex < votingDenominations.length - 1; voteBlockIndex++) {
                 votingDenominations[voteBlockIndex] = votingDenominations[voteBlockIndex+1];
             }
         
-            votingDenominations.length--; 
-
-            fac.setVotingWeight(msg.sender, senderWeight - targetVoteWeight);
+            votingDenominations.length--;*/ 
+            uint subtractedVoteWeight = senderWeight - targetVoteWeight;
+            fac.setVotingWeight(msg.sender, subtractedVoteWeight);
             uint newWeightWithPartDeleg = fac.votingWeights(proxyAddress) + targetVoteWeight;
             fac.setVotingWeight(proxyAddress, newWeightWithPartDeleg);
             
@@ -134,6 +146,19 @@ contract Shareholder is User, ProposalData {
 
             emit SimpleDelegationFrom(msg.sender, senderWeight, proxyAddress, newWeight);
         }  
+    }
+
+    function getDelegate(uint delegateId) public view returns (address _proxyAddress, uint _votingWeight) {
+        Delegate storage deleg = delegations[delegateId];
+        return (deleg.proxy, deleg.votingWeight);
+    }
+
+    function getNumOfDelegations() public view returns (uint length) {
+        return delegations.length;
+    }
+
+    function getNumOfVotingDenominations() public view returns (uint length) {
+        return votingDenominations.length;
     }
 
 

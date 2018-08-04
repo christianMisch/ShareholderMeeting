@@ -17,7 +17,7 @@ const proposalFields = [
     'proposalPassed',
     'passedPercent',
     'voteCount'
-]
+];
 
 const questionFields = [
     'creator',
@@ -26,11 +26,16 @@ const questionFields = [
     'timestamp',
     'upvotes',
     'downvotes'
-]
+];
+
+const delegateFields = [
+    'proxy',
+    'votingWeight'
+];
 
 module.exports = (factory, qa) => {
 
-    async function getFormattedObj(id, type) {
+    async function getFormattedObj(id, type, currContract) {
         let rawData;
 
         switch (type) {
@@ -69,6 +74,19 @@ module.exports = (factory, qa) => {
                     questionFormatted[questionFields[i]] = rawData[i];
                 }
                 return questionFormatted;
+            case 'delegate':
+                rawData = await currContract.getDelegate.call(id);
+
+                if (rawData.length != delegateFields.length) {
+                    throw new Error("The proposal doesn't have the correct format. Please check the properties");
+                }
+                const delegateFormatted = {};
+                for (let i = 0; i < delegateFields.length; i++) {
+                    delegateFormatted[delegateFields[i]] = rawData[i];
+                }
+                return delegateFormatted;
+            default:
+                throw new Error('invalid formatting option...');
         }
         
     }

@@ -133,16 +133,74 @@ contract('Shareholder', async (accounts) => {
         expect(shWeight).toBe(1000);
     })
 
-    it('should add the shareholder weight to the proxy', async () => {
+    it('should add the full shareholder weight to the proxy in a simple delegation', async () => {
         let sender = await Shareholder.new(accounts[9], 1, factory.address, qa.address);
         let proxy = await Shareholder.new(accounts[2], 2, factory.address, qa.address);
         expect(await proxy.userAddress()).toBe(accounts[2]);
         expect(await sender.userAddress()).toBe(accounts[9]);
-        sender.delegateToProxy.sendTransaction(await proxy.userAddress(), {from: accounts[9]});
+        sender.delegateToProxy.sendTransaction(await proxy.userAddress(), false, 0, {from: accounts[9]});
+        
         let facSender = await helper.getFactory(sender);
         let facProxy = await helper.getFactory(proxy);
+        
         expect(+await facProxy.votingWeights(await proxy.userAddress())).toBe(3);
         expect(+await facSender.votingWeights(await sender.userAddress())).toBe(0);
+
+        let delegateObj = await helper.getFormattedObj(0, 'delegate', sender);
+
+        expect(delegateObj.proxy).toBe(accounts[2]);
+        expect(+delegateObj.votingWeight).toBe(1);
+        expect(+await sender.getNumOfDelegations.call()).toBe(1);
+    })
+
+    it('should be possible for a shareholder to denominate his voting weigth into smaller blocks', async () => {
+        let sh = await Shareholder.new(accounts[1], 4500, factory.address, qa.address);
+        await sh.denominateVotingTokens.sendTransaction(4, 0, 0);
+
+        expect(+await sh.getNumOfVotingDenominations.call()).toBe(4);
+        expect(+await sh.votingDenominations(0)).toBe(1000);
+        expect(+await sh.votingDenominations(1)).toBe(1000);
+        expect(+await sh.votingDenominations(2)).toBe(1000);
+        expect(+await sh.votingDenominations(3)).toBe(1000);
+    })
+
+    it('is not possible to denominate more voting weight than he owns', async () => {
+        let sh = await Shareholder.new(accounts[1], 4500, factory.address, qa.address);
+        try {
+            // 6 * 1000 voting weight blocks
+            should.fail(await sh.denominateVotingTokens.sendTransaction(6, 0, 0));
+        } catch (error) {
+            expect(error.message).toContain('undefined');
+        }
+    })
+
+    it('should be possible to denominate voting weight and then perform partial delegation', async () => {
+        let sender = await Shareholder.new(accounts[3], 5432, factory.address, qa.address);
+        let proxy1 = await Shareholder.new(accounts[4], 1234, factory.address, qa.address);
+        let proxy2 = await Shareholder.new(accounts[5], 56777, factory.address, qa.address);
+        let proxy3 = await Shareholder.new(accounts[6], 754432, factory.address, qa.address);
+        console.log(accounts[3]);
+
+        let facSender = await helper.getFactory(sender);
+        let facProxy1 = await helper.getFactory(proxy1);
+        let facProxy2 = await helper.getFactory(proxy2);
+        let facProxy3 = await helper.getFactory(proxy3);
+        
+        // denominateVotingTokens(numOfBlockWeights, equallyDistribution, factorizedBlockWeights)
+        await sender.denominateVotingTokens.sendTransaction(3, 0, 0, {from: accounts[3]});
+        expect(+await sender.getNumOfVotingDenominations.call()).toBe(3);
+        // delegateToProxy(proxyAddress, enablePartialDelegation, votingBlockIndex)
+        await sender.delegateToProxy(accounts[4], true, 0);
+        expect(+await facSender.votingWeights(accounts[3])).toBe(4432);
+        /*expect(+facProxy1.votingWeights(accounts[4])).toBe(2234);
+        
+        await sender.delegateToProxy(accounts[5], true, 1);
+        expect(+await facSender.votingWeights(accounts[3])).toBe(3432);
+        expect(+await facSender.votingWeights(accounts[5])).toBe(57777);
+        
+        await sender.delegateToProxy(accounts[6], true, 2);
+        expect(+await facSender.votingWeights(accounts[3])).toBe(2432);
+        expect(+await facSender.votingWeights(accounts[6])).toBe(755432);*/       
     })
 
     it('should ensure that a shareholder can only rate at most once on a question', async () => {
