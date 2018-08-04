@@ -23,7 +23,7 @@ contract Shareholder is User, ProposalData {
     }
 
     modifier onlyShareholder {
-        require((!this.isDirector()) && (fac.votingWeights(msg.sender) > 0));
+        require((!this.isDirector()) && (fac.votingWeights(msg.sender) > 0), "user is not a shareholder");
         _;
     }
 
@@ -33,6 +33,8 @@ contract Shareholder is User, ProposalData {
     event PartialDelegationFrom(address sender, uint senderWeight, address proxy, uint proxyWeight);
     event SimpleDelegationFrom(address sender, uint senderWeight, address proxy, uint proxyWeight);
     event ShareholderCreated(address userAddress, uint votingWeight, address delegate);
+    event WeightDivision(uint result);
+    event CalculateDivision(uint num, uint copy, uint divider);
     
     constructor(address userAddress, uint _votingWeight, Factory _fac, QandA _qa) 
         User(userAddress, false) public {
@@ -67,25 +69,48 @@ contract Shareholder is User, ProposalData {
     function denominateVotingTokens(uint numOfBlockWeights, uint divider, uint factor) public {
         
         uint voterWeight = fac.votingWeights(msg.sender);
+        uint subtractedVoteWeight;
         
         if (factor != 0 && numOfBlockWeights != 0) {
             require(voterWeight > factor * 1000 * numOfBlockWeights, "sender hasn't enough voting weight for factor-based denomination");
             for (uint i = 0; i < numOfBlockWeights; i++) {
                 votingDenominations.push(factor * 1000);
             }
+            subtractedVoteWeight = voterWeight - (factor * 1000 * numOfBlockWeights);
+            fac.setVotingWeight(msg.sender, subtractedVoteWeight);
+
         } else if (numOfBlockWeights == 0 && factor == 0 && divider != 0) {
-            uint dividedWeight = voterWeight / divider;
+            uint dividedWeight = safeDivision(voterWeight, divider);
             for (uint j = 0; j < divider; j++) {
                 votingDenominations.push(dividedWeight);
             }
+            fac.setVotingWeight(msg.sender, 0);
+            emit WeightDivision(dividedWeight);
+
         } else if (numOfBlockWeights != 0 && divider == 0 && factor == 0) {
             require(voterWeight > 1000 * numOfBlockWeights, "sender doesn't have enough voting weight");
             for (uint k = 0; k < numOfBlockWeights; k++) {
                 votingDenominations.push(1000);
             }
+            subtractedVoteWeight = voterWeight - (1000 * numOfBlockWeights);
+            fac.setVotingWeight(msg.sender, subtractedVoteWeight);
+
         } else {
             revert("Denomination failed. Please check the params for correct denomination");
         }
+    }
+
+    function safeDivision(uint number, uint divider) public returns (uint result) {
+        uint copy = number;
+        emit CalculateDivision(number, copy, divider);
+        uint currVal;
+        result = 0;
+        for (; copy == 0; result++) {
+            currVal = copy - divider;
+            copy = currVal;
+        }
+
+        return result;
     }
 
     function getVoterWeight(address _userAddress) public returns (uint weight) {
@@ -108,13 +133,14 @@ contract Shareholder is User, ProposalData {
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
     function delegateToProxy(address proxyAddress, bool partialDelegation, uint voteBlockIndex) public {
         require(fac.votingWeights(msg.sender) > 0, "Sender does not own enough voting tokens");
-        require(proxyAddress != msg.sender, "Self-delegation is not allowed");
+        //require(proxyAddress != msg.sender, "Self-delegation is not allowed");
         //require(userExists(proxyAddress), "Proxy is not a registered user");
         //require(userExists(msg.sender), "the user account is not registered");
         //require(delegate == address(0), "user already has delegated to another proxy");
 
         uint senderWeight = fac.votingWeights(msg.sender);
         if (partialDelegation) {
+            require(votingDenominations.length != 0, "shareholder cannot delegate partially because he doesn't own weight blocks");
             // partial voting, delegate a voting weight block of his total voting weight to one proxy
             uint targetVoteWeight = votingDenominations[voteBlockIndex];
             // deletes voting weight block in the weight array
@@ -127,8 +153,7 @@ contract Shareholder is User, ProposalData {
             }
         
             votingDenominations.length--;*/ 
-            uint subtractedVoteWeight = senderWeight - targetVoteWeight;
-            fac.setVotingWeight(msg.sender, subtractedVoteWeight);
+            
             uint newWeightWithPartDeleg = fac.votingWeights(proxyAddress) + targetVoteWeight;
             fac.setVotingWeight(proxyAddress, newWeightWithPartDeleg);
             

@@ -179,8 +179,7 @@ contract('Shareholder', async (accounts) => {
         let proxy1 = await Shareholder.new(accounts[4], 1234, factory.address, qa.address);
         let proxy2 = await Shareholder.new(accounts[5], 56777, factory.address, qa.address);
         let proxy3 = await Shareholder.new(accounts[6], 754432, factory.address, qa.address);
-        console.log(accounts[3]);
-
+        // would be enough to use only one factory because all factories store same global state
         let facSender = await helper.getFactory(sender);
         let facProxy1 = await helper.getFactory(proxy1);
         let facProxy2 = await helper.getFactory(proxy2);
@@ -189,19 +188,71 @@ contract('Shareholder', async (accounts) => {
         // denominateVotingTokens(numOfBlockWeights, equallyDistribution, factorizedBlockWeights)
         await sender.denominateVotingTokens.sendTransaction(3, 0, 0, {from: accounts[3]});
         expect(+await sender.getNumOfVotingDenominations.call()).toBe(3);
-        // delegateToProxy(proxyAddress, enablePartialDelegation, votingBlockIndex)
-        await sender.delegateToProxy(accounts[4], true, 0);
-        expect(+await facSender.votingWeights(accounts[3])).toBe(4432);
-        /*expect(+facProxy1.votingWeights(accounts[4])).toBe(2234);
-        
-        await sender.delegateToProxy(accounts[5], true, 1);
-        expect(+await facSender.votingWeights(accounts[3])).toBe(3432);
-        expect(+await facSender.votingWeights(accounts[5])).toBe(57777);
-        
-        await sender.delegateToProxy(accounts[6], true, 2);
         expect(+await facSender.votingWeights(accounts[3])).toBe(2432);
-        expect(+await facSender.votingWeights(accounts[6])).toBe(755432);*/       
+        // delegateToProxy(proxyAddress, enablePartialDelegation, votingBlockIndex)
+        await sender.delegateToProxy(accounts[4], true, 0, {from: accounts[3]});
+        expect(+await facProxy1.votingWeights(accounts[4])).toBe(2234);
+        
+        await sender.delegateToProxy(accounts[5], true, 1, {from: accounts[3]});
+        expect(+await facProxy2.votingWeights(accounts[5])).toBe(57777);
+        
+        await sender.delegateToProxy(accounts[6], true, 2, {from: accounts[3]});
+        expect(+await facProxy3.votingWeights(accounts[6])).toBe(755432);    
     })
+
+    /*it('should be possible to divide voting weight into equally distributed blocks', async () => {
+        let sender = await Shareholder.new(accounts[8], 15000, factory.address, qa.address);
+        let facSender = await helper.getFactory(sender);
+        expect(+await facSender.votingWeights(accounts[8])).toBe(15000)
+        await sender.denominateVotingTokens.sendTransaction(0, 5, 0, {from: accounts[8]});
+        expect(+await facSender.votingWeights(accounts[8])).toBe(0)
+        expect(+await sender.getNumOfVotingDenominations.call()).toBe(5);
+        expect(+await sender.votingDenominations(0)).toBe(1000);
+        expect(+await sender.votingDenominations(1)).toBe(1000);
+        expect(+await sender.votingDenominations(2)).toBe(1000);
+        expect(+await sender.votingDenominations(3)).toBe(1000);
+        expect(+await sender.votingDenominations(4)).toBe(1000);
+
+
+    })*/
+
+    it('should perform an approximate division', async () => {
+        let sender = await Shareholder.new(accounts[8], 16789, factory.address, qa.address);
+        //expect(+await sender.safeDivision(10, 2)).toBe(5);
+    })
+
+    it('should support complex weight denomination and delegation', async () => {
+        let sender = await Shareholder.new(accounts[8], 16789, factory.address, qa.address);
+        let proxy1 = await Shareholder.new(accounts[4], 1234, factory.address, qa.address);
+        let proxy2 = await Shareholder.new(accounts[5], 56777, factory.address, qa.address);
+        let facSender = await helper.getFactory(sender);
+        await sender.denominateVotingTokens.sendTransaction(2, 0, 4, {from: accounts[8]});
+        await sender.denominateVotingTokens.sendTransaction(5, 0, 0, {from: accounts[8]});
+        await proxy2.denominateVotingTokens.sendTransaction(3, 0, 7, {from: accounts[5]});
+
+        expect(+await facSender.votingWeights(accounts[8])).toBe(3789);
+        expect(+await facSender.votingWeights(accounts[5])).toBe(35777);
+        expect(+await sender.getNumOfVotingDenominations.call()).toBe(7);
+        expect(+await proxy2.getNumOfVotingDenominations.call()).toBe(3);
+        expect(+await sender.votingDenominations(0)).toBe(4000);
+        expect(+await sender.votingDenominations(0)).toBe(4000);
+        for (i = 2; i < 7; i++) {
+            expect(+await sender.votingDenominations(i)).toBe(1000);
+        }
+
+        await sender.delegateToProxy(accounts[4], true, 0, {from: accounts[8]});
+        await sender.delegateToProxy(accounts[5], true, 2, {from: accounts[8]});
+        await proxy1.delegateToProxy(accounts[5], false, 0, {from: accounts[4]});
+        await proxy2.delegateToProxy(accounts[8], true, 1, {from: accounts[8]});
+
+        
+        expect(+await facSender.votingWeights(accounts[4])).toBe(0);
+        expect(+await facSender.votingWeights(accounts[5])).toBe(42011);
+        expect(+await facSender.votingWeights(accounts[8])).toBe(10789);
+
+
+
+    }) 
 
     it('should ensure that a shareholder can only rate at most once on a question', async () => {
         let newQARef = await QandA.new();
