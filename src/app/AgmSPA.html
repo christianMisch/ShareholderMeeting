@@ -132,5 +132,13 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
         <script src="scripts.js"></script>
+        <script src= "./../provider/ShareholderProvider.js"></script>
+        <!-- Load Babel -->
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+        <!-- Your custom script here -->
+        <script type="text/babel">
+        const getMessage = () => "Hello World";
+        document.getElementById('output').innerHTML = getMessage();
+        </script>
     </body>
 </html>
