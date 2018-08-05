@@ -1,4 +1,4 @@
-import IPFS from 'ipfs';
+const IPFS = require('ipfs');
 
 let ipfs
 
@@ -11,7 +11,7 @@ function initIPFS() {
   })
 }
 
-export default async function getIPFS() {
+exports.getIPFS = async function() {
   if (!ipfs) {
     ipfs = await initIPFS()
   }

@@ -2,7 +2,7 @@ import { Buffer } from 'buffer';
 import getIPFS from './ipfs'
 import promisify from './promisify'
 
-export default async function upload(data) {
+exports.upload = async function(data) {
   const content = Buffer.from(data);
   const ipfsNode = await getIPFS()
   const files = await promisify(cb => ipfsNode.files.add({ content }, cb))
