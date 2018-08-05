@@ -33,4 +33,18 @@ contract VotingStatistic {
         return totalVotingPower;
     }
 
+    /*
+    function calculateVotingStatistic(uint proposalId) public {
+        VotingStatistic statistic = new VotingStatistic();
+
+        for (uint j = 0; j < users.length; j++) {
+            statistic.updateVotingPower(users[j].userAddress(), votingTokens[users[j].userAddress()]);
+            uint totalVotPow = statistic.getTotalVotingPower();
+            statistic.setTotalVotingPower(totalVotPow + votingTokens[users[j].userAddress()]);
+        }
+        for (uint i = 0; i < proposals.length; i++) {
+            statistic.updatePassedProposal(proposals[i].proposalId, proposals[i].proposalPassed);
+            statistic.updateProposalPercentage(proposalId, proposals[i].passedPercent);
+        }
+    } */
 }

@@ -2,21 +2,11 @@ pragma solidity ^0.4.23;
 
 import "./VotingStatistic.sol";
 import "./User.sol";
+import "./QandA.sol";
 
 contract Director is User {
 
-    // storing the answers of directors
-    Answer[] public answers;
-   
-
-    // answer object used by the director
-    struct Answer {
-        uint answerId;
-        uint questionId;
-        address answerCreator;
-        string content;
-        uint timestamp; 
-    }
+    QandA public qa;
 
     event AnswerCreated(uint ansId, address creator);
 
@@ -26,21 +16,17 @@ contract Director is User {
 
     }
  
-    constructor(address userAddress) 
+    constructor(address userAddress, QandA _qa) 
         User(userAddress, true) public {
+
+        qa = _qa;
     }
 
     // only director is allowed to create an answer
     function createAnswer(uint _questionId, string _content) 
         onlyDirector public returns (uint answerId)  {
 
-        uint id = answers.length++;
-        Answer storage answer = answers[id];
-        answer.answerId = id;
-        answer.questionId = _questionId;
-        answer.answerCreator = msg.sender;
-        answer.content = _content;
-        answer.timestamp = now;
+        answerId = qa.createNewAnswer(_questionId, _content, msg.sender);
 
         emit AnswerCreated(answerId, msg.sender);
     }

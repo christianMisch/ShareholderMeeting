@@ -1,21 +1,24 @@
 pragma solidity ^0.4.23;
 
 import "./User.sol";
-import "./Director.sol";
 import "./Shareholder.sol";
-import "./VotingStatistic.sol";
-import "./Voter.sol";
+import "./Director.sol";
+import "./Factory.sol";
 
-contract AgmOwner is Voter, User {
+contract AgmOwner is User {
 
-    // owner of the contract initializes the AGM
-    address public owner;
-    // store options to every proposal
-    VotingOption[] public votingOptions;
+    Factory public fac;
     // total number of users
     uint public numberOfUsers;
+    // stores all users
+    User[] public users;
+    // stores user's address with corresponding id
+    mapping(address => uint) public userId;
+    // store options to every proposal
+    VotingOption[] public votingOptions;
 
     bool public isFinished = false;
+
     uint public minimumVotingQuorum;
     uint public marginOfVotesForMajority;
     string public meetingName;
@@ -31,17 +34,17 @@ contract AgmOwner is Voter, User {
     }
 
     modifier onlyOwner {
-        require(owner == msg.sender);
+        require(userAddress == msg.sender);
         _;
     }
 
-    event UserCreated(uint userId, address userAddress, bool isDirector);
-    event UserRemoved(uint userId, address userAddress, bool isDirector);
     event ProposalCreated(uint propId, address creator);
     event Voted(address userAddress, uint proposalId, string votingOption);
     event AgmFinished(bool isFinished);
     event ProposalExecuted(uint proposalId, bool proposalPassed, uint passedPercentage, VotingOption[] options);
     event OwnershipTransferedTo(address newOwner);
+    event UserCreated(uint userId, address userAddress, bool isDirector);
+    event UserRemoved(uint userId, address userAddress, bool isDirector);
 
     constructor(
         uint _minimumVotingQuorum,
@@ -51,7 +54,11 @@ contract AgmOwner is Voter, User {
         string _meetingDate,
         string _meetingPlace,
         uint _meetingStartTime,
-        uint _meetingEndTime) public {
+        uint _meetingEndTime,
+        Factory _fac
+    ) 
+            
+            User(msg.sender, true) public {
         
         minimumVotingQuorum = _minimumVotingQuorum;
         marginOfVotesForMajority = _marginOfVotesForMajority;
@@ -61,48 +68,65 @@ contract AgmOwner is Voter, User {
         meetingPlace = _meetingPlace;
         meetingStartTime = _meetingStartTime;
         meetingEndTime = _meetingEndTime;
+        fac = _fac;
     }
 
     // transfer contract ownership to another director
-    function transferOwnership(address _owner) onlyOwner private {
-        require(users[userId[_owner]].isDirector(), "the new owner is not a director");
-        owner = _owner;
+    function transferOwnership(address _owner) onlyOwner public {
+        userAddress = _owner;
 
         emit OwnershipTransferedTo(_owner);
     }
 
-    function addUser(address _userAddress, bool isDirector, uint votingTok) private {
+    function addUser(address _userAddress, bool isDirector, uint votingTok, QandA qa) public {
         uint id = userId[_userAddress];
         if (id == 0) {
-            userId[_userAddress] = users.length++;
             id = users.length++;
+            userId[_userAddress] = id;
         }
 
         if (isDirector) {
-            users[id] = new Director({userAddress: _userAddress});
+            Director d = fac.createNewDirector(_userAddress, qa);
+            users[id] = d;
+            
             emit UserCreated(id, _userAddress, true);
+        
         } else {
-            users[id] = new Shareholder({userAddress: _userAddress, _votingTokens: votingTok});
+            Shareholder s = fac.createNewShareholder(_userAddress, votingTok, qa);
+            users[id] = s;
+            
             emit UserCreated(id, _userAddress, false);
         }
+        numberOfUsers++;
     }
 
-    function removeUser(address _userAddress) private {
-        require(userId[_userAddress] != 0, "User does not exist");
+    function removeUser(address _userAddress) public {
+        //require(userId[_userAddress] != 0, "User does not exist");
 
         uint i = userId[_userAddress];
         User remUser = users[i];
+        delete users[i];
 
-        for (; i < users.length; i++) {
+        for (; i < users.length - 1; i++) {
             users[i] = users[i+1];
+            userId[users[i].userAddress()] = i;
         }
-        delete users[users.length - 1];
+        
         users.length--;
+        numberOfUsers--;
 
         emit UserRemoved(i, _userAddress, remUser.isDirector());
     }
 
-    function finishAGM() onlyOwner private {
+    function getNumOfUsers() public view returns (uint length) {
+        return users.length;
+    }
+
+    function getUser(address _userAddress) public view returns (User u) {
+        return users[userId[_userAddress]];
+    }
+
+    function finishAGM() onlyOwner public {
         require(!isFinished, "AGM has already been finished");
         isFinished = true;
 
@@ -110,32 +134,30 @@ contract AgmOwner is Voter, User {
 
     }
 
-    function announceAGM() onlyOwner private view returns(string recordDate, string recordPlace) {
+    function announceAGM() onlyOwner public view returns (string recordDate, string recordPlace) {
         return (meetingDate, meetingPlace);
     }
 
     // only director is allowed to create a proposal
-    function createProposal(string _name, string _description, string[] _options) 
-        onlyOwner private {
+    function createProposal(string _name, string _description, string _options) 
+        onlyOwner public returns(uint propId) {
 
-        uint propId = proposals.length++;
-        Proposal storage proposal = proposals[propId];
-        proposal.proposalId = propId;
-        proposal.name = _name;
-        proposal.description = _description;
-        proposal.options = _options;
-        proposal.proposalPassed = false;
-        proposal.passedPercent = 0;
-        proposal.voteCount = 0;
-        
+        propId = fac.createNewProposal(_name, _description, _options);
         emit ProposalCreated(propId, msg.sender);
+
+        return propId;
     }
 
     // executes the pending proposal
-    function executeProposal(uint proposalId) private {
+    /*function executeProposal(uint proposalId) public {
         
         Proposal storage prop = proposals[proposalId];
-        string[] storage options = proposals[proposalId].options;
+        var optionString = proposals[proposalId].options.toSlice();
+        var delim = ";".toSlice();
+        var options = new string[](optionString.count(delim) + 1);
+        for (uint l = 0; l < options.length; l++) {
+            options[l] = optionString.split(delim).toString();
+        }
 
         require(now > meetingEndTime, "meeting has not finished yet");
 
@@ -176,20 +198,5 @@ contract AgmOwner is Voter, User {
         delete votingOptions;
 
         emit ProposalExecuted(proposalId, prop.proposalPassed, prop.passedPercent, votingOptions);
-
-    }
-
-    function calculateVotingStatistic(uint proposalId) private {
-        VotingStatistic statistic = new VotingStatistic();
-
-        for (uint j = 0; j < users.length; j++) {
-            statistic.updateVotingPower(users[j].userAddress(), votingTokens[users[j].userAddress()]);
-            uint totalVotPow = statistic.getTotalVotingPower();
-            statistic.setTotalVotingPower(totalVotPow + votingTokens[users[j].userAddress()]);
-        }
-        for (uint i = 0; i < proposals.length; i++) {
-            statistic.updatePassedProposal(proposals[i].proposalId, proposals[i].proposalPassed);
-            statistic.updateProposalPercentage(proposalId, proposals[i].passedPercent);
-        }
-    }
+    }*/
 }

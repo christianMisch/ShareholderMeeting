@@ -9,10 +9,12 @@ const defaultData = {
     meetingEndTime: 240
   }
   
-  
   module.exports = (AgmOwner) => {
-    return () => {
+    return (ownerAdr, factory) => {
         const data = Object.assign({}, defaultData);
+        data.owner = ownerAdr;
+        data.fac = factory;
+        
         return AgmOwner.new(
           data.minimumVotingQuorum, 
           data.marginOfVotesForMajority, 
@@ -21,7 +23,8 @@ const defaultData = {
           data.meetingDate, 
           data.meetingPlace, 
           data.meetingStartTime, 
-          data.meetingEndTime
+          data.meetingEndTime,
+          data.fac
       );
     }
       

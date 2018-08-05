@@ -1,22 +1,44 @@
-var Shareholder = artifacts.require("./Shareholder.sol");
-var AgmOwner = artifacts.require("./AgmOwner.sol");
-var Director = artifacts.require("./Director.sol");
+const Shareholder = artifacts.require("./Shareholder.sol");
+const AgmOwner = artifacts.require("./AgmOwner.sol");
+const Director = artifacts.require("./Director.sol");
+const User = artifacts.require("./User.sol");
+const ProposalData = artifacts.require("./ProposalData.sol");
+const Factory = artifacts.require("./Factory.sol");
+const QandA = artifacts.require("./QandA.sol");
 
 module.exports = function(deployer, network, accounts) {
-    console.log(network);
-    deployer.deploy([
-        [Shareholder, 0x70831e5fc1cac207162c03fc5bc423cd31075f78, 10000],
-        [Director, 0x68e26a21bb1210306e71d07d0a4a21588d2ec520]
-    ]);
-    /*deployer.deploy(
-        AgmOwner,
-        3,
-        50,
-        'Siemens AGM 2018',
-        'Annual General Meeting 2018',
-        '01.01.2018',
-        'ICC Berlin',
-        0,
-        240
-    );*/
+    
+    deployer.deploy(ProposalData);
+    deployer.deploy(User, accounts[0], false);
+    
+    var f, qa;
+    deployer.then(function() {
+        return deployer.deploy(Factory);
+    }).then(function(factory) {   
+        f = factory;
+        return deployer.deploy(QandA);
+    }).then(function(qaInst) {
+        qa = qaInst;
+        return deployer.deploy(Shareholder, accounts[0], 100, f.address, qa.address);
+    }).then(function() {
+        return deployer.deploy(Director, accounts[1], qa.address);
+    }).then(function() {
+        return deployer.deploy(
+            AgmOwner, 
+            3, 
+            50, 
+            'Siemens AGM 2018', 
+            'Annual General Meeting 2018', 
+            '01.01.2018', 
+            'ICC Berlin', 
+            0, 
+            240,
+            f.address
+        );
+    }).then(function() {
+        console.log('factory address:      ' + f.address);
+        console.log('QandA   address:      ' + qa.address);
+    });
+
+    
 }
