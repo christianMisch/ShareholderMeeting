@@ -134,13 +134,13 @@ contract AgmOwner is User {
 
     }
 
-    function announceAGM() onlyOwner public view returns (string recordDate, string recordPlace) {
+    function announceAGM() public onlyOwner view returns (string recordDate, string recordPlace) {
         return (meetingDate, meetingPlace);
     }
 
     // only director is allowed to create a proposal
     function createProposal(string _name, string _description, string _options) 
-        onlyOwner public returns(uint propId) {
+        public onlyOwner returns(uint propId) {
 
         propId = fac.createNewProposal(_name, _description, _options);
         emit ProposalCreated(propId, msg.sender);

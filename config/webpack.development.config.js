@@ -1,11 +1,18 @@
 const path = require('path');
+const publicPath = '/';
 
 module.exports = {
     mode: 'development',
-    entry: '../src/provider/ShareholderProvider.js',
+    entry: {
+        ShareholderProvider: '../src/provider/ShareholderProvider.js',
+        /*IPFSUploadProvider: '../src/provider/IPFSUploadProvider',
+        IPFSDownloadProvider: '../src/provider/IPFSDownloadProvider'*/
+        //ProposalProvider: '../src/provider/ProposalProvider'
+    },
     output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: '[name].bundle.js'
+        path: path.resolve(__dirname, '../dist'),
+        filename: '[name].bundle.js',
+        publicPath: publicPath
     },
     module : {
         rules: [
@@ -15,14 +22,17 @@ module.exports = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: "env"
+                        presets: ["es2015"]
                     }
                 }
             }
         ]
     },
     devServer: {
-        contentBase: './dist'
+        contentBase: path.join(__dirname, 'dist')
     },
-    devtool: 'inline-source-map'
+    devtool: 'inline-source-map',
+    resolve: {
+        extensions: ['.js']
+    }
 }
