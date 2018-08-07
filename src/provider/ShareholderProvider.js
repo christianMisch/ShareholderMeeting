@@ -1,21 +1,19 @@
-//import {initializeWeb3 as web3} from 'web3Provider.js';
-//import ShareholderArtifact from 'artifacts/contracts/Shareholder.json';
-//import {upload} from 'IPFSUploadProvider';
-//const {downloadString} = require('./IPFSDownloadProvider.js'); 
-//var artifactor = require("truffle-artifactor");
-import ShareholderArtifact from '../artifacts/contracts/Shareholder.json';
-//import {createNewProposal} from './ProposalProvider';
+import ShareholderArtifact from '../../solidity/build/contracts/Shareholder.json';
 import {default as contract} from 'truffle-contract';
 
-$(document).ready(function() {
+  export async function createQuestion(content, from, provider) {
+    console.log(ShareholderArtifact);
+    const ShareholderContract = contract(ShareholderArtifact);
+    ShareholderContract.setProvider(await provider.currentProvider);
+    console.log(ShareholderContract);
+    const Shareholder = await ShareholderContract.deployed();
+    console.log(Shareholder);
+    await Shareholder.createQuestion.sendTransaction(content, {from});
+  }
 
-    $('#login-button').click(function() {
-      console.log(ShareholderArtifact);
-
-      console.log('---------------');
-
-      console.log(contract(ShareholderArtifact));
-
-      //createNewProposal('name', 'description', 'options');
-    });
-});
+  export async function test(provider) {
+    const ShareholderContract = contract(ShareholderArtifact);
+    ShareholderContract.setProvider(provider.currentProvider);
+    const Shareholder = await ShareholderContract.deployed();
+    return Shareholder.test.call();
+  }

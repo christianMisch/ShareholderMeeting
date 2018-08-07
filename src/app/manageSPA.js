@@ -2,7 +2,6 @@ var main;
 
 document.addEventListener("DOMContentLoaded", function () {
     var navLinks = document.querySelectorAll("#sidebar a");
-    console.log(navLinks);
     for (var i = 0; i < navLinks.length; i++) {
         navLinks[i].addEventListener("click", function (e) {
             e.preventDefault();

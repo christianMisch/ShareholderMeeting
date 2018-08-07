@@ -186,6 +186,10 @@ contract Shareholder is User, ProposalData {
         return votingDenominations.length;
     }
 
+    function test() public pure returns (string) {
+        return "hello world";
+    }
+
 
 }
 

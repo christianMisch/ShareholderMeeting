@@ -1,14 +1,14 @@
 const path = require('path');
 const publicPath = '/';
+require('babel-polyfill');
 
 module.exports = {
     mode: 'development',
     entry: {
-        ShareholderProvider: '../src/provider/ShareholderProvider.js',
-        /*IPFSUploadProvider: '../src/provider/IPFSUploadProvider',
-        IPFSDownloadProvider: '../src/provider/IPFSDownloadProvider'*/
-        //ProposalProvider: '../src/provider/ProposalProvider'
-    },
+        polyfill: 'babel-polyfill',
+        app: '../src/app/index.js'
+        //ShareholderProvider: '../src/provider/ShareholderProvider.js'
+    }, 
     output: {
         path: path.resolve(__dirname, '../dist'),
         filename: '[name].bundle.js',
@@ -22,7 +22,7 @@ module.exports = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ["es2015"]
+                        presets: ["es2017"]
                     }
                 }
             }

@@ -19,7 +19,11 @@ module.exports = function(deployer, network, accounts) {
         return deployer.deploy(QandA);
     }).then(function(qaInst) {
         qa = qaInst;
-        return deployer.deploy(Shareholder, accounts[0], 100, f.address, qa.address);
+        var random;
+        for (var i = 0; i < accounts.length; i++) {
+            random = Math.floor(Math.random() * (12000 - 5000) ) + 5000;
+            deployer.deploy(Shareholder, accounts[i], random, f.address, qa.address);
+        }
     }).then(function() {
         return deployer.deploy(Director, accounts[1], qa.address);
     }).then(function() {
