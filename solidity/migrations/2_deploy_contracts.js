@@ -42,6 +42,7 @@ module.exports = function(deployer, network, accounts) {
     }).then(function() {
         console.log('factory address:      ' + f.address);
         console.log('QandA   address:      ' + qa.address);
+        accounts.forEach(acc => console.log(acc));
     });
 
     

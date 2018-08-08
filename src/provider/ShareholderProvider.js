@@ -1,19 +1,29 @@
 import ShareholderArtifact from '../../solidity/build/contracts/Shareholder.json';
 import {default as contract} from 'truffle-contract';
 
-  export async function createQuestion(content, from, provider) {
-    console.log(ShareholderArtifact);
-    const ShareholderContract = contract(ShareholderArtifact);
-    ShareholderContract.setProvider(await provider.currentProvider);
-    console.log(ShareholderContract);
-    const Shareholder = await ShareholderContract.deployed();
-    console.log(Shareholder);
-    await Shareholder.createQuestion.sendTransaction(content, {from});
-  }
-
-  export async function test(provider) {
+  export function createQuestion(content, provider) {
+    console.log('createQuestion()');
     const ShareholderContract = contract(ShareholderArtifact);
     ShareholderContract.setProvider(provider.currentProvider);
-    const Shareholder = await ShareholderContract.deployed();
-    return Shareholder.test.call();
+    console.log(ShareholderContract);
+    const Shareholder = ShareholderContract.deployed();
+    console.log(Shareholder);
+    return Shareholder.createQuestion.sendTransaction(content);
+  }
+
+  export function test(provider) {
+    const ShareholderContract = contract(ShareholderArtifact);
+    ShareholderContract.setProvider(provider.currentProvider);
+    var Shareholder, string;
+    ShareholderContract.deployed().then(function(instance) {
+      console.log(instance);
+      Shareholder = instance;
+      return Shareholder.test();
+    }).then(function(result) {
+      console.log(result);
+    }).catch(function(error) {
+      console.log(error.message);
+    });
+
+    return string;
   }

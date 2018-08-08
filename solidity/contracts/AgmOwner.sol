@@ -72,7 +72,7 @@ contract AgmOwner is User {
     }
 
     // transfer contract ownership to another director
-    function transferOwnership(address _owner) onlyOwner public {
+    function transferOwnership(address _owner) public onlyOwner {
         userAddress = _owner;
 
         emit OwnershipTransferedTo(_owner);
@@ -134,7 +134,7 @@ contract AgmOwner is User {
 
     }
 
-    function announceAGM() public onlyOwner view returns (string recordDate, string recordPlace) {
+    function announceAGM() public /*onlyOwner*/ view returns (string recordDate, string recordPlace) {
         return (meetingDate, meetingPlace);
     }
 

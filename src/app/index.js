@@ -1,14 +1,24 @@
-import {web3Init} from '../provider/web3Provider';
 import {createQuestion, test} from '../provider/ShareholderProvider';
+import {transferOwnership, announceAGM} from '../provider/AgmOwnerProvider';
 
-$(document).ready(async function() {
+export class App {
 
-    const web3 = await web3Init();
-    web3.eth.defaultAccount = '0x011Fc7b12E5EEd718680db16a125378a25ac4b2F';    
-    //const account = await web3.eth.accounts[0];
-    //console.log(account);
+    constructor(account, network) {
+        this.account = account;
+        this.network = network;
+    }
 
-    $('#login-button').click(async function() {
-        console.log(await test(web3));
-    });
-});
+    start() {
+        
+        $('#login-button').click(function() {
+            transferOwnership();
+            announceAGM();
+        });
+    
+    }
+    
+
+}
+
+const app = new App(null, null);
+app.start();

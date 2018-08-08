@@ -34,5 +34,8 @@ module.exports = {
     devtool: 'inline-source-map',
     resolve: {
         extensions: ['.js']
+    },
+    node: {
+        fs: "empty"
     }
 }
