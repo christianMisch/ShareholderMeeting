@@ -34,7 +34,7 @@ contract AgmOwner is User {
     }
 
     modifier onlyOwner {
-        require(userAddress == msg.sender);
+        require(userAddress == msg.sender, "only the contract owner can access this function!");
         _;
     }
 
@@ -47,6 +47,7 @@ contract AgmOwner is User {
     event UserRemoved(uint userId, address userAddress, bool isDirector);
 
     constructor(
+        address _userAddress,
         uint _minimumVotingQuorum,
         uint _marginOfVotesForMajority,
         string _meetingName,
@@ -58,7 +59,7 @@ contract AgmOwner is User {
         Factory _fac
     ) 
             
-            User(msg.sender, true) public {
+            User(_userAddress, true) public {
         
         minimumVotingQuorum = _minimumVotingQuorum;
         marginOfVotesForMajority = _marginOfVotesForMajority;
@@ -78,7 +79,7 @@ contract AgmOwner is User {
         emit OwnershipTransferedTo(_owner);
     }
 
-    function addUser(address _userAddress, bool isDirector, uint votingTok, QandA qa) public {
+    function addUser(address _userAddress, bool isDirector, uint votingWeight, QandA qa) public {
         uint id = userId[_userAddress];
         if (id == 0) {
             id = users.length++;
@@ -92,7 +93,7 @@ contract AgmOwner is User {
             emit UserCreated(id, _userAddress, true);
         
         } else {
-            Shareholder s = fac.createNewShareholder(_userAddress, votingTok, qa);
+            Shareholder s = fac.createNewShareholder(_userAddress, votingWeight, qa);
             users[id] = s;
             
             emit UserCreated(id, _userAddress, false);
@@ -126,7 +127,7 @@ contract AgmOwner is User {
         return users[userId[_userAddress]];
     }
 
-    function finishAGM() onlyOwner public {
+    function finishAGM() public /*onlyOwner*/ {
         require(!isFinished, "AGM has already been finished");
         isFinished = true;
 
@@ -134,7 +135,7 @@ contract AgmOwner is User {
 
     }
 
-    function announceAGM() public /*onlyOwner*/ view returns (string recordDate, string recordPlace) {
+    function announceAGM() public onlyOwner view returns (string recordDate, string recordPlace) {
         return (meetingDate, meetingPlace);
     }
 

@@ -8,7 +8,7 @@ import {default as contract} from 'truffle-contract';
     console.log(ShareholderContract);
     const Shareholder = ShareholderContract.deployed();
     console.log(Shareholder);
-    return Shareholder.createQuestion.sendTransaction(content);
+    return Shareholder.createQuestion(content);
   }
 
   export function test(provider) {

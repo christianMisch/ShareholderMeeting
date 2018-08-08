@@ -9,7 +9,7 @@ const QandA = artifacts.require("./QandA.sol");
 module.exports = function(deployer, network, accounts) {
     
     deployer.deploy(ProposalData);
-    deployer.deploy(User, accounts[0], false);
+    //deployer.deploy(User, accounts[1], false);
     
     var f, qa;
     deployer.then(function() {
@@ -20,15 +20,18 @@ module.exports = function(deployer, network, accounts) {
     }).then(function(qaInst) {
         qa = qaInst;
         var random;
-        for (var i = 0; i < accounts.length; i++) {
+        for (var i = 2; i < 6; i++) {
             random = Math.floor(Math.random() * (12000 - 5000) ) + 5000;
             deployer.deploy(Shareholder, accounts[i], random, f.address, qa.address);
         }
     }).then(function() {
-        return deployer.deploy(Director, accounts[1], qa.address);
+        for (var j = 6; j < accounts.length; j++) {
+            return deployer.deploy(Director, accounts[j], qa.address);
+        }
     }).then(function() {
         return deployer.deploy(
-            AgmOwner, 
+            AgmOwner,
+            accounts[0], 
             3, 
             50, 
             'Siemens AGM 2018', 
