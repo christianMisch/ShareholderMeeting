@@ -27,6 +27,7 @@
                             <input type="password" id="password">
                         </label>
                         <input type="button" value="login" id="login-button">
+                        <input type="button" value="logout" id="logout-button">
                     </form>
                 </div>
                 
@@ -44,7 +45,7 @@
                         </div>
                 
                         <ul class="list-unstyled components">
-                            <li class="active">
+                            <li class="active" id = "welcome-link">
                                 <a href="#welcome">Welcome</a>
                             </li>
                             <li>
@@ -136,10 +137,6 @@
            
             
         </template>
-
-        <div id="wrapper">
-
-        </div>
        
         <footer>
 
@@ -151,10 +148,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
         <!--<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>-->
-        <script src="./scripts/manageSPA.js"></script>
-        <script src="./scripts/authentication.js"></script>
-        <!--<script src="../../dist/polyfill.bundle.js"></script>
-        <script src= "../../dist/ShareholderProvider.bundle.js"></script>
+        <!--<script src="./scripts/manageSPA.js"></script>
+        <script src="./scripts/authentication.js"></script>-->
+        <script src="../../dist/polyfill.bundle.js"></script>
+        <script src="../../dist/manageSPA.bundle.js"></script>
+        <script src="../../dist/authentication.bundle.js"></script>
+        <!--<script src= "../../dist/ShareholderProvider.bundle.js"></script>
         <script src="../../dist/app.bundle.js"></script>-->
     </body>
 </html>

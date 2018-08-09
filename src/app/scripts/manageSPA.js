@@ -1,7 +1,22 @@
+import { getActiveUser, createAlert } from './authentication';
+
 var main;
 
 document.addEventListener("DOMContentLoaded", function () {
-    
+    var navLinks = document.querySelectorAll("#sidebar a");
+    console.log(navLinks);
+    for (var i = 0; i < navLinks.length; i++) {
+        navLinks[i].addEventListener("click", function (e) {
+            e.preventDefault();
+            
+            document.querySelector("li.active").className = "";
+            this.parentElement.className = "active";
+
+            location.hash = this.getAttribute("href");
+            console.log(this.getAttribute("href"))
+            console.log(location.hash.trim().substring(1));
+        })
+    }
    
 });
 
@@ -15,21 +30,13 @@ window.addEventListener("hashchange", function() {
 });
 
 function insertTemplate(strHash) {
-    var templateContent;
-
-    var navLinks = document.querySelectorAll("#sidebar a");
-    for (var i = 0; i < navLinks.length; i++) {
-        navLinks[i].addEventListener("click", function (e) {
-            e.preventDefault();
-
-            document.querySelector("li.active").className = "";
-            this.parentElement.className = "active";
-
-            location.hash = this.getAttribute("href");
-            console.log(this.getAttribute("href"))
-            console.log(location.hash.trim().substring(1));
-        })
+    
+    if (!getActiveUser().loggedIn) {
+        createAlert('Please log in first to access other AGM features', 'danger');
+        return;
     }
+    
+    var templateContent;
 
     strHash = strHash || "welcome";
 

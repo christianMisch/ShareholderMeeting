@@ -6,7 +6,9 @@ module.exports = {
     mode: 'development',
     entry: {
         polyfill: 'babel-polyfill',
-        app: '../src/app/scripts/index.js'
+        app: '../src/app/scripts/index.js',
+        manageSPA: '../src/app/scripts/manageSPA.js',
+        authentication: '../src/app/scripts/authentication.js'
         //ShareholderProvider: '../src/provider/ShareholderProvider.js'
     }, 
     output: {
