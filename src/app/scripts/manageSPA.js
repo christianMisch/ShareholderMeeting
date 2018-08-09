@@ -1,5 +1,3 @@
-import { getActiveUser, createAlert } from './authentication';
-
 var main;
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -31,10 +29,10 @@ window.addEventListener("hashchange", function() {
 
 function insertTemplate(strHash) {
     
-    if (!getActiveUser().loggedIn) {
+    /*if (!getActiveUser().loggedIn) {
         createAlert('Please log in first to access other AGM features', 'danger');
         return;
-    }
+    }*/
     
     var templateContent;
 

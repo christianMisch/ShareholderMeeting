@@ -7,7 +7,7 @@ module.exports = {
     entry: {
         polyfill: 'babel-polyfill',
         app: '../src/app/scripts/index.js',
-        manageSPA: '../src/app/scripts/manageSPA.js',
+        //manageSPA: '../src/app/scripts/manageSPA.js',
         authentication: '../src/app/scripts/authentication.js'
         //ShareholderProvider: '../src/provider/ShareholderProvider.js'
     }, 
