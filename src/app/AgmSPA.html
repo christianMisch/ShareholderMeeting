@@ -5,21 +5,25 @@
         <meta charset="utf-8">
         <title>AGM</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
-        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="./styles/styles.css">
     </head>
     <body>
         <header>
             <h1>Annual General Meeting 2018</h1>
             <div class="row">
                 <div class="col">
-                    <p>User: 0xasdfjaslkdjfasfkasdgksgkj</p>
-                    <p>Role: Director</p>
+                    <p id='userAddress'>User: </p>
+                    <p id='userRole'>Role: </p>
                 </div>
                 <div class="col"></div>
                 <div class="col">
                     <form id="login-form">
+                        <label>
+                            Enter your Ethereum wallet address
+                            <input type="text" placeholder="0x..." id="wallet-address">
+                        </label>
                         <label id="password-label">
-                            Enter your Participant ID:
+                            Enter your password:
                             <input type="password" id="password">
                         </label>
                         <input type="button" value="login" id="login-button">
@@ -41,6 +45,9 @@
                 
                         <ul class="list-unstyled components">
                             <li class="active">
+                                <a href="#welcome">Welcome</a>
+                            </li>
+                            <li>
                                 <a href="#home">Home</a>
                             </li>
                             <li>
@@ -64,8 +71,16 @@
             </div>
         </div>
 
+        <template id="welcome-template">
+            <article class="col-xl-12">
+                <strong>Please sign in with your Ethereum wallet address and your password</strong>
+                <p>If you are a <strong>shareholder</strong> then you receive your password via mail</p>
+            </article>
+        </template>
+        
+        
         <template id="home-template">
-            <article class="col-xl-12" style="border: 1px solid black">
+            <article class="col-xl-12">
                 <p>The 1st Annual General Meeting takes place in the ICC in Berlin at 3pm on 31st of august!</p>
                 <p>You will receive your the AGM id for participating in a seperate email. If you did not get the email please write an
                     email to our service: serviceAGM@gmail.com
@@ -121,6 +136,10 @@
            
             
         </template>
+
+        <div id="wrapper">
+
+        </div>
        
         <footer>
 
@@ -132,9 +151,10 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
         <!--<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>-->
-        <script src="manageSPA.js"></script>
-        <script src="../../dist/polyfill.bundle.js"></script>
+        <script src="./scripts/manageSPA.js"></script>
+        <script src="./scripts/authentication.js"></script>
+        <!--<script src="../../dist/polyfill.bundle.js"></script>
         <script src= "../../dist/ShareholderProvider.bundle.js"></script>
-        <script src="../../dist/app.bundle.js"></script>
+        <script src="../../dist/app.bundle.js"></script>-->
     </body>
 </html>
