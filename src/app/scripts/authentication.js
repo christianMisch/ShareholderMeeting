@@ -12,6 +12,7 @@ $(document).ready(function() {
     // hide logout button, welcome link in sidebar and user credentials
     $('#logout-button').hide();
     $('#welcome-link').hide();
+    $('#setup-link').hide();
     hideUserCredentials();
     
 
@@ -31,7 +32,8 @@ $(document).ready(function() {
                 $('#userAddress').html('User: ' + inputAdr);
                 $('#userRole').html('Role: AgmOwner');
                 showLogoutButton();
-                showHome();
+                showView('home-link');
+                $('#setup-link').show();
                 authorizedUsers[inputAdr].loggedIn = true;
 
 
@@ -44,7 +46,7 @@ $(document).ready(function() {
                 $('#userAddress').html('User: ' + inputAdr);
                 $('#userRole').html('Role: Shareholder');
                 showLogoutButton();
-                showHome();
+                showView('home-link');
                 authorizedUsers[inputAdr].loggedIn = true;
 
         } else if (Object.keys(authorizedUsers).includes(inputAdr)
@@ -56,7 +58,7 @@ $(document).ready(function() {
                 $('#userAddress').html('User: ' + inputAdr);
                 $('#userRole').html('Role: Director');
                 showLogoutButton();
-                showHome();
+                showView('home-link');
                 authorizedUsers[inputAdr].loggedIn = true;
             
         } else {
@@ -64,6 +66,9 @@ $(document).ready(function() {
                 .addClass('alert alert-danger');
         }
         console.log($('#wrapper div').length);
+        removeSecondAlert();
+        console.log($('#wrapper'));
+        
         console.log(authorizedUsers);
         setTimeout(function () {
             $('.alert').alert('close');
@@ -82,7 +87,7 @@ $(document).ready(function() {
 
 });
 
-function createAlert(message, alertType = 'success') {
+export function createAlert(message, alertType = 'success') {
     $('#wrapper').append(`<div role="alert">${message}</div>`)
         .addClass(`alert alert-${alertType}`);
 
@@ -108,9 +113,9 @@ function hideUserCredentials() {
     $('#userRole').hide();
 }
 
-function showHome() {
+function showView(viewName) {
     const event = new Event('click');
-    const homeLink = document.getElementsByTagName('a')[1];
+    const homeLink = document.getElementById(viewName);
     homeLink.dispatchEvent(event);
 }
 
@@ -125,86 +130,20 @@ function showWelcomePage() {
     welcomeLink.dispatchEvent(event);
 }
 
-function getActiveUser() {
+export function getActiveUserState() {
     return authorizedUsers[inputAdr] || {loggedIn: false};
 }
 
+export function getActiveUserAddress() {
+    return inputAdr;
+}
+
+export function removeSecondAlert() {
+    var numOfAlerts = $('#wrapper div').length;
+        if (numOfAlerts > 1) {
+            const wrapper = document.querySelector('#wrapper'); 
+            wrapper.removeChild(wrapper.lastChild);
+        }
+}
+
 // start of manageSPA.js
-
-var main;
-
-document.addEventListener("DOMContentLoaded", function () {
-    var navLinks = document.querySelectorAll("#sidebar a");
-    console.log(navLinks);
-    for (var i = 0; i < navLinks.length; i++) {
-        navLinks[i].addEventListener("click", function (e) {
-            e.preventDefault();
-            
-            document.querySelector("li.active").className = "";
-            this.parentElement.className = "active";
-
-            location.hash = this.getAttribute("href");
-            console.log(this.getAttribute("href"))
-            console.log(location.hash.trim().substring(1));
-        })
-    }
-   
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    main = document.querySelector("main");
-    insertTemplate(location.hash.trim().substring(1));
-});
-
-window.addEventListener("hashchange", function() {
-    insertTemplate(location.hash.trim().substring(1));
-});
-
-function insertTemplate(strHash) {
-    
-    if (!getActiveUser().loggedIn && strHash !== 'welcome') {
-        const alertWrapper = $('<div id="wrapper"></div>');
-        $('footer').append(alertWrapper);
-        createAlert('Please log in first to access other AGM features', 'danger');
-        setTimeout(function () {
-            $('.alert').alert('close');
-        }, 3000);
-        //$("li.active").removeClass('active').addClass('');
-        return;
-    }
-    
-    var templateContent;
-
-    strHash = strHash || "welcome";
-
-    clearContentArea();
-
-    switch (strHash) {
-        case "welcome":
-            templateContent = document.getElementById("welcome-template").content;
-            break;
-        case "home":
-            templateContent = document.getElementById("home-template").content;
-            break;
-        case "voting":
-            templateContent = document.getElementById("voting-template").content;
-            break;
-        case "Q&A":
-            templateContent = document.getElementById("QandA-template").content;
-            break;
-        case "list":
-            templateContent = document.getElementById("QandA-list-template").content;
-            break;
-        default:
-            templateContent = document.getElementById("home-template").content;
-            break;
-    }
-
-    main.appendChild(document.importNode(templateContent, true));
-}
-
-function clearContentArea() {
-    while (main.hasChildNodes()) {
-        main.removeChild(main.lastChild);
-    }
-}

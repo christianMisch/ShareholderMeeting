@@ -1,3 +1,5 @@
+import {getActiveUserState, removeSecondAlert, createAlert} from './authentication';
+
 var main;
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -29,10 +31,17 @@ window.addEventListener("hashchange", function() {
 
 function insertTemplate(strHash) {
     
-    /*if (!getActiveUser().loggedIn) {
+    if (!getActiveUserState().loggedIn && strHash !== 'welcome') {
+        const alertWrapper = $('<div id="wrapper"></div>');
+        $('footer').append(alertWrapper);
         createAlert('Please log in first to access other AGM features', 'danger');
+        removeSecondAlert();
+        setTimeout(function () {
+            $('.alert').alert('close');
+        }, 3000);
+        //$("li.active").removeClass('active').addClass('');
         return;
-    }*/
+    }
     
     var templateContent;
 
@@ -46,6 +55,9 @@ function insertTemplate(strHash) {
             break;
         case "home":
             templateContent = document.getElementById("home-template").content;
+            break;
+        case "setup":
+            templateContent = document.getElementById("setup-template").content;
             break;
         case "voting":
             templateContent = document.getElementById("voting-template").content;

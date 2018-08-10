@@ -34,7 +34,7 @@ contract AgmOwner is User {
     }
 
     modifier onlyOwner {
-        require(userAddress == msg.sender, "only the contract owner can access this function!");
+        require(userAddress == tx.origin, "only the contract owner can access this function!");
         _;
     }
 

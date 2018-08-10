@@ -44,7 +44,7 @@ export function announceAGM() {
     })
 }
 
-export function addUser(address, isDirector, votingWeight) {
+export function addUser(address, isDirector, votingWeight, sender) {
     const QandAContract = contract(QandAJson);
     QandAContract.setProvider(web3Provider.currentProvider);
     var QandA;
@@ -53,7 +53,7 @@ export function addUser(address, isDirector, votingWeight) {
         return AgmOwnerContract.deployed();
     }).then(function(depAgmOwner) {
         AgmOwner = depAgmOwner;
-        return AgmOwner.addUser(address, isDirector, votingWeight, QandA);
+        return AgmOwner.addUser(address, isDirector, votingWeight, QandA, {sender});
     }).then(function(result) {
         alert('addUser transaction was successful: ' + result);
     }).catch(function(error) {
@@ -61,10 +61,10 @@ export function addUser(address, isDirector, votingWeight) {
     })
 }
 
-export function removeUser(address) {
+export function removeUser(address, sender) {
     AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
-        return AgmOwner.removeUser(address);
+        return AgmOwner.removeUser(address, {sender});
     }).then(function(result) {
         alert('removeUser TX was successful: ' + result);
     }).catch(function(error) {
