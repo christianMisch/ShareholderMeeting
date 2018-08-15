@@ -11,7 +11,7 @@ contract Director is User {
     event AnswerCreated(uint ansId, address creator);
 
     modifier onlyDirector {
-        require(this.isDirector());
+        require(this.isDirector(), "the user is not a director");
         _;
 
     }

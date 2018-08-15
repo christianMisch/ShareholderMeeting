@@ -7,7 +7,7 @@ import {default as contract} from 'truffle-contract';
 const AgmOwnerContract = contract(AgmOwnerJson);
 AgmOwnerContract.setProvider(web3Provider.currentProvider);
 var AgmOwner;
-const gas = '220000';
+const gas = /*'220000'*/ '3000000';
 
 export function transferOwnership() {
     console.log('web3 accounts: ' + web3Provider.eth.accounts);
@@ -51,10 +51,11 @@ export function addUser(address, isDirector, votingWeight, sender) {
     var QandA;
     QandAContract.deployed().then(function(depQandA) {
         QandA = depQandA;
+        console.log(QandA.address);
         return AgmOwnerContract.deployed();
     }).then(function(depAgmOwner) {
         AgmOwner = depAgmOwner;
-        return AgmOwner.addUser(address, isDirector, votingWeight, QandA, {sender});
+        return AgmOwner.addUser.sendTransaction(address, isDirector, votingWeight, QandA.address, {from: sender, gas: gas});
     }).then(function(result) {
         alert('addUser transaction was successful: ' + result);
     }).catch(function(error) {
@@ -65,7 +66,7 @@ export function addUser(address, isDirector, votingWeight, sender) {
 export function removeUser(address, sender) {
     AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
-        return AgmOwner.removeUser(address, {sender});
+        return AgmOwner.removeUser.sendTransaction(address, {from: sender});
     }).then(function(result) {
         alert('removeUser TX was successful: ' + result);
     }).catch(function(error) {

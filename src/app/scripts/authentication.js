@@ -1,4 +1,5 @@
-// import web3Provider from '../../provider/web3Provider';
+//import web3Provider from '../../provider/web3Provider';
+
 var authorizedUsers = {
     '0x0': {password: 'master', role: 'AgmOwner', loggedIn: false},
     '0x72cccDBCFb464a240c025969bb9Bb81Da0392a90': {password: 'pw1', role: 'Shareholder', loggedIn: false},
@@ -6,7 +7,7 @@ var authorizedUsers = {
 };
 var inputAdr, inputPW;
 
-$(document).ready(function() {
+$(document).ready(function() { 
 
     showWelcomePage();
     // hide logout button, welcome link in sidebar and user credentials
@@ -159,5 +160,3 @@ export function removeSecondAlert() {
             wrapper.removeChild(wrapper.lastChild);
         }
 }
-
-// start of manageSPA.js

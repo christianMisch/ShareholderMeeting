@@ -17,7 +17,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "cd config && npx webpack --config webpack.development.config.js",
-    "rebuild": "cd solidity && truffle compile --all && truffle migrate --reset"
+    "deploy": "cd solidity && truffle compile --all && truffle migrate --reset"
   },
   "repository": {
     "type": "git",
