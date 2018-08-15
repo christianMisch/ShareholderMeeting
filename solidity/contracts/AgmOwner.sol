@@ -34,7 +34,7 @@ contract AgmOwner is User {
     }
 
     modifier onlyOwner {
-        require(userAddress == tx.origin, "only the contract owner can access this function!");
+        require(userAddress == msg.sender, "only the contract owner can access this function!");
         _;
     }
 
@@ -141,7 +141,7 @@ contract AgmOwner is User {
 
     // only director is allowed to create a proposal
     function createProposal(string _name, string _description, string _options) 
-        public onlyOwner returns(uint propId) {
+        public /*onlyOwner*/ returns(uint propId) {
 
         propId = fac.createNewProposal(_name, _description, _options);
         emit ProposalCreated(propId, msg.sender);

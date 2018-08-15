@@ -6,13 +6,12 @@ $(document).ready(function() {
     // check how to access the buttons which are defined in the templates --> printout the main tag with inserted templates
     $('footer').append('<input value="test" type="button" id="test"></input');
     $('#test').click(function() {
-        //console.log('main tag: ' + document.getElementsByTagName('main')[0]);
         const owner = web3Provider.eth.accounts[0];
         console.log('ownerAddress: ' + owner);
         createProposal('name', 'description', 'options', owner);
     });
 
-    $('#proposal-creator-button').click(function() {
+    $('#main proposal-creator-button').click(function() {
         alert('Proposal button');
         const activeUserAddress = getActiveUserAddress();
         const propName = $('#proposal-name').val();
@@ -20,6 +19,7 @@ $(document).ready(function() {
         const propOptions = $('#proposal-options').val();
         createProposal(propName, propDescription, propOptions, activeUserAddress);
     });
+
 
     $('#add-user-button').click(function() {
         const newUserAddress = $('#new-user-address').val();

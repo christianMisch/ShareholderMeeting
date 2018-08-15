@@ -74,6 +74,7 @@ function insertTemplate(strHash) {
     }
 
     main.appendChild(document.importNode(templateContent, true));
+    console.log(document.body);
 }
 
 function clearContentArea() {

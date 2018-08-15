@@ -3,10 +3,11 @@ import QandAJson from '../../solidity/build/contracts/QandA.json';
 import web3Provider from './web3Provider';
 import {default as contract} from 'truffle-contract'; 
 
-const ownerAccount = web3Provider.eth.accounts[0];
+//const ownerAccount = web3Provider.eth.accounts[0];
 const AgmOwnerContract = contract(AgmOwnerJson);
 AgmOwnerContract.setProvider(web3Provider.currentProvider);
 var AgmOwner;
+const gas = '220000';
 
 export function transferOwnership() {
     console.log('web3 accounts: ' + web3Provider.eth.accounts);
@@ -106,12 +107,13 @@ export function finishAGM() {
 }
 
 export function createProposal(name, description, options, sender) {
+    
     AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
         AgmOwner.userAddress.call().then(function(result) {
             console.log('userAddress: ' + result); 
         });
-        return AgmOwner.createProposal(name, description, options, {from: sender});
+        return AgmOwner.createProposal.sendTransaction(name, description, options, {from: sender, gas: gas});
     }).then(function(result) {
         alert('createProposal TX was successful: ' + result);
     }).catch(function(error) {

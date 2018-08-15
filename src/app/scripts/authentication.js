@@ -34,6 +34,7 @@ $(document).ready(function() {
                 showLogoutButton();
                 showView('home-link');
                 $('#setup-link').show();
+                hideLoginFields();
                 authorizedUsers[inputAdr].loggedIn = true;
 
 
@@ -47,6 +48,7 @@ $(document).ready(function() {
                 $('#userRole').html('Role: Shareholder');
                 showLogoutButton();
                 showView('home-link');
+                hideLoginFields();
                 authorizedUsers[inputAdr].loggedIn = true;
 
         } else if (Object.keys(authorizedUsers).includes(inputAdr)
@@ -59,6 +61,7 @@ $(document).ready(function() {
                 $('#userRole').html('Role: Director');
                 showLogoutButton();
                 showView('home-link');
+                hideLoginFields();
                 authorizedUsers[inputAdr].loggedIn = true;
             
         } else {
@@ -80,6 +83,7 @@ $(document).ready(function() {
         $('#login-button').show();
         showWelcomePage();
         hideUserCredentials();
+        showLoginFields();
         authorizedUsers[inputAdr].loggedIn = false;
         console.log(authorizedUsers);
 
@@ -111,6 +115,16 @@ function showUserCredentials() {
 function hideUserCredentials() {
     $('#userAddress').hide();
     $('#userRole').hide();
+}
+
+function hideLoginFields() {
+    $('#address-label').hide();
+    $('#password-label').hide();
+}
+
+function showLoginFields() {
+    $('#address-label').show();
+    $('#password-label').show();
 }
 
 function showView(viewName) {
