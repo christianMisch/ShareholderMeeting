@@ -1,5 +1,5 @@
 import {createProposal, addUser, removeUser, getUser, getNumOfUsers} from '../../provider/AgmOwnerProvider';
-import {getActiveUserAddress} from './authentication';
+import {getActiveUserAddress, authorizedUsers} from './authentication';
 import web3Provider from '../../provider/web3Provider';
 
 const owner = web3Provider.eth.accounts[0];
@@ -21,6 +21,7 @@ $(document).ready(function() {
             const isDirector = $('#director-flag').val();
             const numOfShares = $('#num-of-shares').val();
             addUser(newUserAddress, isDirector, numOfShares, owner);
+            authorizedUsers.newUserAddress = {password: 'test', role: isDirector, loggedIn: false, shares: numOfShares};
             getNumOfUsers();
         });
 

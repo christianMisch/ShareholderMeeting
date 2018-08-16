@@ -82,3 +82,15 @@ textarea {
 input[type="reset"], input[type="submit"] {
     margin-top: 10px;
 }
+
+table {
+    width: 100%;
+}
+
+tr {
+    border: 1px solid black;
+}
+
+label {
+    display: block;
+}

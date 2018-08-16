@@ -56,10 +56,11 @@ contract AgmOwner is User {
         string _meetingPlace,
         uint _meetingStartTime,
         uint _meetingEndTime,
-        Factory _fac
+        Factory _fac,
+        string password
     ) 
             
-            User(_userAddress, true) public {
+            User(_userAddress, true, password) public {
         
         minimumVotingQuorum = _minimumVotingQuorum;
         marginOfVotesForMajority = _marginOfVotesForMajority;
@@ -79,7 +80,7 @@ contract AgmOwner is User {
         emit OwnershipTransferedTo(_owner);
     }
 
-    function addUser(address _userAddress, bool isDirector, uint votingWeight, QandA qa) public {
+    function addUser(address _userAddress, bool isDirector, uint votingWeight, QandA qa, string randomPW) public {
         uint id = userId[_userAddress];
         if (id == 0) {
             id = users.length++;
@@ -87,13 +88,13 @@ contract AgmOwner is User {
         }
 
         if (isDirector) {
-            Director d = fac.createNewDirector(_userAddress, qa);
+            Director d = fac.createNewDirector(_userAddress, qa, randomPW);
             users[id] = d;
             
             emit UserCreated(id, _userAddress, true);
         
         } else {
-            Shareholder s = fac.createNewShareholder(_userAddress, votingWeight, qa);
+            Shareholder s = fac.createNewShareholder(_userAddress, votingWeight, qa, randomPW);
             users[id] = s;
             
             emit UserCreated(id, _userAddress, false);
@@ -127,6 +128,10 @@ contract AgmOwner is User {
         return users[userId[_userAddress]];
     }
 
+    function getUserList() public view returns (User[] userList) {
+        return users;
+    }
+
     function finishAGM() public /*onlyOwner*/ {
         require(!isFinished, "AGM has already been finished");
         isFinished = true;
@@ -139,7 +144,6 @@ contract AgmOwner is User {
         return (meetingDate, meetingPlace);
     }
 
-    // only director is allowed to create a proposal
     function createProposal(string _name, string _description, string _options) 
         public /*onlyOwner*/ returns(uint propId) {
 

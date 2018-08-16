@@ -1,4 +1,5 @@
 import {getProposal, getNumOfProposals} from '../../provider/ProposalProvider';
+import {denominateVotingTokens, delegateToProxy, getVotingDenominations} from '../../provider/ShareholderProvider';
 
 var numOfProp = 0;
 
@@ -19,10 +20,21 @@ $(document).ready(function() {
             for (var i = 0; i < proposalCount; i++) {
                 var currProp = await getProposal(i);
                 const mappedProp = mapProposal(currProp);
+                const splits = mappedProp.options.split(',');
+                var wrapper = $('<div></div>');
+                for (var j = 0; j < splits.length; j++) {
+                    var optionBut = $(
+                        `<div>
+                            <input type="radio" id="${splits[j]}" name="radio">
+                            <label>${splits[j]}</label>
+                        </div>`
+                    );
+                    wrapper.append(optionBut);
+                }
                 $('main table').append(
                     `<tr>
                         <td>${mappedProp.proposalDescription}</td>
-                        <td>${mappedProp.options}</td>
+                        <td>${wrapper.html()}</td>
                         <td>
                             <select>
                                 <option value="simple">simple</option>
@@ -36,7 +48,18 @@ $(document).ready(function() {
                 );
             }            
         });
+
+        $('main').on('click', 'input[id="denominate-button"]', async function() {
+            const numOfBlocks = $('#block-number').val();
+            const factor = $('#factor').val();
+            await denominateVotingTokens(numOfBlocks, factor);
+        });
     });
+
+    /*setInterval(async function() {
+        const denomArr = await getVotingDenominations();
+        console.log(denomArr);
+    }, 3000)*/
 
 });
 

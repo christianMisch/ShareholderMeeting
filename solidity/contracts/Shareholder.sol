@@ -36,8 +36,8 @@ contract Shareholder is User, ProposalData {
     event WeightDivision(uint result);
     event CalculateDivision(uint num, uint copy, uint divider);
     
-    constructor(address userAddress, uint _votingWeight, Factory _fac, QandA _qa) 
-        User(userAddress, false) public {
+    constructor(address userAddress, uint _votingWeight, Factory _fac, QandA _qa, string randomPW) 
+        User(userAddress, false, randomPW) public {
         
         fac = _fac;
         qa = _qa;
@@ -66,51 +66,30 @@ contract Shareholder is User, ProposalData {
         ratings[questionId] = msg.sender;
     }
 
-    function denominateVotingTokens(uint numOfBlockWeights, uint divider, uint factor) public {
+    function denominateVotingTokens(uint numOfBlockWeights, uint factor) public {
         
         uint voterWeight = fac.votingWeights(msg.sender);
         uint subtractedVoteWeight;
         
         if (factor != 0 && numOfBlockWeights != 0) {
-            require(voterWeight > factor * 1000 * numOfBlockWeights, "sender hasn't enough voting weight for factor-based denomination");
+            require(voterWeight >= factor * numOfBlockWeights, "sender hasn't enough voting weight for factor-based denomination");
             for (uint i = 0; i < numOfBlockWeights; i++) {
-                votingDenominations.push(factor * 1000);
+                votingDenominations.push(factor);
             }
-            subtractedVoteWeight = voterWeight - (factor * 1000 * numOfBlockWeights);
+            subtractedVoteWeight = voterWeight - (factor * numOfBlockWeights);
             fac.setVotingWeight(msg.sender, subtractedVoteWeight);
 
-        } else if (numOfBlockWeights == 0 && factor == 0 && divider != 0) {
-            uint dividedWeight = safeDivision(voterWeight, divider);
-            for (uint j = 0; j < divider; j++) {
-                votingDenominations.push(dividedWeight);
-            }
-            fac.setVotingWeight(msg.sender, 0);
-            emit WeightDivision(dividedWeight);
-
-        } else if (numOfBlockWeights != 0 && divider == 0 && factor == 0) {
-            require(voterWeight > 1000 * numOfBlockWeights, "sender doesn't have enough voting weight");
+        } else if (numOfBlockWeights != 0 && factor == 0) {
+            require(voterWeight > numOfBlockWeights, "sender doesn't have enough voting weight");
             for (uint k = 0; k < numOfBlockWeights; k++) {
-                votingDenominations.push(1000);
+                votingDenominations.push(1);
             }
-            subtractedVoteWeight = voterWeight - (1000 * numOfBlockWeights);
+            subtractedVoteWeight = voterWeight - numOfBlockWeights;
             fac.setVotingWeight(msg.sender, subtractedVoteWeight);
 
         } else {
             revert("Denomination failed. Please check the params for correct denomination");
         }
-    }
-
-    function safeDivision(uint number, uint divider) public returns (uint result) {
-        uint copy = number;
-        emit CalculateDivision(number, copy, divider);
-        uint currVal;
-        result = 0;
-        for (; copy == 0; result++) {
-            currVal = copy - divider;
-            copy = currVal;
-        }
-
-        return result;
     }
 
     function getVoterWeight(address _userAddress) public returns (uint weight) {
@@ -186,12 +165,33 @@ contract Shareholder is User, ProposalData {
         return votingDenominations.length;
     }
 
-    function test() public pure returns (string) {
-        return "hello world";
+    function getVotingDenominations() public view returns (uint[] denominations) {
+        return votingDenominations;
+    }
+}
+
+/*
+} else if (numOfBlockWeights == 0 && factor == 0 && dividedWeight != 0 && divider != 0) {
+            for (uint j = 0; j < divider; j++) {
+                votingDenominations.push(dividedWeight);
+            }
+            fac.setVotingWeight(msg.sender, 0);
+            emit WeightDivision(dividedWeight);
+
+    function safeDivision(uint number, uint divider) public returns (uint result) {
+        uint copy = number;
+        emit CalculateDivision(number, copy, divider);
+        uint currVal;
+        result = 0;
+        for (; copy == 0; result++) {
+            currVal = copy - divider;
+            copy = currVal;
+        }
+
+        return result;
     }
 
-
-}
+*/
 
 
 

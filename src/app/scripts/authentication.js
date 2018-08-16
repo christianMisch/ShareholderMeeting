@@ -1,9 +1,11 @@
+import { getUserList } from "../../provider/AgmOwnerProvider";
+
 //import web3Provider from '../../provider/web3Provider';
 
 var authorizedUsers = {
     '0x0': {password: 'master', role: 'AgmOwner', loggedIn: false},
-    '0': {password: '123', role: 'Shareholder', loggedIn: false},
-    '0x5E3407E44756371B4D3De80Eb4378b715c444619': {password: 'pw2', role: 'Director', loggedIn: false}
+    /*'0': {password: '123', role: 'Shareholder', loggedIn: false, shares: 20},
+    '0x5E3407E44756371B4D3De80Eb4378b715c444619': {password: 'pw2', role: 'Director', loggedIn: false, shares: 0}*/
 };
 var inputAdr, inputPW;
 
@@ -175,4 +177,14 @@ export function removeSecondAlert() {
             const wrapper = document.querySelector('#wrapper'); 
             wrapper.removeChild(wrapper.lastChild);
         }
+}
+
+function checkUserCredentials(address, pw) {
+    const userList = await getUserList();
+    for (var i = 0; i < userList; i++) {
+        if (userList[i].userAddress === address && userList[i].password === pw) {
+            return true;
+        } 
+    }
+    return false; 
 }

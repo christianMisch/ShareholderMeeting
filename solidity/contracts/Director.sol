@@ -16,8 +16,8 @@ contract Director is User {
 
     }
  
-    constructor(address userAddress, QandA _qa) 
-        User(userAddress, true) public {
+    constructor(address userAddress, QandA _qa, string randomPW) 
+        User(userAddress, true, randomPW) public {
 
         qa = _qa;
     }

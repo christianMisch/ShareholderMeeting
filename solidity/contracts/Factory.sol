@@ -15,14 +15,14 @@ contract Factory is ProposalData {
     event Log();
     event Test();
 
-    function createNewShareholder(address _userAddress, uint votingTok, QandA qa) public returns (Shareholder) {
-        Shareholder sh = new Shareholder(_userAddress, votingTok, this, qa);
+    function createNewShareholder(address _userAddress, uint votingTok, QandA qa, string randomPW) public returns (Shareholder) {
+        Shareholder sh = new Shareholder(_userAddress, votingTok, this, qa, randomPW);
         shareholders.push(sh);
         return sh;
     }
 
-    function createNewDirector(address _userAddress, QandA qa) public returns (Director) {
-        return new Director(_userAddress, qa);
+    function createNewDirector(address _userAddress, QandA qa, string randomPW) public returns (Director) {
+        return new Director(_userAddress, qa, randomPW);
     }
 
     function createNewProposal(string _name, string _description, string _options) public returns (uint propId) {

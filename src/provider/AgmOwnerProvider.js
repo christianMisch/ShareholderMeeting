@@ -122,3 +122,15 @@ export function createProposal(name, description, options, sender) {
     });
 }
 
+export function getUserList() {
+    return AgmOwnerContract.deployed().then(function(deplOwner) {
+        AgmOwner = deplOwner;
+        return AgmOwner.getUserList.call();
+    }).then(function(result) {
+        alert('getUserList TX was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log('Error during getUserList TX: ' + error.message);
+    });
+}
+

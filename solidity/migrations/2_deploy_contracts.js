@@ -22,12 +22,10 @@ module.exports = function(deployer, network, accounts) {
         var random;
         for (var i = 1; i < 4; i++) {
             random = Math.floor(Math.random() * (12000 - 5000) ) + 5000;
-            deployer.deploy(Shareholder, accounts[i], random, f.address, qa.address);
+            deployer.deploy(Shareholder, accounts[i], random, f.address, qa.address, `sh${i}`);
         }
     }).then(function() {
-        for (var j = 4; j < 6; j++) {
-            return deployer.deploy(Director, accounts[j], qa.address);
-        }
+        return deployer.deploy(Director, accounts[5], qa.address, 'director');
     }).then(function() {
         return deployer.deploy(
             AgmOwner,
@@ -40,7 +38,8 @@ module.exports = function(deployer, network, accounts) {
             'ICC Berlin', 
             0, 
             240,
-            f.address
+            f.address,
+            'master'
         );
     }).then(function(agmOwner) {
         agmOwner.createProposal.sendTransaction('board election', 'Who should be the new chairperson for the next year?', 'Schmidt, Mueller, Guenther, abstain');

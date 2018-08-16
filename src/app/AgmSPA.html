@@ -122,7 +122,21 @@
         </template>
 
         <template id="voting-template">
-            <article class="col-xl-4">
+            <section>
+                <form>
+                    <h3>For partial delegation only</h3>
+                    <strong>Please type in your preferred denomination of your shares for delegation!</strong>
+                    <label>Number of blocks which contain shares: <input type="number" id="block-number"></label>
+                    <label>Number of shares which are contained in one block <input type="number" id="factor"></label>
+                    <input type="button" value="denominate" id="denominate-button">
+                </form>
+                <h3>Your current share denomination</h3>
+                <ol id="voting-denomination-list">
+
+                </ol>
+            </section>
+            
+            <article class="col-xl-12">
                 <h2>Voting</h2>
                 <p>this is a voting example</p>
                 <input type="button" value="refresh list" id="refresh-proposal">
@@ -131,7 +145,7 @@
                         <th>Description</th>
                         <th>Options</th>
                         <th>Delegation style</th>
-                        <th>Proxy</th>
+                        <th>Proxy address</th>
                     </tr>
                 </table>
             </article>
