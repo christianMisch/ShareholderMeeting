@@ -20,12 +20,12 @@ module.exports = function(deployer, network, accounts) {
     }).then(function(qaInst) {
         qa = qaInst;
         var random;
-        for (var i = 2; i < 6; i++) {
+        for (var i = 1; i < 4; i++) {
             random = Math.floor(Math.random() * (12000 - 5000) ) + 5000;
             deployer.deploy(Shareholder, accounts[i], random, f.address, qa.address);
         }
     }).then(function() {
-        for (var j = 6; j < accounts.length; j++) {
+        for (var j = 4; j < 6; j++) {
             return deployer.deploy(Director, accounts[j], qa.address);
         }
     }).then(function() {
@@ -42,10 +42,14 @@ module.exports = function(deployer, network, accounts) {
             240,
             f.address
         );
+    }).then(function(agmOwner) {
+        agmOwner.createProposal.sendTransaction('board election', 'Who should be the new chairperson for the next year?', 'Schmidt, Mueller, Guenther, abstain');
+        /*agmOwner.createProposal('dividend distribution', 'How much percentage should be increased the dividend for shareholders?', '3%, 4%, 5%, abstain');
+        agmOwner.createProposal.sendTransaction('foster research', 'Should the research into new technologies be more fostered?', 'yes, no, abstain');*/
     }).then(function() {
         console.log('factory address:      ' + f.address);
         console.log('QandA   address:      ' + qa.address);
-        accounts.forEach(acc => console.log(acc));
+        //accounts.forEach(acc => console.log(acc));
     });
 
     

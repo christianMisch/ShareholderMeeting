@@ -8,30 +8,28 @@ var Factory;
 const gas = /*'220000'*/ '3000000';
 
 export function getProposal(proposalId) {
-    FactoryContract.deployed().then(function(deplFac) {
+    return FactoryContract.deployed().then(function(deplFac) {
         Factory = deplFac;
         return Factory.getProposal.call(proposalId);
     }).then(function(result) {
         alert('getProposal call was successful: ' + result);
+        return result;
     }).catch(function(error) {
         console.log('Error during getProposal call: ' + error.message);
     }); 
 }
 
 export function getNumOfProposals() {
-    var proposalCount;
-    FactoryContract.deployed().then(function(deplFac) {
+    return FactoryContract.deployed().then(function(deplFac) {
         Factory = deplFac;
         //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
         return Factory.getNumOfProposals.call();
     }).then(function(result) {
-        console.log(result.toNumber());
         alert('getNumOfProposals call was successful: ' + result);
-        return result.toNumber();
+        return result;
     }).catch(function(error) {
         console.log('Error during getNumOfProposals call: ' + error.message);
     }); 
-    return proposalCount;
 }
 
 

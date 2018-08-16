@@ -2,7 +2,7 @@
 
 var authorizedUsers = {
     '0x0': {password: 'master', role: 'AgmOwner', loggedIn: false},
-    '0x72cccDBCFb464a240c025969bb9Bb81Da0392a90': {password: 'pw1', role: 'Shareholder', loggedIn: false},
+    '0': {password: '123', role: 'Shareholder', loggedIn: false},
     '0x5E3407E44756371B4D3De80Eb4378b715c444619': {password: 'pw2', role: 'Director', loggedIn: false}
 };
 var inputAdr, inputPW;
@@ -37,6 +37,7 @@ $(document).ready(function() {
             && authorizedUsers[inputAdr].role === 'AgmOwner') {
                 createAlert('You have successfully logged in as AgmOwner!');
                 $('nav').show();
+                $('#setup-link').show();
                 $('#welcome-link').hide();
                 $('#voting-link').hide();
                 $('#qa-link').hide();
