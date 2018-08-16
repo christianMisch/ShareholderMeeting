@@ -12,8 +12,15 @@ $(document).ready(function() {
     showWelcomePage();
     // hide logout button, welcome link in sidebar and user credentials
     $('#logout-button').hide();
-    $('#welcome-link').hide();
-    $('#setup-link').hide();
+    $('nav').hide();
+    
+    /*const links = $('ul[class="list-unstyled components"] a');
+    console.log(links);
+    $.each(links, function(index, val) {
+        console.log(index, val);
+        //val.hide();
+        //$(`#${val.attr('id')}`).hide();
+    })*/
     hideUserCredentials();
     
 
@@ -29,12 +36,15 @@ $(document).ready(function() {
             && authorizedUsers[inputAdr].password === inputPW
             && authorizedUsers[inputAdr].role === 'AgmOwner') {
                 createAlert('You have successfully logged in as AgmOwner!');
+                $('nav').show();
+                $('#welcome-link').hide();
+                $('#voting-link').hide();
+                $('#qa-link').hide();
                 showUserCredentials();
                 $('#userAddress').html('User: ' + inputAdr);
                 $('#userRole').html('Role: AgmOwner');
                 showLogoutButton();
                 showView('home-link');
-                $('#setup-link').show();
                 hideLoginFields();
                 authorizedUsers[inputAdr].loggedIn = true;
 
@@ -44,6 +54,10 @@ $(document).ready(function() {
             && authorizedUsers[inputAdr].role === 'Shareholder') {
             
                 createAlert('You have successfully logged in as Shareholder!');
+                $('nav').show();
+                $('#voting-link').show();
+                $('#setup-link').hide();
+                $('#welcome-link').hide();
                 showUserCredentials();
                 $('#userAddress').html('User: ' + inputAdr);
                 $('#userRole').html('Role: Shareholder');
@@ -80,6 +94,7 @@ $(document).ready(function() {
     });
 
     $('#logout-button').click(function() {
+        $('nav').hide();
         $('#logout-button').hide();
         $('#login-button').show();
         showWelcomePage();

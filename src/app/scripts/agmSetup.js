@@ -26,7 +26,7 @@ $(document).ready(function() {
 
         $('main').on('click', 'input[id="remove-user-button"]', function() {
             const adrOfRemovedUser = $('#remove-user-address').val();
-            removeUser(adrOfRemovedUser, owner);
+            //removeUser(adrOfRemovedUser, owner);
         })
     });
 

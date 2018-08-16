@@ -55,13 +55,13 @@
                                 <a href="#setup">Setup</a>
                             </li>
                             <li>
-                                <a href="#voting">Voting</a>
+                                <a href="#voting" id="voting-link">Voting</a>
                             </li>
                             <li>
-                                <a href="#Q&A">Q&A</a>
+                                <a href="#Q&A" id="qa-link">Q&A</a>
                             </li>
                             <li>
-                                <a href="#list">Q&A List</a>
+                                <a href="#list" id="list-link">Q&A List</a>
                             </li>
                         </ul>
                     </nav>
@@ -125,6 +125,10 @@
             <article class="col-xl-4">
                 <h2>Voting</h2>
                 <p>this is a voting example</p>
+                <input type="button" value="refresh list" id="refresh-proposal">
+                <ol id="proposal-list">
+
+                </ol>
             </article>
            
         </template>
@@ -181,6 +185,7 @@
         <script src="../../dist/manageSPA.bundle.js"></script>
         <script src="../../dist/authentication.bundle.js"></script>
         <script src="../../dist/agmSetup.bundle.js"></script>
+        <script src="../../dist/voting.bundle.js"></script>
         <!--<script src= "../../dist/ShareholderProvider.bundle.js"></script>
         <script src="../../dist/app.bundle.js"></script>-->
     </body>

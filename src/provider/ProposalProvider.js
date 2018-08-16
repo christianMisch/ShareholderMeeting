@@ -1,27 +1,37 @@
-import FactoryArtifact from '../artifacts/contracts/Factory.json';
-import AgmOwnerArtifact from '../artifacts/contracts/AgmOwner.json';
-import contract from 'truffle-contract';
-import web3 from 'web3';
+import FactoryJson from '../../solidity/build/contracts/Factory.json';
+import {default as contract} from 'truffle-contract'; 
+import web3Provider from './web3Provider';
 
-export async function createNewProposal(name, description, options, from) {
-    console.log('createNewProposal');
-    
-    const FactoryContract = contract(FactoryArtifact);
-    FactoryContract.setProvider(web3.currentProvider);
+const FactoryContract = contract(FactoryJson);
+FactoryContract.setProvider(web3Provider.currentProvider);
+var Factory;
+const gas = /*'220000'*/ '3000000';
 
-    const Factory = await FactoryContract.deployed();
-    const txId = Factory.createNewProposal.sendTransaction(name, description, options, { from });
-
-    console.log(await Factory.getNumOfProposals.call());
-    return txId
+export function getProposal(proposalId) {
+    FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        return Factory.getProposal.call(proposalId);
+    }).then(function(result) {
+        alert('getProposal call was successful: ' + result);
+    }).catch(function(error) {
+        console.log('Error during getProposal call: ' + error.message);
+    }); 
 }
 
-export async function createProposal(name, description, options, from) {
-    const AgmOwnerContract = contract(AgmOwnerArtifact);
-    AgmOwnerContract.setProvider(web3.currentProvider);
-
-    const AgmOwner = await AgmOwnerContract.deployed();
-    return AgmOwner.createProposal.sendTransaction(name, description, options, {from});
+export function getNumOfProposals() {
+    var proposalCount;
+    FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
+        return Factory.getNumOfProposals.call();
+    }).then(function(result) {
+        console.log(result.toNumber());
+        alert('getNumOfProposals call was successful: ' + result);
+        return result.toNumber();
+    }).catch(function(error) {
+        console.log('Error during getNumOfProposals call: ' + error.message);
+    }); 
+    return proposalCount;
 }
 
 

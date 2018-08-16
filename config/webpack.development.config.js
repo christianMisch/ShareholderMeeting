@@ -9,7 +9,8 @@ module.exports = {
         app: '../src/app/scripts/index.js',
         manageSPA: '../src/app/scripts/manageSPA.js',
         authentication: '../src/app/scripts/authentication.js',
-        agmSetup: '../src/app/scripts/agmSetup.js'
+        agmSetup: '../src/app/scripts/agmSetup.js',
+        voting: '../src/app/scripts/voting.js'
         //ShareholderProvider: '../src/provider/ShareholderProvider.js'
     }, 
     output: {
