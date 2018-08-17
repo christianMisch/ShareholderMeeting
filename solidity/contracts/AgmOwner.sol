@@ -56,12 +56,11 @@ contract AgmOwner is User {
         string _meetingPlace,
         uint _meetingStartTime,
         uint _meetingEndTime,
-        Factory _fac,
-        string password
-    ) 
-            
-            User(_userAddress, true, password) public {
-        
+        Factory _fac
+    )
+
+            User(_userAddress, true) public {
+
         minimumVotingQuorum = _minimumVotingQuorum;
         marginOfVotesForMajority = _marginOfVotesForMajority;
         meetingName = _meetingName;
@@ -80,7 +79,7 @@ contract AgmOwner is User {
         emit OwnershipTransferedTo(_owner);
     }
 
-    function addUser(address _userAddress, bool isDirector, uint votingWeight, QandA qa, string randomPW) public {
+    function addUser(address _userAddress, bool isDirector, uint votingWeight, QandA qa) public {
         uint id = userId[_userAddress];
         if (id == 0) {
             id = users.length++;
@@ -88,15 +87,15 @@ contract AgmOwner is User {
         }
 
         if (isDirector) {
-            Director d = fac.createNewDirector(_userAddress, qa, randomPW);
+            Director d = fac.createNewDirector(_userAddress, qa);
             users[id] = d;
-            
+
             emit UserCreated(id, _userAddress, true);
-        
+
         } else {
-            Shareholder s = fac.createNewShareholder(_userAddress, votingWeight, qa, randomPW);
+            Shareholder s = fac.createNewShareholder(_userAddress, votingWeight, qa);
             users[id] = s;
-            
+
             emit UserCreated(id, _userAddress, false);
         }
         numberOfUsers++;
@@ -113,7 +112,7 @@ contract AgmOwner is User {
             users[i] = users[i+1];
             userId[users[i].userAddress()] = i;
         }
-        
+
         users.length--;
         numberOfUsers--;
 
@@ -144,7 +143,7 @@ contract AgmOwner is User {
         return (meetingDate, meetingPlace);
     }
 
-    function createProposal(string _name, string _description, string _options) 
+    function createProposal(string _name, string _description, string _options)
         public /*onlyOwner*/ returns(uint propId) {
 
         propId = fac.createNewProposal(_name, _description, _options);
@@ -155,7 +154,7 @@ contract AgmOwner is User {
 
     // executes the pending proposal
     /*function executeProposal(uint proposalId) public {
-        
+
         Proposal storage prop = proposals[proposalId];
         var optionString = proposals[proposalId].options.toSlice();
         var delim = ";".toSlice();
@@ -166,7 +165,7 @@ contract AgmOwner is User {
 
         require(now > meetingEndTime, "meeting has not finished yet");
 
-        
+
         // iterate over all options to store default options in the map
         for (uint k = 0; k < options.length; k++) {
             uint id = votingOptions.length++;
@@ -174,16 +173,16 @@ contract AgmOwner is User {
 
             // iterate over all votes to check which voter voted for option k
             for (uint i = 0; i < prop.votes.length; i++) {
-                
+
                 Vote storage v = prop.votes[i];
                 if (keccak256(v.voterDecision) == keccak256(options[k])) {
-                    votingOptions[k].optionCount++; 
-                } 
+                    votingOptions[k].optionCount++;
+                }
             }
         }
         uint winningOptionCount = 0;
         uint countSum = 0;
-        
+
         for (uint j = 0; j < votingOptions.length; j++) {
             countSum += votingOptions[j].optionCount;
             if (winningOptionCount < votingOptions[j].optionCount) {
@@ -191,7 +190,7 @@ contract AgmOwner is User {
             }
         }
 
-        if (winningOptionCount > minimumVotingQuorum 
+        if (winningOptionCount > minimumVotingQuorum
             && (winningOptionCount * 100 / countSum) > marginOfVotesForMajority) {
             prop.proposalPassed = true;
         } else {

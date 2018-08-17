@@ -35,10 +35,10 @@ contract Shareholder is User, ProposalData {
     event ShareholderCreated(address userAddress, uint votingWeight, address delegate);
     event WeightDivision(uint result);
     event CalculateDivision(uint num, uint copy, uint divider);
-    
-    constructor(address userAddress, uint _votingWeight, Factory _fac, QandA _qa, string randomPW) 
-        User(userAddress, false, randomPW) public {
-        
+
+    constructor(address userAddress, uint _votingWeight, Factory _fac, QandA _qa)
+        User(userAddress, false) public {
+
         fac = _fac;
         qa = _qa;
         fac.setVotingWeight(userAddress, _votingWeight);
@@ -49,7 +49,7 @@ contract Shareholder is User, ProposalData {
 
     function vote(uint proposalId, string votingOption) public {
         fac.setVote(proposalId, votingOption);
-        
+
         emit Voted(userAddress, proposalId, votingOption);
     }
 
@@ -67,12 +67,12 @@ contract Shareholder is User, ProposalData {
     }
 
     function denominateVotingTokens(uint numOfBlockWeights, uint factor) public {
-        
+
         uint voterWeight = fac.votingWeights(msg.sender);
         uint subtractedVoteWeight;
-        
+
         if (factor != 0 && numOfBlockWeights != 0) {
-            require(voterWeight >= factor * numOfBlockWeights, "sender hasn't enough voting weight for factor-based denomination");
+            require(voterWeight >= factor * numOfBlockWeights, "sender has not enough voting weight for factor-based denomination");
             for (uint i = 0; i < numOfBlockWeights; i++) {
                 votingDenominations.push(factor);
             }
@@ -80,7 +80,7 @@ contract Shareholder is User, ProposalData {
             fac.setVotingWeight(msg.sender, subtractedVoteWeight);
 
         } else if (numOfBlockWeights != 0 && factor == 0) {
-            require(voterWeight > numOfBlockWeights, "sender doesn't have enough voting weight");
+            require(voterWeight > numOfBlockWeights, "sender does not have enough voting weight");
             for (uint k = 0; k < numOfBlockWeights; k++) {
                 votingDenominations.push(1);
             }
@@ -95,7 +95,7 @@ contract Shareholder is User, ProposalData {
     function getVoterWeight(address _userAddress) public returns (uint weight) {
         weight = 0;
         for (uint i = 0; i < fac.getNumOfShareholders(); i++) {
-            
+
             (address currAddress,,address _delegate) = fac.getShareholder(i);
             if (_delegate == _userAddress) {
                 weight += fac.votingWeights(currAddress);
@@ -106,7 +106,7 @@ contract Shareholder is User, ProposalData {
             }
         }
 
-        emit VoterWeight(_userAddress, weight);     
+        emit VoterWeight(_userAddress, weight);
     }
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
@@ -130,12 +130,12 @@ contract Shareholder is User, ProposalData {
             for (; voteBlockIndex < votingDenominations.length - 1; voteBlockIndex++) {
                 votingDenominations[voteBlockIndex] = votingDenominations[voteBlockIndex+1];
             }
-        
-            votingDenominations.length--;*/ 
-            
+
+            votingDenominations.length--;*/
+
             uint newWeightWithPartDeleg = fac.votingWeights(proxyAddress) + targetVoteWeight;
             fac.setVotingWeight(proxyAddress, newWeightWithPartDeleg);
-            
+
             delegations.push(Delegate(proxyAddress, targetVoteWeight));
 
             emit PartialDelegationFrom(msg.sender, senderWeight, proxyAddress, targetVoteWeight);
@@ -146,10 +146,10 @@ contract Shareholder is User, ProposalData {
             uint newWeight = fac.votingWeights(proxyAddress) + senderWeight;
             fac.setVotingWeight(proxyAddress, newWeight);
 
-            delegations.push(Delegate(proxyAddress, senderWeight)); 
+            delegations.push(Delegate(proxyAddress, senderWeight));
 
             emit SimpleDelegationFrom(msg.sender, senderWeight, proxyAddress, newWeight);
-        }  
+        }
     }
 
     function getDelegate(uint delegateId) public view returns (address _proxyAddress, uint _votingWeight) {
@@ -192,7 +192,3 @@ contract Shareholder is User, ProposalData {
     }
 
 */
-
-
-
-

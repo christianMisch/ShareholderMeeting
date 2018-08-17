@@ -43,7 +43,7 @@ a, a:hover, a:focus {
     color: #fff;
     transition: all 0.3s;
     /*min-height: 100vh;*/
-    
+
 }
 
 #sidebar .sidebar-header {
@@ -93,4 +93,33 @@ tr {
 
 label {
     display: block;
+}
+
+#shares {
+  color: red;
+}
+
+#test {
+  display: block;
+}
+
+#delegate-button {
+  margin: 10px;
+}
+
+form {
+  border: 1px solid black;
+  margin: 40px 0;
+}
+
+#refresh-section {
+  margin: 40px 0;
+}
+
+#login-button {
+  float: right;
+}
+
+#logout-button {
+  float: right;
 }

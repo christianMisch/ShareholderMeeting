@@ -1,21 +1,22 @@
 import { getUserList } from "../../provider/AgmOwnerProvider";
 
-//import web3Provider from '../../provider/web3Provider';
+// import web3Provider from '../../provider/web3Provider';
 
 var authorizedUsers = {
     '0x0': {password: 'master', role: 'AgmOwner', loggedIn: false},
-    /*'0': {password: '123', role: 'Shareholder', loggedIn: false, shares: 20},
-    '0x5E3407E44756371B4D3De80Eb4378b715c444619': {password: 'pw2', role: 'Director', loggedIn: false, shares: 0}*/
+    '0': {password: '123', role: 'Shareholder', loggedIn: false, shares: 20},
+    '0x628FBd5a122103e8171BbB2dC70C265f9F775466': {password: 'pw1', role: 'Shareholder', loggedIn: false, shares: 30},
+    '0xc179a95Ac86AAbf6baF4D97BA161152fE0cc0655': {password: 'pw2', role: 'Shareholder', loggedIn: false, shares: 45}
 };
 var inputAdr, inputPW;
 
-$(document).ready(function() { 
+$(document).ready(function() {
 
     showWelcomePage();
     // hide logout button, welcome link in sidebar and user credentials
     $('#logout-button').hide();
     $('nav').hide();
-    
+
     /*const links = $('ul[class="list-unstyled components"] a');
     console.log(links);
     $.each(links, function(index, val) {
@@ -24,7 +25,7 @@ $(document).ready(function() {
         //$(`#${val.attr('id')}`).hide();
     })*/
     hideUserCredentials();
-    
+
 
     $('#login-button').click(function(e) {
         e.preventDefault();
@@ -34,7 +35,7 @@ $(document).ready(function() {
         inputAdr = $('#wallet-address').val();
         inputPW = $('#password').val();
 
-        if (Object.keys(authorizedUsers).includes(inputAdr) 
+        if (Object.keys(authorizedUsers).includes(inputAdr)
             && authorizedUsers[inputAdr].password === inputPW
             && authorizedUsers[inputAdr].role === 'AgmOwner') {
                 createAlert('You have successfully logged in as AgmOwner!');
@@ -52,10 +53,10 @@ $(document).ready(function() {
                 authorizedUsers[inputAdr].loggedIn = true;
 
 
-        } else if (Object.keys(authorizedUsers).includes(inputAdr) 
-            && authorizedUsers[inputAdr].password === inputPW 
+        } else if (Object.keys(authorizedUsers).includes(inputAdr)
+            && authorizedUsers[inputAdr].password === inputPW
             && authorizedUsers[inputAdr].role === 'Shareholder') {
-            
+
                 createAlert('You have successfully logged in as Shareholder!');
                 $('nav').show();
                 $('#voting-link').show();
@@ -81,7 +82,7 @@ $(document).ready(function() {
                 showView('home-link');
                 hideLoginFields();
                 authorizedUsers[inputAdr].loggedIn = true;
-            
+
         } else {
             $('#wrapper').append(`<div role="alert">Login failed!</div>`)
                 .addClass('alert alert-danger');
@@ -89,7 +90,7 @@ $(document).ready(function() {
         console.log($('#wrapper div').length);
         removeSecondAlert();
         console.log($('#wrapper'));
-        
+
         console.log(authorizedUsers);
         setTimeout(function () {
             $('.alert').alert('close');
@@ -123,7 +124,7 @@ export function createAlert(message, alertType = 'success') {
         }
     }*/
     //$('a[href="#home"]').trigger('click');
-   
+
 }
 
 function showUserCredentials() {
@@ -174,17 +175,25 @@ export function getActiveUserAddress() {
 export function removeSecondAlert() {
     var numOfAlerts = $('#wrapper div').length;
         if (numOfAlerts > 1) {
-            const wrapper = document.querySelector('#wrapper'); 
+            const wrapper = document.querySelector('#wrapper');
             wrapper.removeChild(wrapper.lastChild);
         }
 }
 
-function checkUserCredentials(address, pw) {
+export function getAuthorizedUsers() {
+  return authorizedUsers;
+}
+
+export function setAuthorizedUsers(key, value) {
+  authorizedUsers[key].shares = value;
+}
+
+/*function checkUserCredentials(address, pw) {
     const userList = await getUserList();
     for (var i = 0; i < userList; i++) {
         if (userList[i].userAddress === address && userList[i].password === pw) {
             return true;
-        } 
+        }
     }
-    return false; 
-}
+    return false;
+}*/

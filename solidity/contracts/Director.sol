@@ -15,15 +15,15 @@ contract Director is User {
         _;
 
     }
- 
-    constructor(address userAddress, QandA _qa, string randomPW) 
-        User(userAddress, true, randomPW) public {
+
+    constructor(address userAddress, QandA _qa)
+        User(userAddress, true) public {
 
         qa = _qa;
     }
 
     // only director is allowed to create an answer
-    function createAnswer(uint _questionId, string _content) 
+    function createAnswer(uint _questionId, string _content)
         onlyDirector public returns (uint answerId)  {
 
         answerId = qa.createNewAnswer(_questionId, _content, msg.sender);

@@ -9,7 +9,6 @@
     </head>
     <body>
         <header>
-            <h1>Annual General Meeting 2018</h1>
             <div class="row">
                 <div class="col">
                     <p id='userAddress'>User: </p>
@@ -19,7 +18,7 @@
                 <div class="col">
                     <form id="login-form">
                         <label id="address-label">
-                            Enter your Ethereum wallet address
+                            Wallet address:
                             <input type="text" placeholder="0x..." id="wallet-address">
                         </label>
                         <label id="password-label">
@@ -30,11 +29,11 @@
                         <input type="button" value="logout" id="logout-button">
                     </form>
                 </div>
-                
+
             </div>
-            
+
         </header>
-           
+
 
         <div class="container-fluid">
             <div class="row">
@@ -43,7 +42,7 @@
                         <div class="sidebar-header">
                             <h3>AGM features</h3>
                         </div>
-                
+
                         <ul class="list-unstyled components">
                             <li class="active">
                                 <a href="#welcome" id="welcome-link">Welcome</a>
@@ -66,8 +65,9 @@
                         </ul>
                     </nav>
                 </div>
-                
+
                 <div class="col-xl-9">
+                  <h1 class="col-7">Annual General Meeting 2018</h1>
                     <main class="row">
                         <!--template content is inserted here-->
                     </main>
@@ -101,12 +101,12 @@
                     <input type="button" value="add User" id="add-user-button">
                     <p>Here you can remove user from the AGM</p>
                     <label>Type the address of the user who shall be removed: <input type="text" id="remove-user-address"></label>
-                    <input type="button" value="remove User" id="remove-user-button"> 
+                    <input type="button" value="remove User" id="remove-user-button">
                 </article>
             </section>
         </template>
-        
-        
+
+
         <template id="home-template">
             <article class="col-xl-12">
                 <p>The 1st Annual General Meeting takes place in the ICC in Berlin at 3pm on 31st of august!</p>
@@ -122,34 +122,46 @@
         </template>
 
         <template id="voting-template">
-            <section>
+            <h2 class="col-12">Voting</h2>
+            <section class="col-6">
+                <strong>
+                  Number of shares you own:
+                </strong>
+                <strong id="shares">
+
+                </strong>
                 <form>
                     <h3>For partial delegation only</h3>
                     <strong>Please type in your preferred denomination of your shares for delegation!</strong>
                     <label>Number of blocks which contain shares: <input type="number" id="block-number"></label>
                     <label>Number of shares which are contained in one block <input type="number" id="factor"></label>
                     <input type="button" value="denominate" id="denominate-button">
+                    <strong id="test">Your current share denomination is shown below:</strong>
+                    <div id="voting-denomination-list">
                 </form>
-                <h3>Your current share denomination</h3>
-                <ol id="voting-denomination-list">
 
-                </ol>
+
+                </div>
             </section>
-            
-            <article class="col-xl-12">
-                <h2>Voting</h2>
-                <p>this is a voting example</p>
+            <section class="col-6">
+              <label>Please insert the proxy address: <input type="text" id="proxy-address"></label>
+              <label>Choose the position of the share block <input type="number" id="block-index"></label>
+              <input type="button" value="delegate" id="delegate-button">
+            </section>
+
+            <article class="col-xl-12" id="refresh-section">
                 <input type="button" value="refresh list" id="refresh-proposal">
                 <table>
                     <tr>
                         <th>Description</th>
                         <th>Options</th>
-                        <th>Delegation style</th>
-                        <th>Proxy address</th>
+                        <!--<th>Delegation style</th>
+                        <th>Proxy address</th>-->
                     </tr>
                 </table>
             </article>
-           
+            <input type="button" id="vote-button" value="vote">
+
         </template>
 
         <template id="QandA-template">
@@ -168,12 +180,12 @@
 
         <template id="QandA-list-template">
             <article class="col-xl-12">
-                <h2>QandA list</h2> 
+                <h2>QandA list</h2>
             </article>
             <div class="col-5">
                 <ol id="question-list"></ol>
             </div>
-            
+
             <div class="col-5">
                 <article>
                     <div id="selected-question">
@@ -184,10 +196,10 @@
                     <input type="button" value="downvote">
                 </article>
             </div>
-           
-            
+
+
         </template>
-       
+
         <footer>
 
         </footer>

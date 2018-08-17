@@ -15,14 +15,14 @@ contract Factory is ProposalData {
     event Log();
     event Test();
 
-    function createNewShareholder(address _userAddress, uint votingTok, QandA qa, string randomPW) public returns (Shareholder) {
-        Shareholder sh = new Shareholder(_userAddress, votingTok, this, qa, randomPW);
+    function createNewShareholder(address _userAddress, uint votingTok, QandA qa) public returns (Shareholder) {
+        Shareholder sh = new Shareholder(_userAddress, votingTok, this, qa);
         shareholders.push(sh);
         return sh;
     }
 
-    function createNewDirector(address _userAddress, QandA qa, string randomPW) public returns (Director) {
-        return new Director(_userAddress, qa, randomPW);
+    function createNewDirector(address _userAddress, QandA qa) public returns (Director) {
+        return new Director(_userAddress, qa);
     }
 
     function createNewProposal(string _name, string _description, string _options) public returns (uint propId) {
@@ -58,14 +58,14 @@ contract Factory is ProposalData {
 
     function setVote(uint proposalId, string votingOption) public {
         Proposal storage prop = proposals[proposalId];
-        
+
         /*require(!prop.votedOnProposal[msg.sender], "The shareholder already voted");
         require(delegate == address(0), "Proxy is not allowed to vote");*/
 
         uint voteId = prop.votes.length++;
         prop.votes[voteId] = Vote({
-            voterAddress: msg.sender, 
-            voterDecision: votingOption, 
+            voterAddress: msg.sender,
+            voterDecision: votingOption,
             voterWeight: votingWeights[msg.sender]}
         );
         prop.votedOnProposal[msg.sender] = true;
@@ -110,7 +110,7 @@ contract Factory is ProposalData {
         return shareholders.length;
     }
 
-    function getShareholderList() public view returns (Shareholder[]) {  
+    function getShareholderList() public view returns (Shareholder[]) {
         return shareholders;
     }
 }

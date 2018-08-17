@@ -4,20 +4,18 @@ contract User {
 
     address public userAddress;
     bool public isDirector;
-    string public password;
 
     event UserExists(bool exists);
 
-    constructor(address _userAddress, bool _isDirector, string _password) public {
+    constructor(address _userAddress, bool _isDirector) public {
         userAddress = _userAddress;
         isDirector = _isDirector;
-        password = _password;
     }
 
     /*function userExists(address _userAddress) public returns (bool exists) {
         exists = userId[_userAddress] != 0;
 
-        emit UserExists(exists); 
+        emit UserExists(exists);
         return exists;
     }*/
 }

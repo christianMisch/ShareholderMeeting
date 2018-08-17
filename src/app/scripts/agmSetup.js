@@ -21,7 +21,6 @@ $(document).ready(function() {
             const isDirector = $('#director-flag').val();
             const numOfShares = $('#num-of-shares').val();
             addUser(newUserAddress, isDirector, numOfShares, owner);
-            authorizedUsers.newUserAddress = {password: 'test', role: isDirector, loggedIn: false, shares: numOfShares};
             getNumOfUsers();
         });
 
