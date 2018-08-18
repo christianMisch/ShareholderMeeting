@@ -123,15 +123,15 @@ contract Shareholder is User, ProposalData {
             // partial voting, delegate a voting weight block of his total voting weight to one proxy
             uint targetVoteWeight = votingDenominations[voteBlockIndex];
             // deletes voting weight block in the weight array
-            delete votingDenominations[voteBlockIndex];
+            delete votingDenominations[voteBlockIndex - 1];
 
-            /*
+            
             // deletes the entry with swapping elements if required
             for (; voteBlockIndex < votingDenominations.length - 1; voteBlockIndex++) {
                 votingDenominations[voteBlockIndex] = votingDenominations[voteBlockIndex+1];
             }
 
-            votingDenominations.length--;*/
+            votingDenominations.length--;
 
             uint newWeightWithPartDeleg = fac.votingWeights(proxyAddress) + targetVoteWeight;
             fac.setVotingWeight(proxyAddress, newWeightWithPartDeleg);

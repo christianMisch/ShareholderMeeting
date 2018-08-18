@@ -5,6 +5,7 @@ import web3Provider from './web3Provider';
 const ShareholderContract = contract(ShareholderJson);
 ShareholderContract.setProvider(web3Provider.currentProvider);
 var Shareholder;
+const gas = /*'220000'*/ '3000000';
 
 export function createQuestion(content) {
   console.log('createQuestion()');
@@ -15,10 +16,10 @@ export function createQuestion(content) {
   return Shareholder.createQuestion(content);
 }
 
-export function denominateVotingTokens(numOfBlocks, factor) {
+export function denominateVotingTokens(numOfBlocks, factor, from) {
   ShareholderContract.deployed().then(function (deplShareh) {
     Shareholder = deplShareh;
-    return Shareholder.denominateVotingTokens.sendTransaction(numOfBlocks, factor);
+    return Shareholder.denominateVotingTokens.sendTransaction(numOfBlocks, factor, {from: from});
   }).then(function (result) {
     alert('denominateVotingTokens TX was successful: ' + result);
   }).catch(function (error) {

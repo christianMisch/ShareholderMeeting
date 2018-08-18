@@ -21,10 +21,10 @@
                             Wallet address:
                             <input type="text" placeholder="0x..." id="wallet-address">
                         </label>
-                        <label id="password-label">
+                        <!--<label id="password-label">
                             Enter your password:
                             <input type="password" id="password">
-                        </label>
+                        </label>-->
                         <input type="button" value="login" id="login-button">
                         <input type="button" value="logout" id="logout-button">
                     </form>
@@ -144,6 +144,7 @@
                 </div>
             </section>
             <section class="col-6">
+              <label>Which type of delegation do you want (simple=true/partial=false): <input type="text" id="delegation-style"></label>
               <label>Please insert the proxy address: <input type="text" id="proxy-address"></label>
               <label>Choose the position of the share block <input type="number" id="block-index"></label>
               <input type="button" value="delegate" id="delegate-button">

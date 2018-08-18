@@ -3,7 +3,6 @@ import {denominateVotingTokens, delegateToProxy, getVotingDenominations} from '.
 import {getAuthorizedUsers, setAuthorizedUsers, getActiveUserAddress} from './authentication';
 
 var numOfProp = 0;
-var flag = true;
 var users = getAuthorizedUsers();
 
 $(document).ready(function() {
@@ -11,8 +10,8 @@ $(document).ready(function() {
 
     $('a[href="#voting"]').click(function() {
       const activeUser = getActiveUserAddress();
-      console.log(users);
-      console.log(users[activeUser].shares);
+      //console.log(users);
+      //console.log(users[activeUser].shares);
       setTimeout(function() {
         $('main strong[id="shares"]').html(users[activeUser].shares);
       }, 1000);
@@ -54,29 +53,35 @@ $(document).ready(function() {
         $('main').on('click', 'input[id="denominate-button"]', async function() {
             const numOfBlocks = $('#block-number').val();
             const factor = $('#factor').val();
-            //await denominateVotingTokens(numOfBlocks, factor);
-            const denom = $(
-              `<ol>
+            await denominateVotingTokens(numOfBlocks, factor, {from: '0x5E3407E44756371B4D3De80Eb4378b715c444619'});
+
+            const denomList = $('<ol></ol>');
+            for (var i = 1; i <= numOfBlocks; i++) {
+                denomList.append($(`<li id="${i}">${i}. share block:  ${factor}</li>`));
+            }
+            /*
+              <ol>
                 <li id="first">1. shareblock:  5</li>
                 <li id="second">2. shareblock:  5</li>
                 <li>3. shareblock:  5</li>
-              <ol>`
-            );
-            $('main div[id="voting-denomination-list"]').append(denom.html());
+              <ol>
+            */
+            $('main div[id="voting-denomination-list"]').append(denomList.html());
         });
 
         $('main').on('click', 'input[id="delegate-button"]', function() {
+            const delegStyle = $('delegation-style').val();
+            const proxyAdr = $('#proxy-address').val();
+            const blockIndex = $('#block-index').val();
+            delegateToProxy(proxyAdr, delegStyle, blockIndex);
 
-          users['0'].shares -= 5;
-          if (flag) {
-            users['0x628FBd5a122103e8171BbB2dC70C265f9F775466'].shares += 5;
-            $('main li[id="first"]').remove();
-          } else {
-            users['0xc179a95Ac86AAbf6baF4D97BA161152fE0cc0655'].shares += 5;
-            $('main li[id="second"]').remove();
-          }
-          flag = false;
-          $('#shares').html(users['0'].shares);
+            $(`main li[id="${blockIndex}"]`).remove();
+            //console.log(getActiveUserAddress());
+            //console.log(typeof(getActiveUserAddress()));
+            const currShares = $('main strong[id="shares"]').html();
+            const sharesToDelegate = $(`li[id=${blockIndex}]`).html();
+            setAuthorizedUsers( activeUser, (currShares - sharesToDelegate) );
+            $('#shares').html(users[`${getActiveUserAddress()}`].shares);
         });
     });
 

@@ -1,21 +1,33 @@
 import { getUserList } from "../../provider/AgmOwnerProvider";
 
-// import web3Provider from '../../provider/web3Provider';
+import web3Provider from '../../provider/web3Provider';
+
+web3Provider.eth.defaultAccount = web3Provider.eth.accounts[0];
+web3Provider.personal.unlockAccount(web3Provider.eth.defaultAccount);
+console.log('web3 accounts: ');
+console.log(web3Provider.eth.accounts);
 
 var authorizedUsers = {
-    '0x0': {password: 'master', role: 'AgmOwner', loggedIn: false},
-    '0': {password: '123', role: 'Shareholder', loggedIn: false, shares: 20},
-    '0x628FBd5a122103e8171BbB2dC70C265f9F775466': {password: 'pw1', role: 'Shareholder', loggedIn: false, shares: 30},
-    '0xc179a95Ac86AAbf6baF4D97BA161152fE0cc0655': {password: 'pw2', role: 'Shareholder', loggedIn: false, shares: 45}
+    '0x0': {role: 'AgmOwner', loggedIn: false},
+    '0': {role: 'Shareholder', loggedIn: false, shares: 20},
+    '0x628FBd5a122103e8171BbB2dC70C265f9F775466': {role: 'Shareholder', loggedIn: false, shares: 30},
+    '0xc179a95Ac86AAbf6baF4D97BA161152fE0cc0655': {role: 'Shareholder', loggedIn: false, shares: 45}
 };
 var inputAdr, inputPW;
 
-$(document).ready(function() {
+$(document).ready(async function() {
 
     showWelcomePage();
     // hide logout button, welcome link in sidebar and user credentials
     $('#logout-button').hide();
     $('nav').hide();
+
+    /*console.log('isAuthenticated');
+    isAuthenticated('0xbB0487c8aFdAcC15017201e3002dCC60DdDF9C67').then(function(result) {
+        console.log(result.logs);
+    });*/
+
+    hideUserCredentials();
 
     /*const links = $('ul[class="list-unstyled components"] a');
     console.log(links);
@@ -24,8 +36,6 @@ $(document).ready(function() {
         //val.hide();
         //$(`#${val.attr('id')}`).hide();
     })*/
-    hideUserCredentials();
-
 
     $('#login-button').click(function(e) {
         e.preventDefault();
@@ -36,7 +46,6 @@ $(document).ready(function() {
         inputPW = $('#password').val();
 
         if (Object.keys(authorizedUsers).includes(inputAdr)
-            && authorizedUsers[inputAdr].password === inputPW
             && authorizedUsers[inputAdr].role === 'AgmOwner') {
                 createAlert('You have successfully logged in as AgmOwner!');
                 $('nav').show();
@@ -54,7 +63,6 @@ $(document).ready(function() {
 
 
         } else if (Object.keys(authorizedUsers).includes(inputAdr)
-            && authorizedUsers[inputAdr].password === inputPW
             && authorizedUsers[inputAdr].role === 'Shareholder') {
 
                 createAlert('You have successfully logged in as Shareholder!');
@@ -71,7 +79,6 @@ $(document).ready(function() {
                 authorizedUsers[inputAdr].loggedIn = true;
 
         } else if (Object.keys(authorizedUsers).includes(inputAdr)
-             && authorizedUsers.inputAdr.password === inputPW
              && authorizedUsers.inputAdr.role === 'Director') {
 
                 createAlert('You have successfully logged in as Director!');
@@ -87,11 +94,11 @@ $(document).ready(function() {
             $('#wrapper').append(`<div role="alert">Login failed!</div>`)
                 .addClass('alert alert-danger');
         }
-        console.log($('#wrapper div').length);
+        //console.log($('#wrapper div').length);
         removeSecondAlert();
-        console.log($('#wrapper'));
+        //console.log($('#wrapper'));
 
-        console.log(authorizedUsers);
+        //console.log(authorizedUsers);
         setTimeout(function () {
             $('.alert').alert('close');
         }, 3000);
@@ -105,7 +112,7 @@ $(document).ready(function() {
         hideUserCredentials();
         showLoginFields();
         authorizedUsers[inputAdr].loggedIn = false;
-        console.log(authorizedUsers);
+        //console.log(authorizedUsers);
 
     });
 
@@ -188,12 +195,14 @@ export function setAuthorizedUsers(key, value) {
   authorizedUsers[key].shares = value;
 }
 
-/*function checkUserCredentials(address, pw) {
+async function isAuthenticated(address) {
     const userList = await getUserList();
+    console.log('userList: ');
+    console.log(userList);
     for (var i = 0; i < userList; i++) {
-        if (userList[i].userAddress === address && userList[i].password === pw) {
+        if (userList[i].userAddress === address) {
             return true;
         }
     }
     return false;
-}*/
+}

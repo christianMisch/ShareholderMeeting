@@ -10,7 +10,10 @@ module.exports = function(deployer, network, accounts) {
 
     deployer.deploy(ProposalData);
     //deployer.deploy(User, accounts[1], false);
-
+    console.log('web3 accounts');
+    console.log(web3.eth.accounts);
+    console.log('truffle accounts');
+    console.log(accounts);
     var f, qa;
     deployer.then(function() {
         return deployer.deploy(Factory);
@@ -42,11 +45,16 @@ module.exports = function(deployer, network, accounts) {
         );
     }).then(function(agmOwner) {
         agmOwner.createProposal.sendTransaction('board election', 'Who should be the new chairperson for the next year?', 'Schmidt, Mueller, Guenther, abstain');
+        agmOwner.addUser.sendTransaction('0', false, 20, qa.address);
+        agmOwner.addUser.sendTransaction('0x5E3407E44756371B4D3De80Eb4378b715c444619', false, 30, qa.address);
+        agmOwner.addUser.sendTransaction('0xbB0487c8aFdAcC15017201e3002dCC60DdDF9C67', false, 45, qa.address);
+        return agmOwner
         /*agmOwner.createProposal('dividend distribution', 'How much percentage should be increased the dividend for shareholders?', '3%, 4%, 5%, abstain');
         agmOwner.createProposal.sendTransaction('foster research', 'Should the research into new technologies be more fostered?', 'yes, no, abstain');*/
-    }).then(function() {
+    }).then(function(agmOwner) {
         console.log('factory address:      ' + f.address);
         console.log('QandA   address:      ' + qa.address);
+        console.log('AgmOwner address: ' + agmOwner.address);
         //accounts.forEach(acc => console.log(acc));
     });
 
