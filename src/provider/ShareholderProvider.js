@@ -7,13 +7,9 @@ ShareholderContract.setProvider(web3Provider.currentProvider);
 var Shareholder;
 const gas = /*'220000'*/ '3000000';
 
-export function createQuestion(content) {
-  console.log('createQuestion()');
-
-  console.log(ShareholderContract);
-  const Shareholder = ShareholderContract.deployed();
-  console.log(Shareholder);
-  return Shareholder.createQuestion(content);
+export async function createQuestion(content) {
+  const Shareholder = await ShareholderContract.deployed();
+  Shareholder.createQuestion.sendTransaction(content);
 }
 
 export function denominateVotingTokens(numOfBlocks, factor, from) {

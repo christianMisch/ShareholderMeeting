@@ -3,7 +3,6 @@ import {denominateVotingTokens, delegateToProxy, getVotingDenominations} from '.
 import {getAuthorizedUsers, setAuthorizedUsers, getActiveUserAddress} from './authentication';
 
 var numOfProp = 0;
-var users = getAuthorizedUsers();
 
 $(document).ready(function() {
   console.log(getAuthorizedUsers());
@@ -12,6 +11,7 @@ $(document).ready(function() {
       const activeUser = getActiveUserAddress();
       //console.log(users);
       //console.log(users[activeUser].shares);
+      var users = getAuthorizedUsers();
       setTimeout(function() {
         $('main strong[id="shares"]').html(users[activeUser].shares);
       }, 1000);
@@ -78,6 +78,7 @@ $(document).ready(function() {
             $(`main li[id="${blockIndex}"]`).remove();
             //console.log(getActiveUserAddress());
             //console.log(typeof(getActiveUserAddress()));
+            var users = getAuthorizedUsers();
             const currShares = $('main strong[id="shares"]').html();
             const sharesToDelegate = $(`li[id=${blockIndex}]`).html();
             setAuthorizedUsers( activeUser, (currShares - sharesToDelegate) );

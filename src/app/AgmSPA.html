@@ -169,9 +169,10 @@
             <h2 class="col-xl-12">Q&A</h2>
             <div class="col-xl-6">
                 <form id="Q&A-form">
-                    <textarea placeholder="Please write your Question or Answer here..." row="30" cols="50"></textarea>
+                    <textarea row="30" cols="50" id="qa-placeholder"></textarea>
+                    <label id="quest-id-label">Please insert the question id: <input type="number" id="question-id"></label>
                     <input type="reset" value="reset">
-                    <input type="submit" value="submit">
+                    <input type="submit" value="submit" id="qa-submit-button">
                 </form>
             </div>
             <div id="Q&A-feed" class="col-xl-6">
@@ -218,6 +219,7 @@
         <script src="../../dist/authentication.bundle.js"></script>
         <script src="../../dist/agmSetup.bundle.js"></script>
         <script src="../../dist/voting.bundle.js"></script>
+        <script src="../../dist/qAndA.bundle.js"></script>
         <!--<script src= "../../dist/ShareholderProvider.bundle.js"></script>
         <script src="../../dist/app.bundle.js"></script>-->
     </body>
