@@ -123,3 +123,7 @@ form {
 #logout-button {
   float: right;
 }
+
+#quest-answ-list {
+    margin-top: 50px;
+}

@@ -11,9 +11,9 @@ var authorizedUsers = {
     '0x628FBd5a122103e8171BbB2dC70C265f9F775466': {role: 'Shareholder', loggedIn: false, shares: 30},
     '0xc179a95Ac86AAbf6baF4D97BA161152fE0cc0655': {role: 'Shareholder', loggedIn: false, shares: 45},
     '0xB78E4A88e140b9ceeC48D569d6ae0ED4F419eFb1': {role: 'Shareholder', loggedIn: false, shares: 12},
-    '0x1': {role: 'Director', loggedIn: false, shares: 0}
+    '0x88D7d45b3eBD3Fd8b202D8BF1Ec8e2CC2006692D': {role: 'Director', loggedIn: false, shares: 0}
 };
-var inputAdr, inputPW;
+var inputAdr;
 
 $(document).ready(async function() {
 
@@ -43,7 +43,6 @@ $(document).ready(async function() {
         const alertWrapper = $('<div id="wrapper"></div>');
         $('footer').append(alertWrapper);
         inputAdr = $('#wallet-address').val();
-        inputPW = $('#password').val();
 
         if (Object.keys(authorizedUsers).includes(inputAdr)
             && authorizedUsers[inputAdr].role === 'AgmOwner') {

@@ -183,19 +183,27 @@
         <template id="QandA-list-template">
             <article class="col-xl-12">
                 <h2>QandA list</h2>
+                <div> 
+                    <span id="num-of-quest"></span>
+                    <span id="num-of-answ"></span>
+                </div>
             </article>
-            <div class="col-5">
-                <ol id="question-list"></ol>
+            <div class="col-6">
+                <ol id="quest-answ-list">
+
+                </ol>
             </div>
 
-            <div class="col-5">
+            <div class="col-6">
                 <article>
-                    <div id="selected-question">
-                        <div id="content"></div>
-                        <ol id="answer-list"></ol>
-                    </div>
-                    <input type="button" value="upvote">
-                    <input type="button" value="downvote">
+                    <form>
+                        <div id="selected-question">
+                            <div id="content"></div>
+                            <ol id="answer-list"></ol>
+                        </div>
+                        <input type="button" value="upvote">
+                        <input type="button" value="downvote">
+                    </form>
                 </article>
             </div>
 
