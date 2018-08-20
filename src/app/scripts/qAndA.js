@@ -1,5 +1,9 @@
-import {getAuthorizedUsers, setAuthorizedUsers, getActiveUserAddress, getActiveUserState} from './authentication';
+import {getAuthorizedUsers, setAuthorizedUsers, getActiveUserAddress, getActiveUserState, createAlert} from './authentication';
 import {createQuestion, createAnswer, getNumOfAnswers, getNumOfQuestions, getAnswer, getQuestion} from '../../provider/QandAProvider';
+import {rateQuestion} from '../../provider/ShareholderProvider';
+
+var numOfQuest = 0;
+var numOfAnsw= 0;
 
 $(function() {
 
@@ -37,51 +41,58 @@ $(function() {
     });
 
     $('a[href="#list"]').click(async function() {
+        setTimeout(function() {
+            $('main form[id="select-question-form"]').hide();
+        }, 500);
         setInterval(async function() {
-            const numOfQuest = await getNumOfQuestions();
-            const numOfAnsw = await getNumOfAnswers();
-            $('main #num-of-quest').html(`Number of questions: ${numOfQuest}`);
-            $('main #num-of-answ').html(`Number of answers: ${numOfAnsw}`);
-        }, 1000);
-
-        const questNum = await getNumOfQuestions();
-        const answNum = await getNumOfAnswers();
-        for (var i = 0; i < questNum; i++) {
-            var currQuestArr = await getQuestion(i);
-            console.log(currQuestArr);
-            var mappQuest = mapQuestion(currQuestArr);
-            var qaWrapper = $(
-                `<div>
-                    <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                        <div id="${i+1}"> Question ${i+1}: ${mappQuest.content} </div>
-                    </a>
-                </div>`);  
+           
+            const questNum = await getNumOfQuestions();
+            const answNum = await getNumOfAnswers();
+            $('main #num-of-quest').html(`Number of questions: ${questNum}`);
+            $('main #num-of-answ').html(`Number of answers: ${answNum}`);
             
-            console.log(qaWrapper.html());
-            $('main #quest-answ-list').append(qaWrapper.html());
-            var divWrapper = $('<div></div>');
-            var ansWrapper = $('<ol class="list-group"></ol>');
-            var count = 0;
-            for (var j = 0; j < answNum; j++) {
-                console.log(j);
-                var currAnswArr = await getAnswer(j);
-                console.log(currAnswArr);
-                var mappAnsw = mapAnswer(currAnswArr);
-                if (mappAnsw.questionId === i) {
-                    ansWrapper.append(`<li class="list-group-item list-group-item-action flex-column align-items-start">Answer ${count+1}: ${mappAnsw.content}</li>`);
-                    count++;
-                }
+            if (numOfQuest === questNum.toNumber() && numOfAnsw === answNum.toNumber()) {
+                return;
             }
-            divWrapper.append(ansWrapper);
-            console.log(divWrapper.html());
-            $(`main div[id="${i+1}"]`).append(divWrapper.html());
-            //divWrapper.append(ansWrapper.html());
-            //console.log(divWrapper.html());
-            //console.log(contentWrapper.html());
-            
-        }
 
-        console.log(document.body);
+            numOfQuest = questNum.toNumber();
+            numOfAnsw = answNum.toNumber();
+            clearQandAList();
+
+            for (var i = 0; i < questNum; i++) {
+                var currQuestArr = await getQuestion(i);
+                console.log(currQuestArr);
+                var mappQuest = mapQuestion(currQuestArr);
+                var qaWrapper = $(
+                    `<div>
+                            <a href="#question-${i+1}" class="list-group-item list-group-item-action flex-column align-items-start list-group-item-danger">
+                                <div id="${i + 1}"> Question ${i + 1}: ${mappQuest.content} </div>
+                            </a>
+                        </div>`);
+
+                console.log(qaWrapper.html());
+                $('main #quest-answ-list').append(qaWrapper.html());
+                var divWrapper = $('<div></div>');
+                var ansWrapper = $('<ol class="list-group"></ol>');
+                var count = 0;
+                for (var j = 0; j < answNum; j++) {
+                    console.log(j);
+                    var currAnswArr = await getAnswer(j);
+                    console.log(currAnswArr);
+                    var mappAnsw = mapAnswer(currAnswArr);
+                    if (mappAnsw.questionId === i) {
+                        ansWrapper.append(`<li class="list-group-item list-group-item-action flex-column align-items-start list-group-item-success">Answer ${count + 1}: ${mappAnsw.content}</li>`);
+                        count++;
+                    }
+                }
+                divWrapper.append(ansWrapper);
+                console.log(divWrapper.html());
+                $(`main div[id="${i + 1}"]`).append(divWrapper.html());
+            }
+
+        //console.log(document.body);
+
+        }, 1000);
 
         /*
         <div>
@@ -96,7 +107,29 @@ $(function() {
         </div>
         */
 
+        $('main').on('click', 'a[href^="#question-"]', function(e) {
+            e.preventDefault();
+            $('#selected-question').empty();
+            $('main form[id="select-question-form"]').show();
+            var questId = e.currentTarget.getAttribute('href').substring(10);
+            var from = getActiveUserAddress();
+            //console.log(e.currentTarget.getAttribute('href').substring(10));
+            $('#selected-question').append($(`main div[id="${questId}"]`).clone());
         
+            $('main').on('click', 'input[id="upvote-button"]', async function() {
+                var txId = await rateQuestion(questId, 1, from);
+                if (txId.charAt(1) === 'x') {
+                    createAlert('You successfully upvoted this question');
+                }
+            });
+
+            $('main').on('click', 'input[id="downvote-button"]', async function() {
+                var txId = await rateQuestion(questId, 0, from);
+                if (txId.charAt(1) === 'x') {
+                    createAlert('You successfully downvotes this question');
+                }
+            });
+        });
     
     });
 });
@@ -120,4 +153,8 @@ function mapAnswer(answArr) {
         content: answArr[3],
         timestamp: answArr[4].toNumber()
     }
+}
+
+function clearQandAList() {
+    $('#quest-answ-list').empty();
 }

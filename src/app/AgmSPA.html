@@ -182,10 +182,10 @@
 
         <template id="QandA-list-template">
             <article class="col-xl-12">
-                <h2>QandA list</h2>
                 <div> 
                     <span id="num-of-quest"></span>
                     <span id="num-of-answ"></span>
+                    <div>Please click on the question which you want to rate!</div>
                 </div>
             </article>
             <div class="col-6 list-group" id="quest-answ-list">
@@ -193,14 +193,13 @@
             </div>
 
             <div class="col-6">
-                <article>
-                    <form>
+                <article id="rate-article">
+                    <form id="select-question-form">
                         <div id="selected-question">
-                            <div id="content"></div>
-                            <ol id="answer-list"></ol>
+                            
                         </div>
-                        <input type="button" value="upvote">
-                        <input type="button" value="downvote">
+                        <input type="button" value="upvote" id="upvote-button">
+                        <input type="button" value="downvote" id="downvote-button">
                     </form>
                 </article>
             </div>

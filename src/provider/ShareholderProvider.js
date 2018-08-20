@@ -7,11 +7,6 @@ ShareholderContract.setProvider(web3Provider.currentProvider);
 var Shareholder;
 const gas = /*'220000'*/ '3000000';
 
-export async function createQuestion(content) {
-  const Shareholder = await ShareholderContract.deployed();
-  Shareholder.createQuestion.sendTransaction(content);
-}
-
 export function denominateVotingTokens(numOfBlocks, factor, from) {
   ShareholderContract.deployed().then(function (deplShareh) {
     Shareholder = deplShareh;
@@ -35,7 +30,6 @@ export function delegateToProxy(proxyAddress, partialDelegation, voteBlockIndex)
 }
 
 export function getVotingDenominations() {
-  var Shareholder;
   return ShareholderContract.deployed().then(function (deplShareh) {
     Shareholder = deplShareh;
     return Shareholder.getVotingDenominations.call();
@@ -45,6 +39,19 @@ export function getVotingDenominations() {
   }).catch(function (error) {
     console.log('error during getVotingDenominations TX: ' + error.message);
   });
-} 
+}
+
+export function rateQuestion(questId, ratOpt, from) {
+  return ShareholderContract.deployed().then(function (deplShareh) {
+    Shareholder = deplShareh;
+    return Shareholder.rateQuestion.sendTransaction(questId, ratOpt, {from: from});
+  }).then(function (result) {
+    alert('rateQuestion TX was successful: ' + result);
+    return result;
+  }).catch(function (error) {
+    console.log('error during rateQuestion TX: ' + error.message);
+    return error.message;
+  });
+}
 
 
