@@ -50,43 +50,50 @@ $(function() {
             var currQuestArr = await getQuestion(i);
             console.log(currQuestArr);
             var mappQuest = mapQuestion(currQuestArr);
-            var qaWrapper = $('<li></li>');
-            var linkWrapp = $(
-                `<a class="list-group-item list-group-item-action flex-column align-items-start active"> 
-                    <div id="${i+1}"> Question ${i+1}: ${mappQuest.content} </div>
-                <a/>`
-            );
-
-            console.log(document.body);
+            var qaWrapper = $(
+                `<div>
+                    <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div id="${i+1}"> Question ${i+1}: ${mappQuest.content} </div>
+                    </a>
+                </div>`);  
             
-            var ansWrapper = $('<ol></ol>');
+            console.log(qaWrapper.html());
+            $('main #quest-answ-list').append(qaWrapper.html());
+            var divWrapper = $('<div></div>');
+            var ansWrapper = $('<ol class="list-group"></ol>');
+            var count = 0;
             for (var j = 0; j < answNum; j++) {
+                console.log(j);
                 var currAnswArr = await getAnswer(j);
                 console.log(currAnswArr);
                 var mappAnsw = mapAnswer(currAnswArr);
-                ansWrapper.append(`<li>Answer ${j+1}: ${mappAnsw.content}</li>`);
+                if (mappAnsw.questionId === i) {
+                    ansWrapper.append(`<li class="list-group-item list-group-item-action flex-column align-items-start">Answer ${count+1}: ${mappAnsw.content}</li>`);
+                    count++;
+                }
             }
-            
-            linkWrapp.append(ansWrapper.html());
-            qaWrapper.append(linkWrapp.html());
-            $('main #quest-answ-list').append(qaWrapper.html());
-
+            divWrapper.append(ansWrapper);
+            console.log(divWrapper.html());
+            $(`main div[id="${i+1}"]`).append(divWrapper.html());
+            //divWrapper.append(ansWrapper.html());
+            //console.log(divWrapper.html());
+            //console.log(contentWrapper.html());
             
         }
 
+        console.log(document.body);
+
         /*
-        <ol>
-            <li>
-                <a>
-                    <div>question
-                        <ol>
-                            <li>Answer 1 </li>
-                            <li>Answer 2 </li>
-                        </ol>
-                    </div>
-                </a>
-            </li>
-        </ol>
+        <div>
+            <a>
+                <div>question
+                    <ol>
+                        <li>Answer 1 </li>
+                        <li>Answer 2 </li>
+                    </ol>
+                </div>
+            </a>
+        </div>
         */
 
         
