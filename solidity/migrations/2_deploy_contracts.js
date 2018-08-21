@@ -22,13 +22,10 @@ module.exports = function(deployer, network, accounts) {
         return deployer.deploy(QandA);
     }).then(function(qaInst) {
         qa = qaInst;
-        var random;
-        for (var i = 1; i < 2; i++) {
-            random = Math.floor(Math.random() * (12 - 5) ) + 5;
-            deployer.deploy(Shareholder, accounts[i], random, f.address, qa.address);
-        }
+        var random = Math.floor(Math.random() * (12 - 5)) + 5;
+        deployer.deploy(Shareholder, accounts[8], random, f.address, qa.address);
     }).then(function() {
-        return deployer.deploy(Director, accounts[5], qa.address);
+        return deployer.deploy(Director, accounts[9], qa.address);
     }).then(function() {
         return deployer.deploy(
             AgmOwner,

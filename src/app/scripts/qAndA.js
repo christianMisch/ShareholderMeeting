@@ -4,6 +4,7 @@ import {rateQuestion} from '../../provider/ShareholderProvider';
 
 var numOfQuest = 0;
 var numOfAnsw= 0;
+var totalUpDownVoteCount = 0;
 
 $(function() {
 
@@ -50,42 +51,72 @@ $(function() {
            
             const questNum = await getNumOfQuestions();
             const answNum = await getNumOfAnswers();
+            var currUpDownVoteCount = 0;
             $('main #num-of-quest').html(`Number of questions: ${questNum}`);
             $('main #num-of-answ').html(`Number of answers: ${answNum}`);
             // rating also not changing because if it changes then it should load again
-            if (numOfQuest === questNum.toNumber() && numOfAnsw === answNum.toNumber()) {
+            
+            var visitedArr = [];
+            var priorityMetric = 0;
+            for (var k = 0; k < questNum.toNumber(); k++) {
+                var currQuestArr = await getQuestion(k);
+                //console.log(currQuestArr);
+                var mappQuest = mapQuestion(currQuestArr);
+                visitedArr.push({questId: mappQuest.questionId, visited: false});
+                var questPriority = mappQuest.upvotes - mappQuest.downvotes;
+                currUpDownVoteCount += questPriority;
+                if (questPriority >= priorityMetric) {
+                    priorityMetric = questPriority;
+                }
+            }
+            console.log('globalSum: ' + typeof(totalUpDownVoteCount));
+            console.log('currSum: ' + typeof(currUpDownVoteCount));
+            
+            if (numOfQuest === questNum.toNumber() 
+                && numOfAnsw === answNum.toNumber()
+                && totalUpDownVoteCount === currUpDownVoteCount) {
+                console.log('no change');
                 return;
+                
             }
 
+            totalUpDownVoteCount = currUpDownVoteCount;
             numOfQuest = questNum.toNumber();
             numOfAnsw = answNum.toNumber();
             clearQandAList();
-            var priorityMetric = 0;
-            var visitedArr = [];
+            
+            var questCount = 1;
             var allVisited = false;
             
-            for (;!allVisited; allVisited = visitedArr.filter(q => q.visited === true).length === questNum.toNumber()) {
-                priorityMetric = 0;
+            console.log(visitedArr);
+            
+            for (;!allVisited; 
+                allVisited = visitedArr.filter(q => q.visited === true).length === questNum.toNumber()
+            ) {
+                //priorityMetric = 0;
                 /*console.log(questNum);
                 console.log(visitedArr.filter(q => q.visited === true).length);
                 console.log(allVisited);
                 console.log(visitedArr);*/
+                
                 for (var i = 0; i < questNum; i++) {
+                    
                     var currQuestArr = await getQuestion(i);
                     //console.log(currQuestArr);
                     var mappQuest = mapQuestion(currQuestArr);
                     var questPriority = mappQuest.upvotes - mappQuest.downvotes;
+                    console.log(mappQuest.questionId, questPriority);
                     //console.log(mappQuest.questionId + ': ' + questPriority);
     
                     if (questPriority >= priorityMetric 
-                        && !(visitedArr.map(q => q.questId).includes(mappQuest.questionId)) ) {
+                        && (visitedArr[i].visited === false) ) {
                         //console.log('inner if');
-                        priorityMetric = questPriority;
-                        visitedArr.push({questId: mappQuest.questionId, visited: true});
+                        //priorityMetric = questPriority;
+                        visitedArr[i].visited = true;
                         var qaWrapper = $(
                             `<div>
                                     <a href="#question-${i+1}" class="list-group-item list-group-item-action flex-column align-items-start list-group-item-danger">
-                                        <div id="${i + 1}"> Question ${i + 1}: ${mappQuest.content} </div>
+                                        <div id="${i + 1}"> Question ${questCount++}: ${mappQuest.content} </div>
                                     </a>
                             </div>`
                         );
@@ -108,10 +139,13 @@ $(function() {
                         divWrapper.append(ansWrapper);
                         //console.log(divWrapper.html());
                         $(`main div[id="${i + 1}"]`).append(divWrapper.html());
+                    
+                        
                     }
                     
                     
                 }
+                priorityMetric--;
             }
             visitedArr = [];
             console.log('escaped for loop');
@@ -119,7 +153,7 @@ $(function() {
 
         //console.log(document.body);
 
-        }, 10000);
+        }, 1000);
 
         /*
         <div>
@@ -133,32 +167,36 @@ $(function() {
             </a>
         </div>
         */
+    
+    });
 
-        $('main').on('click', 'a[href^="#question-"]', function(e) {
-            e.preventDefault();
-            $('#selected-question').empty();
-            $('main form[id="select-question-form"]').show();
-            var questId = e.currentTarget.getAttribute('href').substring(10);
-            var from = getActiveUserAddress();
-            //console.log(e.currentTarget.getAttribute('href').substring(10));
-            $('#selected-question').append($(`main div[id="${questId}"]`).clone());
+    $('main').on('click', 'a[href^="#question-"]', function(e) {
+        e.preventDefault();
+        $('#selected-question').empty();
+        $('main form[id="select-question-form"]').show();
+        var questId = e.currentTarget.getAttribute('href').substring(10);
+        var from = getActiveUserAddress();
+        //console.log(e.currentTarget.getAttribute('href').substring(10));
         
-            $('main').on('click', 'input[id="upvote-button"]', async function() {
-                var txId = await rateQuestion(questId-1 , 1, from);
-                if (txId.charAt(1) === 'x') {
-                    createAlert('You successfully upvoted this question');
-                    //console.log(await getQuestion(questId-1));
-                }
-            });
-
-            $('main').on('click', 'input[id="downvote-button"]', async function() {
-                var txId = await rateQuestion(questId-1, 0, from);
-                if (txId.charAt(1) === 'x') {
-                    createAlert('You successfully downvotes this question');
-                }
-            });
+        $('#selected-question').append($(`main div[id="${questId}"]`).clone());
+        //$(`main div[id="${questId}"]`).clone().appendTo('#selected-question');
+    
+        $('main div').on('click', 'input[id="upvote-button"]', async function() {
+            var txId = await rateQuestion(questId-1 , 1, from);
+            //$('#selected-question li:last').remove();
+            if (txId.charAt(1) === 'x') {
+                createAlert('You successfully upvoted this question');
+                //console.log(await getQuestion(questId-1));
+            }
         });
     
+        $('main').on('click', 'input[id="downvote-button"]', async function() {
+            var txId = await rateQuestion(questId-1, 0, from);
+            //$('#selected-question li:last').remove();
+            if (txId.charAt(1) === 'x') {
+                createAlert('You successfully downvotes this question');
+            }
+        });
     });
 });
 
@@ -226,4 +264,62 @@ for (var i = 0; i < questNum; i++) {
 
         }, 1000);
 
+*/
+
+
+/*
+for (;!allVisited; allVisited = visitedArr.filter(q => q.visited === true).length === questNum.toNumber()) {
+                priorityMetric = 0;
+                console.log(questNum);
+                console.log(visitedArr.filter(q => q.visited === true).length);
+                console.log(allVisited);
+                console.log(visitedArr);
+                
+                for (var i = 0; i < questNum; i++) {
+                    
+                    var currQuestArr = await getQuestion(i);
+                    //console.log(currQuestArr);
+                    var mappQuest = mapQuestion(currQuestArr);
+                    var questPriority = mappQuest.upvotes - mappQuest.downvotes;
+                    console.log(mappQuest.questionId, questPriority);
+                    //console.log(mappQuest.questionId + ': ' + questPriority);
+    
+                    if (questPriority >= priorityMetric 
+                        && !(visitedArr.map(q => q.questId).includes(mappQuest.questionId)) ) {
+                        //console.log('inner if');
+                        priorityMetric = questPriority;
+                        visitedArr.push({questId: mappQuest.questionId, visited: true});
+                        var qaWrapper = $(
+                            `<div>
+                                    <a href="#question-${i+1}" class="list-group-item list-group-item-action flex-column align-items-start list-group-item-danger">
+                                        <div id="${i + 1}"> Question ${questCount++}: ${mappQuest.content} </div>
+                                    </a>
+                            </div>`
+                        );
+        
+                        //console.log(qaWrapper.html());
+                        $('main #quest-answ-list').append(qaWrapper.html());
+                        var divWrapper = $('<div></div>');
+                        var ansWrapper = $('<ol class="list-group"></ol>');
+                        var count = 0;
+                        for (var j = 0; j < answNum; j++) {
+                            //console.log(j);
+                            var currAnswArr = await getAnswer(j);
+                            //console.log(currAnswArr);
+                            var mappAnsw = mapAnswer(currAnswArr);
+                            if (mappAnsw.questionId === i) {
+                                ansWrapper.append(`<li class="list-group-item list-group-item-action flex-column align-items-start list-group-item-success">Answer ${count + 1}: ${mappAnsw.content}</li>`);
+                                count++;
+                            }
+                        }
+                        divWrapper.append(ansWrapper);
+                        //console.log(divWrapper.html());
+                        $(`main div[id="${i + 1}"]`).append(divWrapper.html());
+                    }
+                    
+                    
+                }
+            }
+            visitedArr = [];
+            console.log('escaped for loop');
 */
