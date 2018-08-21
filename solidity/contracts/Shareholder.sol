@@ -61,7 +61,7 @@ contract Shareholder is User, ProposalData {
     }
 
     function rateQuestion(uint questionId, RatingOption ratingOpt) public {
-        require(ratings[questionId] != msg.sender, "sender has already rated this question");
+        //require(ratings[questionId] != msg.sender, "sender has already rated this question");
         qa.setRating(questionId, uint(ratingOpt));
         ratings[questionId] = msg.sender;
     }
