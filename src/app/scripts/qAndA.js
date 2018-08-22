@@ -8,7 +8,13 @@ var totalUpDownVoteCount = 0;
 
 $(function() {
 
-    $('a[href="#Q&A"]').click(function() {
+    /*$('a[href="#Q&A"]').click(function() {
+        
+        
+    });*/
+
+    $('a[href="#list"]').click(async function() {
+        
         
         const activeUser = getActiveUserState(getActiveUserAddress());
         console.log(activeUser);
@@ -20,11 +26,13 @@ $(function() {
               }, 500);
         } else if (activeUser.role === 'Director') {
             setTimeout(function() {
-                $('main textarea[id="qa-placeholder"]').attr('placeholder', 'Please insert a answer here...');
+                $('#question-form-wrapper').hide();
+                //$('main textarea[id="qa-placeholder"]').attr('placeholder', 'Please insert a answer here...');
               }, 500);
         }
 
-        $('main').on('click', 'input[id="qa-submit-button"]', function() {
+        $('main').on('click', 'input[id="qa-submit-button"]', function(e) {
+            e.preventDefault();
             const activeUser = getActiveUserState(getActiveUserAddress());
             const textareaContent = $('main textarea[id="qa-placeholder"]').val();
             const questId = $('main input[id="question-id"]').val();
@@ -39,9 +47,7 @@ $(function() {
                 getNumOfAnswers();
             }
         });
-    });
-
-    $('a[href="#list"]').click(async function() {
+        
         numOfAnsw = 0;
         numOfQuest = 0;
         setTimeout(function() {
@@ -69,8 +75,8 @@ $(function() {
                     priorityMetric = questPriority;
                 }
             }
-            console.log('globalSum: ' + typeof(totalUpDownVoteCount));
-            console.log('currSum: ' + typeof(currUpDownVoteCount));
+            //console.log('globalSum: ' + typeof(totalUpDownVoteCount));
+            //console.log('currSum: ' + typeof(currUpDownVoteCount));
             
             if (numOfQuest === questNum.toNumber() 
                 && numOfAnsw === answNum.toNumber()
@@ -88,7 +94,7 @@ $(function() {
             var questCount = 1;
             var allVisited = false;
             
-            console.log(visitedArr);
+            //console.log(visitedArr);
             
             for (;!allVisited; 
                 allVisited = visitedArr.filter(q => q.visited === true).length === questNum.toNumber()
@@ -114,8 +120,9 @@ $(function() {
                         //priorityMetric = questPriority;
                         visitedArr[i].visited = true;
                         var qaWrapper = $(
+                            // question-i is the real question id
                             `<div>
-                                    <a href="#question-${i+1}" class="list-group-item list-group-item-action flex-column align-items-start list-group-item-danger">
+                                    <a href="#question-${i + 1}" class="list-group-item list-group-item-action flex-column align-items-start list-group-item-danger">
                                         <div id="${i + 1}"> Question ${questCount++}: ${mappQuest.content} </div>
                                     </a>
                             </div>`
@@ -149,7 +156,13 @@ $(function() {
             }
             visitedArr = [];
             console.log('escaped for loop');
-            
+            // enable modal function to questions
+            if (activeUser.role === 'Director') {
+                $('main a[href^="#question-"]').attr({
+                    'data-toggle': "modal",
+                    'data-target': "#answerModal"
+                });
+            }
 
         //console.log(document.body);
 
@@ -172,7 +185,17 @@ $(function() {
 
     $('main').on('click', 'a[href^="#question-"]', function(e) {
         e.preventDefault();
+        const activeUser = getActiveUserState(getActiveUserAddress());
+        //console.log('pressed a tag');
+        if (activeUser.role === 'Director') {
+            const questContent = e.currentTarget.firstChild.nextSibling.firstChild.data;
+            const questId = e.currentTarget.getAttribute('href').substring(10);
+            console.log(questContent, questId);
+            $('main div[id="question-content"]').html(questContent);
+            return;
+        }
         $('#selected-question').empty();
+        console.log(document.body);
         $('main form[id="select-question-form"]').show();
         var questId = e.currentTarget.getAttribute('href').substring(10);
         var from = getActiveUserAddress();
@@ -183,7 +206,7 @@ $(function() {
     
         $('main div').on('click', 'input[id="upvote-button"]', async function() {
             var txId = await rateQuestion(questId-1 , 1, from);
-            //$('#selected-question li:last').remove();
+            $('#selected-question ol:last').remove();
             if (txId.charAt(1) === 'x') {
                 createAlert('You successfully upvoted this question');
                 //console.log(await getQuestion(questId-1));
@@ -192,11 +215,17 @@ $(function() {
     
         $('main').on('click', 'input[id="downvote-button"]', async function() {
             var txId = await rateQuestion(questId-1, 0, from);
-            //$('#selected-question li:last').remove();
+            $('#selected-question ol:last').remove();
             if (txId.charAt(1) === 'x') {
                 createAlert('You successfully downvotes this question');
             }
         });
+    });
+
+    $('main').on('click', 'button[id="submit-question-button"]', function() {
+        console.log($('main textarea[id="answer-content"]').val());
+        const answContent = $('main textarea[id="answer-content"]').val();
+        createAnswer(questId, answContent);
     });
 });
 

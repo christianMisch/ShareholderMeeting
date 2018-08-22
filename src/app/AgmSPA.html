@@ -165,7 +165,7 @@
 
         </template>
 
-        <template id="QandA-template">
+        <!--<template id="QandA-template">
             <h2 class="col-xl-12">Q&A</h2>
             <div class="col-xl-6">
                 <form id="Q&A-form">
@@ -176,17 +176,26 @@
                 </form>
             </div>
             <div id="Q&A-feed" class="col-xl-6">
-                <!--Here comes the feed-->
             </div>
-        </template>
+        </template>-->
 
         <template id="QandA-list-template">
             <article class="col-xl-12">
-                <div> 
+                <div>
+                    <a href="#">Trigger the modal</a> 
                     <span id="num-of-quest"></span>
                     <span id="num-of-answ"></span>
                     <div>Please click on the question which you want to rate!</div>
                 </div>
+                <div id="question-form-wrapper">
+                    <form id="Q&A-form">
+                        <textarea row="30" cols="50" id="qa-placeholder"></textarea>
+                        <label id="quest-id-label">Please insert the question id: <input type="number" id="question-id"></label>
+                        <input type="reset" value="reset">
+                        <input type="submit" value="submit" id="qa-submit-button">
+                    </form>
+                </div>
+
             </article>
             <div class="col-6 list-group" id="quest-answ-list">
                 
@@ -204,6 +213,34 @@
                 </article>
             </div>
 
+            <div class="modal fade" id="answerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="modalLabel">Answer a question</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <form>
+                        <div class="form-group">
+                          <label class="col-form-label">Question:</label>
+                          <div type="text" class="form-control" id="question-content"></div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-form-label">Your answer:</label>
+                          <textarea class="form-control" id="answer-content"></textarea>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary" id="submit-question-button">Submit question</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
         </template>
 
