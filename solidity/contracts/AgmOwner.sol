@@ -16,6 +16,8 @@ contract AgmOwner is User {
     mapping(address => uint) public userId;
     // store options to every proposal
     VotingOption[] public votingOptions;
+    // owners which have permission to setup the AGM
+    address[] owners;
 
     bool public isFinished = false;
 
@@ -42,7 +44,7 @@ contract AgmOwner is User {
     event Voted(address userAddress, uint proposalId, string votingOption);
     event AgmFinished(bool isFinished);
     event ProposalExecuted(uint proposalId, bool proposalPassed, uint passedPercentage, VotingOption[] options);
-    event OwnershipTransferedTo(address newOwner);
+    event OwnerhshipSharedTo(address newOwner);
     event UserCreated(uint userId, address userAddress, bool isDirector);
     event UserRemoved(uint userId, address userAddress, bool isDirector);
 
@@ -70,13 +72,15 @@ contract AgmOwner is User {
         meetingStartTime = _meetingStartTime;
         meetingEndTime = _meetingEndTime;
         fac = _fac;
+        owners.push(_userAddress);
     }
 
     // transfer contract ownership to another director
     function transferOwnership(address _owner) public onlyOwner {
-        userAddress = _owner;
+        //userAddress = _owner;
+        owners.push(_owner);
 
-        emit OwnershipTransferedTo(_owner);
+        emit OwnerhshipSharedTo(_owner);
     }
 
     function addUser(address _userAddress, bool isDirector, uint votingWeight, QandA qa) public {
@@ -150,6 +154,14 @@ contract AgmOwner is User {
         emit ProposalCreated(propId, msg.sender);
 
         return propId;
+    }
+
+    function getOwnerAddress() public view returns (address ownerAdr) {
+        return userAddress;
+    }
+
+    function getOwners() public view returns (address[] ownerAdr) {
+        return owners;
     }
 
     // executes the pending proposal

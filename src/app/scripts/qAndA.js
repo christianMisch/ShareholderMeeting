@@ -192,6 +192,13 @@ $(function() {
             const questId = e.currentTarget.getAttribute('href').substring(10);
             console.log(questContent, questId);
             $('main div[id="question-content"]').html(questContent);
+
+            $('main').on('click', 'button[id="submit-question-button"]', function() {
+                //alert('hey');
+                // console.log($('main textarea[id="answer-content"]').val());
+                const answContent = $('main textarea[id="answer-content"]').val();
+                createAnswer(questId-1, answContent, getActiveUserAddress());
+            });
             return;
         }
         $('#selected-question').empty();
@@ -220,12 +227,6 @@ $(function() {
                 createAlert('You successfully downvotes this question');
             }
         });
-    });
-
-    $('main').on('click', 'button[id="submit-question-button"]', function() {
-        console.log($('main textarea[id="answer-content"]').val());
-        const answContent = $('main textarea[id="answer-content"]').val();
-        createAnswer(questId, answContent);
     });
 });
 

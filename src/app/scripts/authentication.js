@@ -6,7 +6,8 @@ console.log('web3 accounts: ');
 console.log(web3Provider.eth.accounts);
 
 var authorizedUsers = {
-    '0x0': {role: 'AgmOwner', loggedIn: false},
+    '0x011Fc7b12E5EEd718680db16a125378a25ac4b2F': {role: 'AgmOwner', loggedIn: false},
+    '0xd02Dc75c5D17021a71060DeE44b12958fBa069FB': {role: 'AgmOwner', loggedIn: false},
     '0': {role: 'Shareholder', loggedIn: false, shares: 20},
     '0x628FBd5a122103e8171BbB2dC70C265f9F775466': {role: 'Shareholder', loggedIn: false, shares: 30},
     '0xc179a95Ac86AAbf6baF4D97BA161152fE0cc0655': {role: 'Shareholder', loggedIn: false, shares: 45},

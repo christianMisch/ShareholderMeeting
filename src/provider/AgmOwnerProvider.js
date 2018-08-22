@@ -9,29 +9,55 @@ AgmOwnerContract.setProvider(web3Provider.currentProvider);
 var AgmOwner;
 const gas = /*'220000'*/ '3000000';
 
-export function transferOwnership() {
-    console.log('web3 accounts: ' + web3Provider.eth.accounts);
-    console.log('web3 default account: ' + web3Provider.eth.defaultAccount);
-    web3Provider.eth.defaultAccount = web3Provider.eth.accounts[0];
+export function transferOwnership(newOwnerAdr, from) {
+    //console.log('web3 accounts: ' + web3Provider.eth.accounts);
+    //console.log('web3 default account: ' + web3Provider.eth.defaultAccount);
+    //web3Provider.eth.defaultAccount = web3Provider.eth.accounts[0];
     //web3Provider.personal.unlockAccount(web3Provider.eth.defaultAccount);
-    console.log('web3 default account: ' + web3Provider.eth.defaultAccount);
-
-    const receiver = web3Provider.eth.accounts[2];
+    //console.log('web3 default account: ' + web3Provider.eth.defaultAccount);
+    //const receiver = web3Provider.eth.accounts[2];
 
     AgmOwnerContract.deployed().then(function(instance) {
         AgmOwner = instance;
         /*AgmOwner.userAddress.call().then(function(result) {
             console.log('userAddress: ' + result); 
         });*/
-        return AgmOwner.transferOwnership(receiver, {from: ownerAccount});
+        return AgmOwner.transferOwnership.sendTransaction(newOwnerAdr, {from: from});
     }).then(function(result) {
         console.log(result);
-        alert('Transaction successful');
+        alert('transferOwnership TX was successful: ' + result);
     }).catch(function(error) {
         console.log(error);
-    })
-    
+    });   
 }
+
+export function getOwnerAddress() {
+    return AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+        return AgmOwner.getOwnerAddress.call();
+    }).then(function(result) {
+        console.log(result);
+        //alert('getOwnerAddress call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log(error);
+    });   
+}
+
+export function getOwners() {
+    return AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+        return AgmOwner.getOwners.call();
+    }).then(function(result) {
+        console.log(result);
+        //alert('getOwners call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log(error);
+    });   
+}
+
+
 
 export function announceAGM() {
     AgmOwnerContract.deployed().then(function(instance) {
@@ -63,10 +89,10 @@ export function addUser(address, isDirector, votingWeight, sender) {
     })
 }
 
-export function removeUser(address, sender) {
+export function removeUser(address, from) {
     AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
-        return AgmOwner.removeUser.sendTransaction(address, {from: sender});
+        return AgmOwner.removeUser.sendTransaction(address, {from: from, gas: gas});
     }).then(function(result) {
         alert('removeUser TX was successful: ' + result);
     }).catch(function(error) {

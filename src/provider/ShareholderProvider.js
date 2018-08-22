@@ -41,8 +41,8 @@ export function getVotingDenominations() {
   });
 }
 
-export function rateQuestion(questId, ratOpt, from) {
-  return ShareholderContract.deployed().then(function (deplShareh) {
+export async function rateQuestion(questId, ratOpt, from) {
+  /*return ShareholderContract.deployed().then(function (deplShareh) {
     Shareholder = deplShareh;
     return Shareholder.rateQuestion.sendTransaction(questId, ratOpt, {from: from});
   }).then(function (result) {
@@ -51,7 +51,13 @@ export function rateQuestion(questId, ratOpt, from) {
   }).catch(function (error) {
     console.log('error during rateQuestion TX: ' + error.message);
     return error.message;
-  });
+  });*/
+
+  const deplShContract = await ShareholderContract.deployed();
+
+  const txId = await deplShContract.rateQuestion.sendTransaction(questId, ratOpt, {from: from});
+  alert('rateQuestion TX was successful: ' + txId);
+  return txId;
 }
 
 
