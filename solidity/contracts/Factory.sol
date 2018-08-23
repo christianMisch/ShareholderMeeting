@@ -13,44 +13,15 @@ contract Factory is ProposalData {
     Proposal[] public proposals;
     mapping(address => uint) public votingWeights;
 
-    event Log();
-    event Test();
-
     function createNewShareholder(address _userAddress, uint votingTok, QandA qa) public returns (Shareholder) {
         Shareholder sh = new Shareholder(_userAddress, votingTok, this, qa);
         shareholders.push(sh);
         return sh;
     }
 
-    function createNewDirector(address _userAddress, QandA qa) public returns (Director) {
-        return new Director(_userAddress, qa);
+    function createNewDirector(address _userAddress, bool isAdministrator, QandA qa) public returns (Director) {
+        return new Director(_userAddress, isAdministrator, qa);
     }
-
-    /*function createNewAgmOwner(
-        address userAddress,
-        /*uint minimumVotingQuorum,
-        uint marginOfVotesForMajority,
-        string meetingName,
-        string meetingDescription,
-        string meetingDate,
-        string meetingPlace,
-        uint meetingStartTime,
-        uint meetingEndTime,
-        Factory fac    
-    ) public returns (AgmOwner) {
-        return new AgmOwner(
-                userAddress,
-                0,
-                0,
-                "",
-                "",
-                "",
-                "",
-                0,
-                0,
-                fac
-        );
-    }*/
 
     function createNewProposal(string _name, string _description, string _options) public returns (uint propId) {
         propId = proposals.length++;
@@ -106,11 +77,9 @@ contract Factory is ProposalData {
             Vote storage v = proposal.votes[i];
 
             if (true) {
-                //emit Log();
                 return (v.voterAddress, v.voterDecision, v.voterWeight);
             }
         }
-        //emit Test();
         return (address(0), "", 0);
     }
 
@@ -137,7 +106,7 @@ contract Factory is ProposalData {
         return shareholders.length;
     }
 
-    function getShareholderList() public view returns (Shareholder[]) {
+    /*function getShareholderList() public view returns (Shareholder[]) {
         return shareholders;
-    }
+    }*/
 }

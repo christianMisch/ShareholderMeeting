@@ -27,7 +27,7 @@ module.exports = function(deployer, network, accounts) {
         //var random = Math.floor(Math.random() * (12 - 5)) + 5;
         deployer.deploy(Shareholder, uppCaseAcc[8], 10, f.address, qa.address);
     }).then(function() {
-        return deployer.deploy(Director, uppCaseAcc[9], qa.address);
+        return deployer.deploy(Director, uppCaseAcc[9], false, qa.address);
     }).then(function() {
         return deployer.deploy(
             AgmOwner,

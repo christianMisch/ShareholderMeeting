@@ -31,10 +31,10 @@ export function transferOwnership(newOwnerAdr, from) {
     });   
 }
 
-export function getOwnerAddress() {
+export function getOwnerAddress(from) {
     return AgmOwnerContract.deployed().then(function(instance) {
         AgmOwner = instance;
-        return AgmOwner.getOwnerAddress.call();
+        return AgmOwner.getOwnerAddress.call({from: from});
     }).then(function(result) {
         console.log(result);
         //alert('getOwnerAddress call was successful: ' + result);
@@ -43,6 +43,21 @@ export function getOwnerAddress() {
         console.log(error);
     });   
 }
+
+export function hasPermission(from) {
+    return AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+        return AgmOwner.hasPermission.call({from: from});
+    }).then(function(result) {
+        console.log(result);
+        //alert('hasPermission call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log(error);
+    });   
+}
+
+
 
 export function getOwners() {
     return AgmOwnerContract.deployed().then(function(instance) {

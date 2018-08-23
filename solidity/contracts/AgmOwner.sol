@@ -51,7 +51,7 @@ contract AgmOwner is User {
     event Voted(address userAddress, uint proposalId, string votingOption);
     event AgmFinished(bool isFinished);
     event ProposalExecuted(uint proposalId, bool proposalPassed, uint passedPercentage, VotingOption[] options);
-    event OwnerhshipSharedTo(address newOwner);
+    event OwnershipSharedTo(address newOwner);
     event UserCreated(uint userId, address userAddress, string role);
     event UserRemoved(uint userId, address userAddress, uint role);
 
@@ -87,7 +87,7 @@ contract AgmOwner is User {
         //userAddress = _owner;
         owners.push(_owner);
 
-        emit OwnerhshipSharedTo(_owner);
+        emit OwnershipSharedTo(_owner);
     }
 
     function addUser(address _userAddress, Role role, uint votingWeight, QandA qa) public {
@@ -96,26 +96,14 @@ contract AgmOwner is User {
             id = users.length++;
             userId[_userAddress] = id;
         }
-
-        /*if (uint(role) == 0) {
-            AgmOwner o = fac.createNewAgmOwner(
-                _userAddress,
-                /*minimumVotingQuorum,
-                marginOfVotesForMajority,
-                meetingName,
-                meetingDescription,
-                meetingDate,
-                meetingPlace,
-                meetingStartTime,
-                meetingEndTime,
-                fac
-            );
+        if (uint(role) == 0) {
+            Director o = fac.createNewDirector(_userAddress, true, qa);
             users[id] = o;
 
             emit UserCreated(id, _userAddress, "AgmOwner");
-
-        } else*/ if (uint(role) == 1) {
-            Director d = fac.createNewDirector(_userAddress, qa);
+        }
+        else if (uint(role) == 1) {
+            Director d = fac.createNewDirector(_userAddress, false, qa);
             users[id] = d;
 
             emit UserCreated(id, _userAddress, "Director");

@@ -31,7 +31,7 @@ window.addEventListener("hashchange", function() {
 
 function insertTemplate(strHash) {
     
-    if (!getActiveUserState().loggedIn && strHash !== 'welcome') {
+    /*if (!getActiveUserState().loggedIn && strHash !== 'welcome') {
         const alertWrapper = $('<div id="wrapper"></div>');
         $('footer').append(alertWrapper);
         createAlert('Please log in first to access other AGM features', 'danger');
@@ -41,7 +41,7 @@ function insertTemplate(strHash) {
         }, 3000);
         //$("li.active").removeClass('active').addClass('');
         return;
-    }
+    }*/
     
     var templateContent;
 

@@ -1,5 +1,5 @@
-import {createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners} from '../../provider/AgmOwnerProvider';
-import {getActiveUserAddress, authorizedUsers, createAlert} from './authentication';
+import {createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission} from '../../provider/AgmOwnerProvider';
+import {getActiveUserAddress, setAuthorizedUsers, createAlert, getAuthorizedUsers} from './authentication';
 import web3Provider from '../../provider/web3Provider';
 
 //const owner = web3Provider.eth.accounts[0];
@@ -11,11 +11,12 @@ $(document).ready(function() {
 
         $('main').on('click', 'input[id="proposal-creator-button"]', async function() {
             const activeUserAddress = getActiveUserAddress();
-            const ownerAddress = await getOwnerAddress();
-            console.log('ownerAddress: ' + ownerAddress);
-            console.log('activeUserAdr: ' + activeUserAddress);
+            //console.log('ownerAddress: ' + ownerAddress);
+            //console.log('activeUserAdr: ' + activeUserAddress);
             //console.log('owner: ' + owner.toUpperCase());
-            if (activeUserAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
+            /*console.log(await getOwners());
+            console.log('hasPermission: ' + (await getOwners()).includes(activeUserAddress.toLowerCase()))*/
+            if (!(await getOwners()).includes(activeUserAddress)) {
                 createAlert('You have currently no permission to setup the AGM', 'danger');
                 return;
             }
@@ -23,44 +24,47 @@ $(document).ready(function() {
             const propName = $('#proposal-name').val();
             const propDescription = $('#proposal-description').val();
             const propOptions = $('#proposal-options').val();
-            console.log(activeUserAddress, propName, propDescription, propOptions);
+            //console.log(activeUserAddress, propName, propDescription, propOptions);
             createProposal(propName, propDescription, propOptions, activeUserAddress);
         });
 
         $('main').on('click', 'input[id="add-user-button"]', async function() {
             const activeUserAddress = getActiveUserAddress();
-            const ownerAddress = await getOwnerAddress();
-            if (activeUserAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
+            if (!(await getOwners()).includes(activeUserAddress)) {
                 createAlert('You have currently no permission to setup the AGM', 'danger');
                 return;
             }
-            const newUserAddress = $('#new-user-address').val();
-            const isDirector = $('#director-flag').val();
+            const newUserAddress = $('#new-user-address').val().toLowerCase();
+            const role = parseInt($('#director-flag').val());
+            console.log('role: ' + typeof(role));
             const numOfShares = $('#num-of-shares').val();
-            addUser(newUserAddress, isDirector, numOfShares, activeUserAddress);
+            addUser(newUserAddress, role, numOfShares, activeUserAddress);
             getNumOfUsers();
+            const mapRole = role === 0 ? 'AgmOwner': (role === 1 ? 'Director': 'Shareholder');
+            console.log('mapRole: ' + mapRole);  
+            setAuthorizedUsers(newUserAddress, {role: mapRole, loggedIn: false, shares: parseInt(numOfShares)});
+            console.log(getAuthorizedUsers());
+
         });
 
         $('main').on('click', 'input[id="remove-user-button"]', async function() {
-            const activeUserAddress = getActiveUserAddress();
-            const ownerAddress = await getOwnerAddress();
-            if (activeUserAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
+            const activeUserAddress = getActiveUserAddress().toLowerCase();
+            if (!(await getOwners()).includes(activeUserAddress)) {
                 createAlert('You have currently no permission to setup the AGM', 'danger');
                 return;
             }
-            const adrOfRemovedUser = $('#remove-user-address').val();
+            const adrOfRemovedUser = $('#remove-user-address').val().toLowerCase();
             removeUser(adrOfRemovedUser, activeUserAddress);
             getNumOfUsers();
         });
 
         $('main').on('click', 'input[id="transfer-ownership-button"]', async function() {
             const activeUserAddress = getActiveUserAddress();
-            const ownerAddress = await getOwnerAddress();
-            if (activeUserAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
+            if (!(await getOwners()).includes(activeUserAddress)) {
                 createAlert('You have currently no permission to setup the AGM', 'danger');
                 return;
             }
-            const newOwnerAddress = $('#ownership-address').val();
+            const newOwnerAddress = $('#ownership-address').val().toLowerCase();
             console.log(newOwnerAddress);
             await transferOwnership(newOwnerAddress, activeUserAddress);
         

@@ -6,20 +6,21 @@ console.log('web3 accounts: ');
 console.log(web3Provider.eth.accounts);
 
 var authorizedUsers = {
-    '0x011Fc7b12E5EEd718680db16a125378a25ac4b2F': {role: 'AgmOwner', loggedIn: false},
+    /*'0x011Fc7b12E5EEd718680db16a125378a25ac4b2F': {role: 'AgmOwner', loggedIn: false},
     '0xd02Dc75c5D17021a71060DeE44b12958fBa069FB': {role: 'AgmOwner', loggedIn: false},
     '0': {role: 'Shareholder', loggedIn: false, shares: 20},
     '0x628FBd5a122103e8171BbB2dC70C265f9F775466': {role: 'Shareholder', loggedIn: false, shares: 30},
     '0xc179a95Ac86AAbf6baF4D97BA161152fE0cc0655': {role: 'Shareholder', loggedIn: false, shares: 45},
     '0xB78E4A88e140b9ceeC48D569d6ae0ED4F419eFb1': {role: 'Shareholder', loggedIn: false, shares: 12},
     '0x5E3407E44756371B4D3De80Eb4378b715c444619': {role: 'Shareholder', loggedIn: false, shares: 34},
-    '0x88D7d45b3eBD3Fd8b202D8BF1Ec8e2CC2006692D': {role: 'Director', loggedIn: false, shares: 0}
+    '0x88D7d45b3eBD3Fd8b202D8BF1Ec8e2CC2006692D': {role: 'Director', loggedIn: false}*/
 };
+
 var inputAdr;
 
 $(document).ready(async function() {
-
-    console.log('Num of users should be 5: ' + await getNumOfUsers());
+    authorizedUsers[`${web3Provider.eth.accounts[0].toLowerCase()}`] = {role: 'AgmOwner', loggedIn: false, shares: 0};
+    //console.log('Num of users should be 5: ' + await getNumOfUsers());
     showWelcomePage();
     // hide logout button, welcome link in sidebar and user credentials
     $('#logout-button').hide();
@@ -45,7 +46,7 @@ $(document).ready(async function() {
 
         const alertWrapper = $('<div id="wrapper"></div>');
         $('footer').append(alertWrapper);
-        inputAdr = $('#wallet-address').val();
+        inputAdr = $('#wallet-address').val().toLowerCase();
 
         if (Object.keys(authorizedUsers).includes(inputAdr)
             && authorizedUsers[inputAdr].role === 'AgmOwner') {
@@ -61,6 +62,8 @@ $(document).ready(async function() {
                 showLogoutButton();
                 showView('home-link');
                 hideLoginFields();
+                console.log(inputAdr);
+                console.log(authorizedUsers);
                 authorizedUsers[inputAdr].loggedIn = true;
 
 
@@ -184,7 +187,7 @@ export function getActiveUserState() {
 }
 
 export function getActiveUserAddress() {
-    return inputAdr;
+    return inputAdr.toLowerCase();
 }
 
 export function removeSecondAlert() {
@@ -199,8 +202,12 @@ export function getAuthorizedUsers() {
   return authorizedUsers;
 }
 
-export function setAuthorizedUsers(key, value) {
-  authorizedUsers[key].shares = value;
+export function setUserShares(key, shares) {
+  authorizedUsers[key].shares = shares;
+}
+
+export function setAuthorizedUsers(adr, val) {
+    authorizedUsers[adr] = val;
 }
 
 async function isAuthenticated(address) {
