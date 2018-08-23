@@ -23,7 +23,7 @@ contract Shareholder is User, ProposalData {
     }
 
     modifier onlyShareholder {
-        require((!this.isDirector()) && (fac.votingWeights(msg.sender) > 0), "user is not a shareholder");
+        require((this.role() == 2) && (fac.votingWeights(msg.sender) > 0), "user is not a shareholder");
         _;
     }
 
@@ -37,7 +37,7 @@ contract Shareholder is User, ProposalData {
     event CalculateDivision(uint num, uint copy, uint divider);
 
     constructor(address userAddress, uint _votingWeight, Factory _fac, QandA _qa)
-        User(userAddress, false) public {
+        User(userAddress, Role.SHAREHOLDER) public {
 
         fac = _fac;
         qa = _qa;

@@ -5,6 +5,7 @@ import "./Director.sol";
 import "./Shareholder.sol";
 import "./ProposalData.sol";
 import "./QandA.sol";
+import "./AgmOwner.sol";
 
 contract Factory is ProposalData {
 
@@ -24,6 +25,32 @@ contract Factory is ProposalData {
     function createNewDirector(address _userAddress, QandA qa) public returns (Director) {
         return new Director(_userAddress, qa);
     }
+
+    /*function createNewAgmOwner(
+        address userAddress,
+        /*uint minimumVotingQuorum,
+        uint marginOfVotesForMajority,
+        string meetingName,
+        string meetingDescription,
+        string meetingDate,
+        string meetingPlace,
+        uint meetingStartTime,
+        uint meetingEndTime,
+        Factory fac    
+    ) public returns (AgmOwner) {
+        return new AgmOwner(
+                userAddress,
+                0,
+                0,
+                "",
+                "",
+                "",
+                "",
+                0,
+                0,
+                fac
+        );
+    }*/
 
     function createNewProposal(string _name, string _description, string _options) public returns (uint propId) {
         propId = proposals.length++;
@@ -98,12 +125,12 @@ contract Factory is ProposalData {
 
     function getShareholder(uint shareholderId) public view returns (
         address _userAddress,
-        bool _isDirector,
+        uint _role,
         address _delegate
     ) {
         Shareholder sh = shareholders[shareholderId];
         return
-            (sh.userAddress(), sh.isDirector(), sh.delegate());
+            (sh.userAddress(), sh.role(), sh.delegate());
     }
 
     function getNumOfShareholders() public view returns (uint length) {

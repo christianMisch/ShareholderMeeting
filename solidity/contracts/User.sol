@@ -3,13 +3,15 @@ pragma solidity ^0.4.23;
 contract User {
 
     address public userAddress;
-    bool public isDirector;
+    uint public role;
+    // enum for roles
+    enum Role {AGMOWNER, DIRECTOR, SHAREHOLDER}
 
     event UserExists(bool exists);
 
-    constructor(address _userAddress, bool _isDirector) public {
+    constructor(address _userAddress, Role _role) public {
         userAddress = _userAddress;
-        isDirector = _isDirector;
+        role = uint(_role);
     }
 
     /*function userExists(address _userAddress) public returns (bool exists) {

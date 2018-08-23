@@ -1,4 +1,4 @@
-import { getUserList } from "../../provider/AgmOwnerProvider";
+import { getUserList, getNumOfUsers } from "../../provider/AgmOwnerProvider";
 
 import web3Provider from '../../provider/web3Provider';
 
@@ -19,6 +19,7 @@ var inputAdr;
 
 $(document).ready(async function() {
 
+    console.log('Num of users should be 5: ' + await getNumOfUsers());
     showWelcomePage();
     // hide logout button, welcome link in sidebar and user credentials
     $('#logout-button').hide();

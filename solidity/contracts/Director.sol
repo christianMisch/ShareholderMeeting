@@ -11,13 +11,13 @@ contract Director is User {
     event AnswerCreated(uint ansId, address creator);
 
     modifier onlyDirector {
-        require(this.isDirector(), "the user is not a director");
+        require(this.role() == 1, "the user is not a director");
         _;
 
     }
 
     constructor(address userAddress, QandA _qa)
-        User(userAddress, true) public {
+        User(userAddress, Role.DIRECTOR) public {
 
         qa = _qa;
     }

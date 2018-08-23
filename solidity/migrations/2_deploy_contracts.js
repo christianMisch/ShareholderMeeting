@@ -8,12 +8,14 @@ const QandA = artifacts.require("./QandA.sol");
 
 module.exports = function(deployer, network, accounts) {
 
+    const uppCaseAcc = accounts.map(acc => acc.toLowerCase());
     deployer.deploy(ProposalData);
     //deployer.deploy(User, accounts[1], false);
-    console.log('web3 accounts');
+    /*console.log('web3 accounts');
     console.log(web3.eth.accounts);
     console.log('truffle accounts');
-    console.log(accounts);
+    console.log(accounts);*/
+
     var f, qa;
     deployer.then(function() {
         return deployer.deploy(Factory);
@@ -22,14 +24,14 @@ module.exports = function(deployer, network, accounts) {
         return deployer.deploy(QandA);
     }).then(function(qaInst) {
         qa = qaInst;
-        var random = Math.floor(Math.random() * (12 - 5)) + 5;
-        deployer.deploy(Shareholder, accounts[8], random, f.address, qa.address);
+        //var random = Math.floor(Math.random() * (12 - 5)) + 5;
+        deployer.deploy(Shareholder, uppCaseAcc[8], 10, f.address, qa.address);
     }).then(function() {
-        return deployer.deploy(Director, accounts[9], qa.address);
+        return deployer.deploy(Director, uppCaseAcc[9], qa.address);
     }).then(function() {
         return deployer.deploy(
             AgmOwner,
-            accounts[0],
+            uppCaseAcc[0],
             3,
             50,
             'Siemens AGM 2018',
@@ -40,10 +42,12 @@ module.exports = function(deployer, network, accounts) {
             240,
             f.address
         );
-    }).then(function(agmOwner) {
+    }).then(async function(agmOwner) {
         console.log('factory address:      ' + f.address);
         console.log('QandA   address:      ' + qa.address);
-        console.log('AgmOwner address: ' + agmOwner.address);
+        console.log('AgmOwner user address: ' + await agmOwner.userAddress());
+        console.log(uppCaseAcc[0]);
+        //console.log(agmOwner.then(function(deplOwner){console.log(deplOwner.userAddress)}));
         //accounts.forEach(acc => console.log(acc));
     });
 

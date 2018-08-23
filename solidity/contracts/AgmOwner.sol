@@ -36,7 +36,14 @@ contract AgmOwner is User {
     }
 
     modifier onlyOwner {
-        require(userAddress == msg.sender, "only the contract owner can access this function!");
+        bool isOwner;
+        for (uint i = 0; i < owners.length; i++) {
+            if (owners[i] == msg.sender) {
+                isOwner = true;
+            }
+        }
+        isOwner = false;
+        //require(isOwner == true, "only an AGM owner can access this function!");
         _;
     }
 
@@ -45,8 +52,8 @@ contract AgmOwner is User {
     event AgmFinished(bool isFinished);
     event ProposalExecuted(uint proposalId, bool proposalPassed, uint passedPercentage, VotingOption[] options);
     event OwnerhshipSharedTo(address newOwner);
-    event UserCreated(uint userId, address userAddress, bool isDirector);
-    event UserRemoved(uint userId, address userAddress, bool isDirector);
+    event UserCreated(uint userId, address userAddress, string role);
+    event UserRemoved(uint userId, address userAddress, uint role);
 
     constructor(
         address _userAddress,
@@ -61,7 +68,7 @@ contract AgmOwner is User {
         Factory _fac
     )
 
-            User(_userAddress, true) public {
+            User(_userAddress, Role.AGMOWNER) public {
 
         minimumVotingQuorum = _minimumVotingQuorum;
         marginOfVotesForMajority = _marginOfVotesForMajority;
@@ -83,24 +90,41 @@ contract AgmOwner is User {
         emit OwnerhshipSharedTo(_owner);
     }
 
-    function addUser(address _userAddress, bool isDirector, uint votingWeight, QandA qa) public {
+    function addUser(address _userAddress, Role role, uint votingWeight, QandA qa) public {
         uint id = userId[_userAddress];
         if (id == 0) {
             id = users.length++;
             userId[_userAddress] = id;
         }
 
-        if (isDirector) {
+        /*if (uint(role) == 0) {
+            AgmOwner o = fac.createNewAgmOwner(
+                _userAddress,
+                /*minimumVotingQuorum,
+                marginOfVotesForMajority,
+                meetingName,
+                meetingDescription,
+                meetingDate,
+                meetingPlace,
+                meetingStartTime,
+                meetingEndTime,
+                fac
+            );
+            users[id] = o;
+
+            emit UserCreated(id, _userAddress, "AgmOwner");
+
+        } else*/ if (uint(role) == 1) {
             Director d = fac.createNewDirector(_userAddress, qa);
             users[id] = d;
 
-            emit UserCreated(id, _userAddress, true);
+            emit UserCreated(id, _userAddress, "Director");
 
-        } else {
+        } else if(uint(role) == 2) {
             Shareholder s = fac.createNewShareholder(_userAddress, votingWeight, qa);
             users[id] = s;
 
-            emit UserCreated(id, _userAddress, false);
+            emit UserCreated(id, _userAddress, "Shareholder");
         }
         numberOfUsers++;
     }
@@ -120,7 +144,7 @@ contract AgmOwner is User {
         users.length--;
         numberOfUsers--;
 
-        emit UserRemoved(i, _userAddress, remUser.isDirector());
+        emit UserRemoved(i, _userAddress, remUser.role());
     }
 
     function getNumOfUsers() public view returns (uint length) {

@@ -9,10 +9,11 @@ module.exports = async function(deployer, network, accounts) {
     const DirectorContract = await Director.deployed();
     const f = await Factory.deployed();
     const qa = await QandA.deployed();
+    const lowCaseAcc = accounts.map(acc => acc.toLowerCase());
 
-    const sh1 = await Shareholder.new(accounts[2], 13, f.address, qa.address);
-    const sh2 = await Shareholder.new(accounts[3], 16, f.address, qa.address);
-    const sh3 = await Shareholder.new(accounts[4], 43, f.address, qa.address);
+    const sh1 = await Shareholder.new(lowCaseAcc[2], 13, f.address, qa.address);
+    const sh2 = await Shareholder.new(lowCaseAcc[3], 16, f.address, qa.address);
+    const sh3 = await Shareholder.new(lowCaseAcc[4], 43, f.address, qa.address);
 
     
     await ShareholderContract.createQuestion.sendTransaction('On which financial sector will the company focus in the next year?');

@@ -12,10 +12,10 @@ $(document).ready(function() {
         $('main').on('click', 'input[id="proposal-creator-button"]', async function() {
             const activeUserAddress = getActiveUserAddress();
             const ownerAddress = await getOwnerAddress();
-            console.log(ownerAddress);
-            //console.log('activeUserAdr: ' + activeUserAddress.toUpperCase());
+            console.log('ownerAddress: ' + ownerAddress);
+            console.log('activeUserAdr: ' + activeUserAddress);
             //console.log('owner: ' + owner.toUpperCase());
-            if (activeUserAddress.toUpperCase() !== ownerAddress.toUpperCase()) {
+            if (activeUserAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
                 createAlert('You have currently no permission to setup the AGM', 'danger');
                 return;
             }
@@ -30,7 +30,7 @@ $(document).ready(function() {
         $('main').on('click', 'input[id="add-user-button"]', async function() {
             const activeUserAddress = getActiveUserAddress();
             const ownerAddress = await getOwnerAddress();
-            if (activeUserAddress.toUpperCase() !== ownerAddress.toUpperCase()) {
+            if (activeUserAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
                 createAlert('You have currently no permission to setup the AGM', 'danger');
                 return;
             }
@@ -44,7 +44,7 @@ $(document).ready(function() {
         $('main').on('click', 'input[id="remove-user-button"]', async function() {
             const activeUserAddress = getActiveUserAddress();
             const ownerAddress = await getOwnerAddress();
-            if (activeUserAddress.toUpperCase() !== ownerAddress.toUpperCase()) {
+            if (activeUserAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
                 createAlert('You have currently no permission to setup the AGM', 'danger');
                 return;
             }
@@ -56,7 +56,7 @@ $(document).ready(function() {
         $('main').on('click', 'input[id="transfer-ownership-button"]', async function() {
             const activeUserAddress = getActiveUserAddress();
             const ownerAddress = await getOwnerAddress();
-            if (activeUserAddress.toUpperCase() !== ownerAddress.toUpperCase()) {
+            if (activeUserAddress.toLowerCase() !== ownerAddress.toLowerCase()) {
                 createAlert('You have currently no permission to setup the AGM', 'danger');
                 return;
             }
