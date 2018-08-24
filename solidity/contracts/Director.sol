@@ -17,8 +17,8 @@ contract Director is User {
 
     }
     
-    constructor(address userAddress, bool _isAdministrator, QandA _qa)
-        User(userAddress, Role.DIRECTOR) public {
+    constructor(address userAddress, bool _isAdministrator, QandA _qa, uint _role)
+        User(userAddress, Role(_role)) public {
 
         isAdministrator = _isAdministrator;    
         qa = _qa;

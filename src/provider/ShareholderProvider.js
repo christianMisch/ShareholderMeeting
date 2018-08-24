@@ -14,20 +14,22 @@ var Factory;
 const gas = /*'220000'*/ '3000000';
 
 export function denominateVotingTokens(numOfBlocks, factor, from) {
-  ShareholderContract.deployed().then(function (deplShareh) {
+  return ShareholderContract.deployed().then(function (deplShareh) {
     Shareholder = deplShareh;
-    return Shareholder.denominateVotingTokens.sendTransaction(numOfBlocks, factor, {from: from});
+    return Shareholder.denominateVotingTokens.sendTransaction(numOfBlocks, factor, {from: from, gas: gas});
   }).then(function (result) {
     alert('denominateVotingTokens TX was successful: ' + result);
+    return result;
   }).catch(function (error) {
+    return 'error';
     console.log('error during denominateVotingTokens TX: ' + error.message);
   });
 }
 
-export function delegateToProxy(proxyAddress, partialDelegation, voteBlockIndex) {
+export function delegateToProxy(proxyAddress, partialDelegation, voteBlockIndex, from) {
   ShareholderContract.deployed().then(function (deplShareh) {
     Shareholder = deplShareh;
-    return Shareholder.delegateToProxy.sendTransaction(proxyAddress, partialDelegation, voteBlockIndex);
+    return Shareholder.delegateToProxy.sendTransaction(proxyAddress, partialDelegation, voteBlockIndex, {from: from, gas: gas});
   }).then(function (result) {
     alert('delegateToProxy TX was successful: ' + result);
   }).catch(function (error) {

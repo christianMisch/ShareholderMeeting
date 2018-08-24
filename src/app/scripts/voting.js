@@ -6,28 +6,38 @@ import {setUserShares, getActiveUserAddress} from './authentication';
 var numOfProp = 0;
 
 $(document).ready(async function() {
+  
   //console.log(getAuthorizedUsers());
 
-    $('a[href="#voting"]').click(function() {
-      const activeUserAdr = getActiveUserAddress().toLowerCase();
+    $('a[href="#voting"]').click(async function() {
+
+      setInterval(function() {
+        var proposalCount = await getNumOfProposals();
+
+        if (numOfProp == proposalCount) {
+            return;
+        }
+        numOfProp = proposalCount;
+        const e = new Event('click');
+        var propRefreshBut = document.getElementById('main #refresh-proposal');
+        propRefreshBut.dispatchEvent(e);
+        console.log('proposalCount: ' + proposalCount);
+        console.log('numOfProp: ' + numOfProp);
+      }, 3000);
+    
+      const activeUserAdr = getActiveUserAddress();
       //console.log(users);
       //console.log(users[activeUser].shares);
       var user = mapShareholder(await getShareholder(activeUserAdr));
       
       setTimeout(function() {
+        $('main #refresh-proposal').hide();
         $('main strong[id="shares"]').html(user.shares);
       }, 1000);
 
 
         $('main').on('click', 'input[id="refresh-proposal"]', async function() {
-            var proposalCount = await getNumOfProposals();
-
-            if (numOfProp == proposalCount) {
-                return;
-            }
-            numOfProp = proposalCount;
-            console.log('proposalCount: ' + proposalCount);
-            console.log('numOfProp: ' + numOfProp);
+            
 
             for (var i = 0; i < proposalCount; i++) {
                 var currProp = await getProposal(i);
@@ -53,13 +63,19 @@ $(document).ready(async function() {
         });
 
         $('main').on('click', 'input[id="denominate-button"]', async function() {
-            const numOfBlocks = $('#block-number').val();
-            const factor = $('#factor').val();
-            await denominateVotingTokens(numOfBlocks, factor, {from: '0x5E3407E44756371B4D3De80Eb4378b715c444619'});
-
-            const denomList = $('<ol></ol>');
+            const numOfBlocks = parseInt($('#block-number').val());
+            const factor = parseInt($('#factor').val());
+            console.log('typeof factor: ' + typeof(factor));
+            const txId = await denominateVotingTokens(numOfBlocks, factor, getActiveUserAddress());
+            console.log(txId);
+            if (!(txId.charAt(1) === 'x')) {
+                return;
+            }
+            var shareholder = mapShareholder(await getShareholder(getActiveUserAddress()));
+            $('#shares').html(shareholder.shares);
+            const denomList = $('<ol class="list-group"></ol>');
             for (var i = 1; i <= numOfBlocks; i++) {
-                denomList.append($(`<li id="${i}">${i}. share block:  ${factor}</li>`));
+                denomList.append($(`<li class="list-group-item list-group-item-primary id="${i}">${i}. share block:  ${factor}</li>`));
             }
             /*
               <ol>
@@ -71,20 +87,19 @@ $(document).ready(async function() {
             $('main div[id="voting-denomination-list"]').append(denomList.html());
         });
 
-        $('main').on('click', 'input[id="delegate-button"]', function() {
-            const delegStyle = $('delegation-style').val();
+        $('main').on('click', 'input[id="delegate-button"]', async function() {
+            const delegStyle = $('#delegation-style').val();
+            console.log(typeof(delegStyle));
             const proxyAdr = $('#proxy-address').val();
-            const blockIndex = $('#block-index').val();
-            delegateToProxy(proxyAdr, delegStyle, blockIndex);
+            const blockIndex = parseInt($('#block-index').val());
+            delegateToProxy(proxyAdr, delegStyle, blockIndex, getActiveUserAddress());
 
             $(`main li[id="${blockIndex}"]`).remove();
             //console.log(getActiveUserAddress());
             //console.log(typeof(getActiveUserAddress()));
-            var shareholder = mapShareholder(await getShareholder(getActiveUserAddress().toLowerCase()));
             //const currShares = $('main strong[id="shares"]').html();
             //const sharesToDelegate = $(`li[id=${blockIndex}]`).html();
             //setUserShares( activeUser, (currShares - sharesToDelegate) );
-            $('#shares').html(shareholder.shares);
         });
     });
 

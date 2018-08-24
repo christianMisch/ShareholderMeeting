@@ -24,15 +24,22 @@ $(function() {
             setTimeout(function() {
                 $('main #quest-id-label').hide();
                 $('main textarea[id="qa-placeholder"]').attr('placeholder', 'Please insert a question here...');
-              }, 500);
+              }, 100);
         } else if (activeUser.role === 1) {
             setTimeout(function() {
                 $('#question-form-wrapper').hide();
+                $('#rating-info').hide();
+                $('#qa-info').append($('<div>Please click on the question which you want to answer.</div>'))
                 //$('main textarea[id="qa-placeholder"]').attr('placeholder', 'Please insert a answer here...');
-              }, 500);
+              }, 100);
+        } else if (activeUser.role === 0) {
+            setTimeout(function() {
+                $('#question-form-wrapper').hide();
+                $('#rating-info').hide();
+              }, 100);
         }
 
-        $('main').on('click', 'input[id="qa-submit-button"]', function(e) {
+        $('main').on('click', 'input[id="qa-submit-button"]', async function(e) {
             e.preventDefault();
             const activeUser = mapUser(await getUser(getActiveUserAddress().toLowerCase()));
             const textareaContent = $('main textarea[id="qa-placeholder"]').val();
@@ -184,7 +191,7 @@ $(function() {
     
     });
 
-    $('main').on('click', 'a[href^="#question-"]', function(e) {
+    $('main').on('click', 'a[href^="#question-"]', async function(e) {
         e.preventDefault();
         const activeUser = mapUser(await getUser(getActiveUserAddress().toLowerCase()));;
         //console.log('pressed a tag');

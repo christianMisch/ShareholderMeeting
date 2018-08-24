@@ -32,7 +32,7 @@ contract Shareholder is User, ProposalData {
     event VoterWeight(address userAddress, uint weight);
     event PartialDelegationFrom(address sender, uint senderWeight, address proxy, uint proxyWeight);
     event SimpleDelegationFrom(address sender, uint senderWeight, address proxy, uint proxyWeight);
-    event ShareholderCreated(address userAddress, uint votingWeight, address delegate);
+    event ShareholderCreated(address userAddress, uint votingWeight);
     event WeightDivision(uint result);
     event CalculateDivision(uint num, uint copy, uint divider);
 
@@ -42,9 +42,8 @@ contract Shareholder is User, ProposalData {
         fac = _fac;
         qa = _qa;
         fac.setVotingWeight(userAddress, _votingWeight);
-        delegate = address(0);
 
-        emit ShareholderCreated(userAddress, fac.votingWeights(userAddress), delegate);
+        emit ShareholderCreated(userAddress, fac.votingWeights(userAddress));
     }
 
     function vote(uint proposalId, string votingOption) public {
@@ -92,7 +91,7 @@ contract Shareholder is User, ProposalData {
         }
     }
 
-    function getVoterWeight(address _userAddress) public returns (uint weight) {
+    /*function getVoterWeight(address _userAddress) public returns (uint weight) {
         weight = 0;
         for (uint i = 0; i < fac.getNumOfShareholders(); i++) {
 
@@ -107,7 +106,7 @@ contract Shareholder is User, ProposalData {
         }
 
         emit VoterWeight(_userAddress, weight);
-    }
+    }*/
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
     function delegateToProxy(address proxyAddress, bool partialDelegation, uint voteBlockIndex) public {
@@ -121,7 +120,7 @@ contract Shareholder is User, ProposalData {
         if (partialDelegation) {
             require(votingDenominations.length != 0, "shareholder cannot delegate partially because he doesn't own weight blocks");
             // partial voting, delegate a voting weight block of his total voting weight to one proxy
-            uint targetVoteWeight = votingDenominations[voteBlockIndex];
+            uint targetVoteWeight = votingDenominations[voteBlockIndex - 1];
             // deletes voting weight block in the weight array
             delete votingDenominations[voteBlockIndex - 1];
 

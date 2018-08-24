@@ -20,7 +20,12 @@ contract Factory is ProposalData {
     }
 
     function createNewDirector(address _userAddress, bool isAdministrator, QandA qa) public returns (Director) {
-        return new Director(_userAddress, isAdministrator, qa);
+        if (isAdministrator) {
+            return new Director(_userAddress, isAdministrator, qa, 0);
+        } else {
+            return new Director(_userAddress, isAdministrator, qa, 1);
+        }
+        
     }
 
     function createNewProposal(string _name, string _description, string _options) public returns (uint propId) {

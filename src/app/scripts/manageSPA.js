@@ -4,7 +4,7 @@ var main;
 
 document.addEventListener("DOMContentLoaded", function () {
     var navLinks = document.querySelectorAll("#sidebar a");
-    console.log(navLinks);
+    //console.log(navLinks);
     for (var i = 0; i < navLinks.length; i++) {
         navLinks[i].addEventListener("click", function (e) {
             e.preventDefault();
@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", function () {
             this.parentElement.className = "active";
 
             location.hash = this.getAttribute("href");
-            console.log(this.getAttribute("href"))
-            console.log(location.hash.trim().substring(1));
+            //console.log(this.getAttribute("href"))
+            //console.log(location.hash.trim().substring(1));
         })
     }
    

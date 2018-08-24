@@ -131,7 +131,7 @@ export function getUser(address) {
         AgmOwner = deplOwner;
         return AgmOwner.getUser.call(address);
     }).then(function(result) {
-        alert('getUser call was successful: ' + result);
+        //alert('getUser call was successful: ' + result);
         return result;
     }).catch(function(error) {
         console.log('Error during getUser call: ' + error.message);

@@ -2,8 +2,8 @@ import { getUserList, getNumOfUsers, getUser } from "../../provider/AgmOwnerProv
 
 import web3Provider from '../../provider/web3Provider';
 
-console.log('web3 accounts: ');
-console.log(web3Provider.eth.accounts);
+//console.log('web3 accounts: ');
+//console.log(web3Provider.eth.accounts);
 
 /*var authorizedUsers = {
     '0x011Fc7b12E5EEd718680db16a125378a25ac4b2F': {role: 'AgmOwner', loggedIn: false},
@@ -47,10 +47,9 @@ $(document).ready(async function() {
         const alertWrapper = $('<div id="wrapper"></div>');
         $('footer').append(alertWrapper);
         inputAdr = $('#wallet-address').val().toLowerCase();
-        //console.log(authorizedUsers);
-        console.log('getUserlist: ');
-        console.log(mapUser(await getUser(inputAdr)));
-        const user = mapUser(await getUser(inputAdr)); 
+        const user = mapUser(await getUser(inputAdr));
+        console.log('activeUser: ');
+        console.log(user); 
         if (user && user.role === 0) {
                 createAlert('You have successfully logged in as AgmOwner!');
                 $('nav').show();
@@ -65,8 +64,6 @@ $(document).ready(async function() {
                 showView('home-link');
                 hideLoginFields();
                 console.log(inputAdr);
-                //console.log(authorizedUsers);
-                //authorizedUsers[inputAdr].loggedIn = true;
                 console.log('loggedIn as Owner');
 
 
@@ -83,7 +80,8 @@ $(document).ready(async function() {
                 showLogoutButton();
                 showView('home-link');
                 hideLoginFields();
-                //authorizedUsers[inputAdr].loggedIn = true;
+                console.log(inputAdr);
+                console.log('loggedIn as Shareholder');
 
         } else if (user && user.role === 1) {
 
@@ -98,14 +96,15 @@ $(document).ready(async function() {
                 showLogoutButton();
                 showView('home-link');
                 hideLoginFields();
-                //authorizedUsers[inputAdr].loggedIn = true;
+                console.log(inputAdr);
+                console.log('loggedIn as Director');
 
         } else {
             $('#wrapper').append(`<div role="alert">Login failed!</div>`)
                 .addClass('alert alert-danger');
         }
         //console.log($('#wrapper div').length);
-        removeSecondAlert();
+        //removeSecondAlert();
         //console.log($('#wrapper'));
 
         //console.log(authorizedUsers);
