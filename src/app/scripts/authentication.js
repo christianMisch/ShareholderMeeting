@@ -1,25 +1,25 @@
-import { getUserList, getNumOfUsers } from "../../provider/AgmOwnerProvider";
+import { getUserList, getNumOfUsers, getUser } from "../../provider/AgmOwnerProvider";
 
 import web3Provider from '../../provider/web3Provider';
 
 console.log('web3 accounts: ');
 console.log(web3Provider.eth.accounts);
 
-var authorizedUsers = {
-    /*'0x011Fc7b12E5EEd718680db16a125378a25ac4b2F': {role: 'AgmOwner', loggedIn: false},
+/*var authorizedUsers = {
+    '0x011Fc7b12E5EEd718680db16a125378a25ac4b2F': {role: 'AgmOwner', loggedIn: false},
     '0xd02Dc75c5D17021a71060DeE44b12958fBa069FB': {role: 'AgmOwner', loggedIn: false},
     '0': {role: 'Shareholder', loggedIn: false, shares: 20},
     '0x628FBd5a122103e8171BbB2dC70C265f9F775466': {role: 'Shareholder', loggedIn: false, shares: 30},
     '0xc179a95Ac86AAbf6baF4D97BA161152fE0cc0655': {role: 'Shareholder', loggedIn: false, shares: 45},
     '0xB78E4A88e140b9ceeC48D569d6ae0ED4F419eFb1': {role: 'Shareholder', loggedIn: false, shares: 12},
     '0x5E3407E44756371B4D3De80Eb4378b715c444619': {role: 'Shareholder', loggedIn: false, shares: 34},
-    '0x88D7d45b3eBD3Fd8b202D8BF1Ec8e2CC2006692D': {role: 'Director', loggedIn: false}*/
-};
+    '0x88D7d45b3eBD3Fd8b202D8BF1Ec8e2CC2006692D': {role: 'Director', loggedIn: false}
+};*/
 
 var inputAdr;
 
 $(document).ready(async function() {
-    authorizedUsers[`${web3Provider.eth.accounts[0].toLowerCase()}`] = {role: 'AgmOwner', loggedIn: false, shares: 0};
+    //authorizedUsers[`${web3Provider.eth.accounts[0].toLowerCase()}`] = {role: 'AgmOwner', loggedIn: false, shares: 0};
     //console.log('Num of users should be 5: ' + await getNumOfUsers());
     showWelcomePage();
     // hide logout button, welcome link in sidebar and user credentials
@@ -41,15 +41,17 @@ $(document).ready(async function() {
         //$(`#${val.attr('id')}`).hide();
     })*/
 
-    $('#login-button').click(function(e) {
+    $('#login-button').click(async function(e) {
         e.preventDefault();
 
         const alertWrapper = $('<div id="wrapper"></div>');
         $('footer').append(alertWrapper);
         inputAdr = $('#wallet-address').val().toLowerCase();
-
-        if (Object.keys(authorizedUsers).includes(inputAdr)
-            && authorizedUsers[inputAdr].role === 'AgmOwner') {
+        //console.log(authorizedUsers);
+        console.log('getUserlist: ');
+        console.log(mapUser(await getUser(inputAdr)));
+        const user = mapUser(await getUser(inputAdr)); 
+        if (user && user.role === 0) {
                 createAlert('You have successfully logged in as AgmOwner!');
                 $('nav').show();
                 $('#setup-link').show();
@@ -63,12 +65,12 @@ $(document).ready(async function() {
                 showView('home-link');
                 hideLoginFields();
                 console.log(inputAdr);
-                console.log(authorizedUsers);
-                authorizedUsers[inputAdr].loggedIn = true;
+                //console.log(authorizedUsers);
+                //authorizedUsers[inputAdr].loggedIn = true;
+                console.log('loggedIn as Owner');
 
 
-        } else if (Object.keys(authorizedUsers).includes(inputAdr)
-            && authorizedUsers[inputAdr].role === 'Shareholder') {
+        } else if (user && user.role === 2) {
 
                 createAlert('You have successfully logged in as Shareholder!');
                 $('nav').show();
@@ -81,10 +83,9 @@ $(document).ready(async function() {
                 showLogoutButton();
                 showView('home-link');
                 hideLoginFields();
-                authorizedUsers[inputAdr].loggedIn = true;
+                //authorizedUsers[inputAdr].loggedIn = true;
 
-        } else if (Object.keys(authorizedUsers).includes(inputAdr)
-             && authorizedUsers[inputAdr].role === 'Director') {
+        } else if (user && user.role === 1) {
 
                 createAlert('You have successfully logged in as Director!');
                 $('nav').show();
@@ -97,7 +98,7 @@ $(document).ready(async function() {
                 showLogoutButton();
                 showView('home-link');
                 hideLoginFields();
-                authorizedUsers[inputAdr].loggedIn = true;
+                //authorizedUsers[inputAdr].loggedIn = true;
 
         } else {
             $('#wrapper').append(`<div role="alert">Login failed!</div>`)
@@ -120,7 +121,7 @@ $(document).ready(async function() {
         showWelcomePage();
         hideUserCredentials();
         showLoginFields();
-        authorizedUsers[inputAdr].loggedIn = false;
+        //authorizedUsers[inputAdr].loggedIn = false;
         //console.log(authorizedUsers);
 
     });
@@ -182,9 +183,9 @@ function showWelcomePage() {
     welcomeLink.dispatchEvent(event);
 }
 
-export function getActiveUserState() {
+/*export function getActiveUserState() {
     return authorizedUsers[inputAdr] || {loggedIn: false};
-}
+}*/
 
 export function getActiveUserAddress() {
     return inputAdr.toLowerCase();
@@ -198,16 +199,23 @@ export function removeSecondAlert() {
         }
 }
 
-export function getAuthorizedUsers() {
+/*export function getAuthorizedUsers() {
   return authorizedUsers;
-}
+}*/
 
-export function setUserShares(key, shares) {
+/*export function setUserShares(key, shares) {
   authorizedUsers[key].shares = shares;
-}
+}*/
 
-export function setAuthorizedUsers(adr, val) {
+/*export function setAuthorizedUsers(adr, val) {
     authorizedUsers[adr] = val;
+}*/
+
+export function mapUser(userArr) {
+    return {
+        userAddress: userArr[0],
+        role: userArr[1].toNumber()
+    }
 }
 
 async function isAuthenticated(address) {

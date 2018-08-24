@@ -80,6 +80,7 @@ contract AgmOwner is User {
         meetingEndTime = _meetingEndTime;
         fac = _fac;
         owners.push(_userAddress);
+        users.push(User(address(this)));
     }
 
     // transfer contract ownership to another director
@@ -139,8 +140,9 @@ contract AgmOwner is User {
         return users.length;
     }
 
-    function getUser(address _userAddress) public view returns (User u) {
-        return users[userId[_userAddress]];
+    function getUser(address _userAddress) public view returns (address adr, uint role) {
+        User u = users[userId[_userAddress]];
+        return (u.userAddress(), u.role());
     }
 
     function getUserList() public view returns (User[] userList) {

@@ -1,6 +1,7 @@
-import {getAuthorizedUsers, setAuthorizedUsers, getActiveUserAddress, getActiveUserState, createAlert} from './authentication';
+import {getActiveUserAddress, getActiveUserState, createAlert, mapUser} from './authentication';
 import {createQuestion, createAnswer, getNumOfAnswers, getNumOfQuestions, getAnswer, getQuestion} from '../../provider/QandAProvider';
 import {rateQuestion} from '../../provider/ShareholderProvider';
+import {getUser} from '../../provider/AgmOwnerProvider';
 
 var numOfQuest = 0;
 var numOfAnsw= 0;
@@ -16,15 +17,15 @@ $(function() {
     $('a[href="#list"]').click(async function() {
         
         
-        const activeUser = getActiveUserState(getActiveUserAddress());
+        const activeUser = mapUser(await getUser(getActiveUserAddress().toLowerCase()));
         console.log(activeUser);
         console.log($('main textarea[id="qa-placeholder"]'));
-        if (activeUser.role === 'Shareholder') {
+        if (activeUser.role === 2) {
             setTimeout(function() {
                 $('main #quest-id-label').hide();
                 $('main textarea[id="qa-placeholder"]').attr('placeholder', 'Please insert a question here...');
               }, 500);
-        } else if (activeUser.role === 'Director') {
+        } else if (activeUser.role === 1) {
             setTimeout(function() {
                 $('#question-form-wrapper').hide();
                 //$('main textarea[id="qa-placeholder"]').attr('placeholder', 'Please insert a answer here...');
@@ -33,16 +34,16 @@ $(function() {
 
         $('main').on('click', 'input[id="qa-submit-button"]', function(e) {
             e.preventDefault();
-            const activeUser = getActiveUserState(getActiveUserAddress());
+            const activeUser = mapUser(await getUser(getActiveUserAddress().toLowerCase()));
             const textareaContent = $('main textarea[id="qa-placeholder"]').val();
             const questId = $('main input[id="question-id"]').val();
             const activeUserAdr = getActiveUserAddress();
             console.log(activeUserAdr);
             console.log(textareaContent);
-            if (activeUser.role === 'Shareholder') {
+            if (activeUser.role === 2) {
                 createQuestion(textareaContent, activeUserAdr);
                 getNumOfQuestions();
-            } else if (activeUser.role === 'Director') {
+            } else if (activeUser.role === 1) {
                 createAnswer(questId, textareaContent, activeUserAdr);
                 getNumOfAnswers();
             }
@@ -157,7 +158,7 @@ $(function() {
             visitedArr = [];
             console.log('escaped for loop');
             // enable modal function to questions
-            if (activeUser.role === 'Director') {
+            if (activeUser.role === 1) {
                 $('main a[href^="#question-"]').attr({
                     'data-toggle': "modal",
                     'data-target': "#answerModal"
@@ -185,9 +186,9 @@ $(function() {
 
     $('main').on('click', 'a[href^="#question-"]', function(e) {
         e.preventDefault();
-        const activeUser = getActiveUserState(getActiveUserAddress());
+        const activeUser = mapUser(await getUser(getActiveUserAddress().toLowerCase()));;
         //console.log('pressed a tag');
-        if (activeUser.role === 'Director') {
+        if (activeUser.role === 1) {
             const questContent = e.currentTarget.firstChild.nextSibling.firstChild.data;
             const questId = e.currentTarget.getAttribute('href').substring(10);
             console.log(questContent, questId);

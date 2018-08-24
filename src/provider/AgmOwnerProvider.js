@@ -86,7 +86,7 @@ export function announceAGM() {
     })
 }
 
-export function addUser(address, isDirector, votingWeight, sender) {
+export function addUser(address, role, votingWeight, sender) {
     const QandAContract = contract(QandAJson);
     QandAContract.setProvider(web3Provider.currentProvider);
     var QandA;
@@ -96,7 +96,7 @@ export function addUser(address, isDirector, votingWeight, sender) {
         return AgmOwnerContract.deployed();
     }).then(function(depAgmOwner) {
         AgmOwner = depAgmOwner;
-        return AgmOwner.addUser.sendTransaction(address, isDirector, votingWeight, QandA.address, {from: sender, gas: gas});
+        return AgmOwner.addUser.sendTransaction(address, role, votingWeight, QandA.address, {from: sender, gas: gas});
     }).then(function(result) {
         alert('addUser transaction was successful: ' + result);
     }).catch(function(error) {
@@ -127,11 +127,12 @@ export function getNumOfUsers() {
 }
 
 export function getUser(address) {
-    AgmOwnerContract.deployed().then(function(deplOwner) {
+    return AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
         return AgmOwner.getUser.call(address);
     }).then(function(result) {
         alert('getUser call was successful: ' + result);
+        return result;
     }).catch(function(error) {
         console.log('Error during getUser call: ' + error.message);
     });
@@ -168,10 +169,10 @@ export function getUserList() {
         AgmOwner = deplOwner;
         return AgmOwner.getUserList.call();
     }).then(function(result) {
-        alert('getUserList TX was successful: ' + result);
+        alert('getUserList call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log('Error during getUserList TX: ' + error.message);
+        console.log('Error during getUserList call: ' + error.message);
     });
 }
 

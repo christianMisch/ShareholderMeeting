@@ -36,12 +36,12 @@ $(document).ready(function() {
             }
             const newUserAddress = $('#new-user-address').val().toLowerCase();
             const role = parseInt($('#director-flag').val());
-            console.log('role: ' + typeof(role));
+            //console.log('role: ' + typeof(role));
             const numOfShares = $('#num-of-shares').val();
             addUser(newUserAddress, role, numOfShares, activeUserAddress);
             getNumOfUsers();
             const mapRole = role === 0 ? 'AgmOwner': (role === 1 ? 'Director': 'Shareholder');
-            console.log('mapRole: ' + mapRole);  
+            //console.log('mapRole: ' + mapRole);  
             setAuthorizedUsers(newUserAddress, {role: mapRole, loggedIn: false, shares: parseInt(numOfShares)});
             console.log(getAuthorizedUsers());
 

@@ -10,7 +10,7 @@ contract Shareholder is User, ProposalData {
     Factory public fac;
     QandA public qa;
 
-    address public delegate;
+    //address public delegate;
     uint[] public votingDenominations;
     Delegate[] public delegations;
     mapping (uint => address) public ratings;

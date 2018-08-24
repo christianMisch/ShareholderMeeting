@@ -7,6 +7,7 @@ import "./QandA.sol";
 contract Director is User {
 
     QandA public qa;
+    bool isAdministrator;
 
     event AnswerCreated(uint ansId, address creator);
 
@@ -15,10 +16,11 @@ contract Director is User {
         _;
 
     }
-
-    constructor(address userAddress, bool isAdministrator, QandA _qa)
+    
+    constructor(address userAddress, bool _isAdministrator, QandA _qa)
         User(userAddress, Role.DIRECTOR) public {
 
+        isAdministrator = _isAdministrator;    
         qa = _qa;
     }
 

@@ -9,13 +9,13 @@ import "./AgmOwner.sol";
 
 contract Factory is ProposalData {
 
-    Shareholder[] public shareholders;
+    mapping(address => Shareholder) public shareholders;
     Proposal[] public proposals;
     mapping(address => uint) public votingWeights;
 
     function createNewShareholder(address _userAddress, uint votingTok, QandA qa) public returns (Shareholder) {
         Shareholder sh = new Shareholder(_userAddress, votingTok, this, qa);
-        shareholders.push(sh);
+        shareholders[_userAddress] = sh;
         return sh;
     }
 
@@ -92,19 +92,19 @@ contract Factory is ProposalData {
         votingWeights[userAddress] = weight;
     }
 
-    function getShareholder(uint shareholderId) public view returns (
+    function getShareholder(address shAdr) public view returns (
         address _userAddress,
         uint _role,
-        address _delegate
+        uint _shares
     ) {
-        Shareholder sh = shareholders[shareholderId];
+        Shareholder sh = shareholders[shAdr];
         return
-            (sh.userAddress(), sh.role(), sh.delegate());
+            (sh.userAddress(), sh.role(), votingWeights[sh.userAddress()]);
     }
 
-    function getNumOfShareholders() public view returns (uint length) {
+    /*function getNumOfShareholders() public view returns (uint length) {
         return shareholders.length;
-    }
+    }*/
 
     /*function getShareholderList() public view returns (Shareholder[]) {
         return shareholders;

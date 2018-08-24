@@ -10,6 +10,7 @@ module.exports = function(deployer, network, accounts) {
 
     const uppCaseAcc = accounts.map(acc => acc.toLowerCase());
     deployer.deploy(ProposalData);
+    console.log('acc[0]: ' + uppCaseAcc[0]);
     //deployer.deploy(User, accounts[1], false);
     /*console.log('web3 accounts');
     console.log(web3.eth.accounts);

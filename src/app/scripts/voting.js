@@ -1,19 +1,21 @@
 import {getProposal, getNumOfProposals} from '../../provider/ProposalProvider';
 import {denominateVotingTokens, delegateToProxy, getVotingDenominations} from '../../provider/ShareholderProvider';
-import {getAuthorizedUsers, setAuthorizedUsers, getActiveUserAddress} from './authentication';
+import {getShareholder, getNumOfShareholders} from '../../provider/ShareholderProvider';
+import {setUserShares, getActiveUserAddress} from './authentication';
 
 var numOfProp = 0;
 
-$(document).ready(function() {
-  console.log(getAuthorizedUsers());
+$(document).ready(async function() {
+  //console.log(getAuthorizedUsers());
 
     $('a[href="#voting"]').click(function() {
-      const activeUser = getActiveUserAddress();
+      const activeUserAdr = getActiveUserAddress().toLowerCase();
       //console.log(users);
       //console.log(users[activeUser].shares);
-      var users = getAuthorizedUsers();
+      var user = mapShareholder(await getShareholder(activeUserAdr));
+      
       setTimeout(function() {
-        $('main strong[id="shares"]').html(users[activeUser].shares);
+        $('main strong[id="shares"]').html(user.shares);
       }, 1000);
 
 
@@ -78,11 +80,11 @@ $(document).ready(function() {
             $(`main li[id="${blockIndex}"]`).remove();
             //console.log(getActiveUserAddress());
             //console.log(typeof(getActiveUserAddress()));
-            var users = getAuthorizedUsers();
-            const currShares = $('main strong[id="shares"]').html();
-            const sharesToDelegate = $(`li[id=${blockIndex}]`).html();
-            setAuthorizedUsers( activeUser, (currShares - sharesToDelegate) );
-            $('#shares').html(users[`${getActiveUserAddress()}`].shares);
+            var shareholder = mapShareholder(await getShareholder(getActiveUserAddress().toLowerCase()));
+            //const currShares = $('main strong[id="shares"]').html();
+            //const sharesToDelegate = $(`li[id=${blockIndex}]`).html();
+            //setUserShares( activeUser, (currShares - sharesToDelegate) );
+            $('#shares').html(shareholder.shares);
         });
     });
 
@@ -102,6 +104,14 @@ function mapProposal(propArr) {
         proposalPassed: propArr[4],
         proposalPercent: propArr[5],
         proposalCount: propArr[6],
+    }
+}
+
+function mapShareholder(shArr) {
+    return {
+        userAddress: shArr[0],
+        role: shArr[1].toNumber(),
+        shares: shArr[2].toNumber()
     }
 }
 
