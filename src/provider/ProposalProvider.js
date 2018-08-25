@@ -25,7 +25,7 @@ export function getNumOfProposals() {
         //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
         return Factory.getNumOfProposals.call();
     }).then(function(result) {
-        alert('getNumOfProposals call was successful: ' + result);
+        //alert('getNumOfProposals call was successful: ' + result);
         return result;
     }).catch(function(error) {
         console.log('Error during getNumOfProposals call: ' + error.message);

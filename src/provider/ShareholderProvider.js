@@ -92,4 +92,15 @@ export function getNumOfShareholders() {
   });
 }
 
+export function vote(propId, votOpt, from) {
+  ShareholderContract.deployed().then(function (deplShareh) {
+    Shareholder = deplShareh;
+    return Shareholder.vote.sendTransaction(propId, votOpt, {from: from, gas: gas});
+  }).then(function (result) {
+    alert('vote TX was successful: ' + result);
+  }).catch(function (error) {
+    console.log('error during vote TX: ' + error.message);
+  });
+}
+
 

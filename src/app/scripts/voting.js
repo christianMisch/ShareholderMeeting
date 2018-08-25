@@ -1,29 +1,16 @@
 import {getProposal, getNumOfProposals} from '../../provider/ProposalProvider';
 import {denominateVotingTokens, delegateToProxy, getVotingDenominations} from '../../provider/ShareholderProvider';
-import {getShareholder, getNumOfShareholders} from '../../provider/ShareholderProvider';
+import {getShareholder, getNumOfShareholders, vote} from '../../provider/ShareholderProvider';
 import {setUserShares, getActiveUserAddress} from './authentication';
 
 var numOfProp = 0;
 
 $(document).ready(async function() {
+    
   
   //console.log(getAuthorizedUsers());
 
     $('a[href="#voting"]').click(async function() {
-
-      setInterval(function() {
-        var proposalCount = await getNumOfProposals();
-
-        if (numOfProp == proposalCount) {
-            return;
-        }
-        numOfProp = proposalCount;
-        const e = new Event('click');
-        var propRefreshBut = document.getElementById('main #refresh-proposal');
-        propRefreshBut.dispatchEvent(e);
-        console.log('proposalCount: ' + proposalCount);
-        console.log('numOfProp: ' + numOfProp);
-      }, 3000);
     
       const activeUserAdr = getActiveUserAddress();
       //console.log(users);
@@ -31,34 +18,74 @@ $(document).ready(async function() {
       var user = mapShareholder(await getShareholder(activeUserAdr));
       
       setTimeout(function() {
-        $('main #refresh-proposal').hide();
+        $('main #refresh-proposal').css('visibility', 'hidden');
         $('main strong[id="shares"]').html(user.shares);
-      }, 1000);
+
+        setInterval(async function() {
+            var proposalCount = parseInt(await getNumOfProposals());
+    
+            if (numOfProp == proposalCount) {
+                console.log('proposal count has not changed.');
+                return;
+            }
+            numOfProp = proposalCount;
+            //const e = new Event('click');
+            console.log($('main #refresh-proposal'));
+            $('main #refresh-proposal').trigger('click');
+            //var propRefreshBut = document.getElementById('main input[id="refresh-proposal"]');
+            //console.log(propRefreshBut);
+            //propRefreshBut.dispatchEvent(e);
+            console.log('proposalCount: ' + proposalCount);
+            console.log('numOfProp: ' + numOfProp);
+          }, 1000);
+
+      }, 100);
 
 
         $('main').on('click', 'input[id="refresh-proposal"]', async function() {
-            
+            $('main table').empty();
+            var radioCount = 0;
 
-            for (var i = 0; i < proposalCount; i++) {
+            for (var i = 0; i < numOfProp; i++) {
                 var currProp = await getProposal(i);
                 const mappedProp = mapProposal(currProp);
                 const splits = mappedProp.options.split(',');
                 var wrapper = $('<div></div>');
+                
                 for (var j = 0; j < splits.length; j++) {
                     var optionBut = $(
                         `<div>
-                            <input type="radio" id="${splits[j]}" name="radio">
-                            <label>${splits[j]}</label>
+                            <label><input type="radio" id="${splits[j]}" name="${radioCount}">${splits[j]}</label>
                         </div>`
                     );
                     wrapper.append(optionBut);
                 }
+                wrapper.append($(
+                    `<div>
+                        <label><input type="radio" id="abstain" name="${radioCount}">abstain</label>
+                    </div>`
+                ));
+                ++radioCount;
                 $('main table').append(
                     `<tr>
                         <td>${mappedProp.proposalDescription}</td>
                         <td>${wrapper.html()}</td>
                     </tr>`
                 );
+            }
+
+            console.log(document.body);
+        });
+
+        $('main').on('click', 'input[id="vote-button"]', async function() {
+            const activeUserAdr = getActiveUserAddress();
+            console.log($('main input[type="radio"]:checked'));
+            var selectedOptions = $('main input[type="radio"]:checked');
+            for (var l = 0; l < selectedOptions.length; l++) {
+                /*console.log(selectedOptions[l]);
+                console.log(parseInt(selectedOptions[l].name));
+                console.log(selectedOptions[l].nextSibling.data.trim());*/
+                vote(parseInt(selectedOptions[l].name), selectedOptions[l].nextSibling.data.trim(), activeUserAdr);
             }
         });
 

@@ -15,9 +15,9 @@ module.exports = async function(deployer, network, accounts) {
     await AgmOwnerContract.addUser.sendTransaction('0xB78E4A88e140b9ceeC48D569d6ae0ED4F419eFb1'.toLowerCase(), 2, 12, QandAContract.address);
     await AgmOwnerContract.addUser.sendTransaction('0x92130D033C5846d2653D088c74D844f61717794d'.toLowerCase(), 1, 0, QandAContract.address);
 
-    await AgmOwnerContract.createProposal.sendTransaction('board election', 'Who should be the new chairperson for the next year?', 'Schmidt, Mueller, Guenther, abstain');
-    await AgmOwnerContract.createProposal.sendTransaction('dividend distribution', 'How much percentage should be increased the dividend for shareholders?', '3%, 4%, 5%, abstain');
-    await AgmOwnerContract.createProposal.sendTransaction('foster research', 'Should the research into new technologies be more fostered?', 'yes, no, abstain');
+    await AgmOwnerContract.createProposal.sendTransaction('board election', 'Who should be the new chairperson for the next year?', 'Schmidt, Mueller, Guenther');
+    await AgmOwnerContract.createProposal.sendTransaction('dividend distribution', 'How much percentage should be increased the dividend for shareholders?', '3%, 4%, 5%');
+    await AgmOwnerContract.createProposal.sendTransaction('foster research', 'Should the research into new technologies be more fostered?', 'yes, no');
 }
 
 /*
