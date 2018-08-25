@@ -75,17 +75,13 @@ contract Factory is ProposalData {
         prop.voteCount++;
     }
 
-    function getVote(uint proposalID, address voter) public view returns (address user, string option, uint weight) {
+    function getVote(uint proposalID, uint voteId) public view returns (address user, string option, uint weight) {
         Proposal storage proposal = proposals[proposalID];
-
-        for (uint i = 0; i < proposal.votes.length; i++) {
-            Vote storage v = proposal.votes[i];
-
-            if (true) {
-                return (v.voterAddress, v.voterDecision, v.voterWeight);
-            }
+        Vote storage v = proposal.votes[voteId];
+        if (v.voterAddress == address(0)) {
+            return (address(0), "", 0);
         }
-        return (address(0), "", 0);
+        return (v.voterAddress, v.voterDecision, v.voterWeight);
     }
 
     function getNumOfVotes(uint proposalId) public view returns (uint length) {

@@ -156,8 +156,8 @@
 
             <article class="col-xl-12" id="refresh-section">
                 <input type="button" value="refresh list" id="refresh-proposal">
-                <table>
-                    <tr>
+                <table class="list-group">
+                    <tr id="table-header" class="list-group-item-info">
                         <th>Description</th>
                         <th>Options</th>
                         <!--<th>Delegation style</th>
@@ -193,6 +193,7 @@
                 </div>
                 <div id="question-form-wrapper">
                     <form id="Q&A-form">
+                        <!--<label>Please insert the question headline: <textarea row="30" cols="50" id="question-headline"></textarea></label>-->
                         <textarea row="30" cols="50" id="qa-placeholder"></textarea>
                         <label id="quest-id-label">Please insert the question id: <input type="number" id="question-id"></label>
                         <input type="reset" value="reset">

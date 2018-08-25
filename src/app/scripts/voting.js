@@ -43,7 +43,7 @@ $(document).ready(async function() {
 
 
         $('main').on('click', 'input[id="refresh-proposal"]', async function() {
-            $('main table').empty();
+            $('main table tr').not('tr[id="table-header"]').empty();
             var radioCount = 0;
 
             for (var i = 0; i < numOfProp; i++) {
@@ -55,7 +55,7 @@ $(document).ready(async function() {
                 for (var j = 0; j < splits.length; j++) {
                     var optionBut = $(
                         `<div>
-                            <label><input type="radio" id="${splits[j]}" name="${radioCount}">${splits[j]}</label>
+                            <label ><input type="radio" id="${splits[j]}" name="${radioCount}">${splits[j]}</label>
                         </div>`
                     );
                     wrapper.append(optionBut);
@@ -67,7 +67,7 @@ $(document).ready(async function() {
                 ));
                 ++radioCount;
                 $('main table').append(
-                    `<tr>
+                    `<tr class="list-group-item-info">
                         <td>${mappedProp.proposalDescription}</td>
                         <td>${wrapper.html()}</td>
                     </tr>`

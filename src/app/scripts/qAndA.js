@@ -127,11 +127,30 @@ $(function() {
                         //console.log('inner if');
                         //priorityMetric = questPriority;
                         visitedArr[i].visited = true;
+                        
+                        var date = new Date();
+                        var dd = date.getDate();
+                        var mm = date.getMonth()+1; //January is 0!
+                        var yyyy = date.getFullYear();
+
+                        if(dd<10) {
+                            dd = '0'+dd
+                        } 
+
+                        if(mm<10) {
+                            mm = '0'+mm
+                        } 
+
+                        date = mm + '.' + dd + '.' + yyyy;
                         var qaWrapper = $(
                             // question-i is the real question id
                             `<div>
                                     <a href="#question-${i + 1}" class="list-group-item list-group-item-action flex-column align-items-start list-group-item-danger">
-                                        <div id="${i + 1}"> Question ${questCount++}: ${mappQuest.content} </div>
+                                        <small class="left-small">user: ${mappQuest.creator}</small>
+                                        <small class="right-small">date: ${date} </small>
+                                        <div id="${i + 1}" class="clear-fix"> Question ${questCount++}: ${mappQuest.content} </div>
+                                        <small class="left-small">upvotes: ${mappQuest.upvotes}</small>
+                                        <small class="right-small">downvotes: ${mappQuest.downvotes}</small>
                                     </a>
                             </div>`
                         );
@@ -164,6 +183,13 @@ $(function() {
             }
             visitedArr = [];
             console.log('escaped for loop');
+            console.log($('main small.left-small'));
+            console.log($('main small.right-small'));
+            $('main small').css('display', 'block');
+            $('main small.left-small').css('float', 'left');
+            $('main small.right-small').css('float', 'right');
+            $('main .clear-fix').css('clear', 'both');
+            //$('main small').css('display', 'inline-block');
             // enable modal function to questions
             if (activeUser.role === 1) {
                 $('main a[href^="#question-"]').attr({
