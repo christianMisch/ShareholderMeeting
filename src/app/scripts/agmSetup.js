@@ -1,6 +1,6 @@
 import {createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission} from '../../provider/AgmOwnerProvider';
 import {getActiveUserAddress, setAuthorizedUsers, createAlert, getAuthorizedUsers} from './authentication';
-import web3Provider from '../../provider/web3Provider';
+import {web3} from './index';
 
 //const owner = web3Provider.eth.accounts[0];
 //console.log('owner address: ' + owner);

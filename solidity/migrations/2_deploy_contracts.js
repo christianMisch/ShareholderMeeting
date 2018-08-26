@@ -37,7 +37,7 @@ module.exports = function(deployer, network, accounts) {
             50,
             'Siemens AGM 2018',
             'Annual General Meeting 2018',
-            '01.01.2018',
+            '01.01.2018, 3pm',
             'ICC Berlin',
             0,
             240,

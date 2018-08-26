@@ -6,12 +6,12 @@ module.exports = {
     mode: 'development',
     entry: {
         polyfill: 'babel-polyfill',
-        app: '../src/app/scripts/index.js',
-        manageSPA: '../src/app/scripts/manageSPA.js',
+        app: '../src/app/scripts/index.js'
+        /*manageSPA: '../src/app/scripts/manageSPA.js',
         authentication: '../src/app/scripts/authentication.js',
         agmSetup: '../src/app/scripts/agmSetup.js',
         voting: '../src/app/scripts/voting.js',
-        qAndA: '../src/app/scripts/qAndA.js'
+        qAndA: '../src/app/scripts/qAndA.js'*/
         //ShareholderProvider: '../src/provider/ShareholderProvider.js'
     }, 
     output: {

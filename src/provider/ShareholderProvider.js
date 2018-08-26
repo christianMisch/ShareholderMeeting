@@ -1,14 +1,14 @@
 import ShareholderJson from '../../solidity/build/contracts/Shareholder.json';
 import FactoryJson from '../../solidity/build/contracts/Factory.json';
 import {default as contract} from 'truffle-contract';
-import web3Provider from './web3Provider';
+import web3 from './web3Provider';
 
 const ShareholderContract = contract(ShareholderJson);
-ShareholderContract.setProvider(web3Provider.currentProvider);
+ShareholderContract.setProvider(web3.currentProvider);
 var Shareholder;
 
 const FactoryContract = contract(FactoryJson);
-FactoryContract.setProvider(web3Provider.currentProvider);
+FactoryContract.setProvider(web3.currentProvider);
 var Factory;
 
 const gas = /*'220000'*/ '3000000';

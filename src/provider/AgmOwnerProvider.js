@@ -1,12 +1,21 @@
 import AgmOwnerJson from '../../solidity/build/contracts/AgmOwner.json';
 import QandAJson from '../../solidity/build/contracts/QandA.json';
-import web3Provider from './web3Provider';
+//import {web3} from '../app/scripts/index';
+import web3 from './web3Provider';
 import {default as contract} from 'truffle-contract'; 
 
 //const ownerAccount = web3Provider.eth.accounts[0];
+
+console.log(web3);
 const AgmOwnerContract = contract(AgmOwnerJson);
-AgmOwnerContract.setProvider(web3Provider.currentProvider);
+AgmOwnerContract.setProvider(web3.currentProvider);
 var AgmOwner;
+
+const QandAContract = contract(QandAJson);
+QandAContract.setProvider(web3.currentProvider);
+var QandA;
+
+
 const gas = /*'220000'*/ '3000000';
 
 export function transferOwnership(newOwnerAdr, from) {
@@ -87,9 +96,6 @@ export function announceAGM() {
 }
 
 export function addUser(address, role, votingWeight, sender) {
-    const QandAContract = contract(QandAJson);
-    QandAContract.setProvider(web3Provider.currentProvider);
-    var QandA;
     QandAContract.deployed().then(function(depQandA) {
         QandA = depQandA;
         console.log(QandA.address);
@@ -149,8 +155,7 @@ export function finishAGM() {
     });
 }
 
-export function createProposal(name, description, options, sender) {
-    
+export function createProposal(name, description, options, sender) {   
     AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
         AgmOwner.userAddress.call().then(function(result) {

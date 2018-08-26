@@ -1,7 +1,8 @@
 import { getUserList, getNumOfUsers, getUser } from "../../provider/AgmOwnerProvider";
-
-import web3Provider from '../../provider/web3Provider';
-
+import web3 from './index';
+console.log(web3)
+console.log(web3);
+//import web3Provider from '../../provider/web3Provider';
 //console.log('web3 accounts: ');
 //console.log(web3Provider.eth.accounts);
 

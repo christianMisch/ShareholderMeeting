@@ -2,16 +2,16 @@ import ShareholderJson from '../../solidity/build/contracts/Shareholder.json';
 import DirectorJson from '../../solidity/build/contracts/Director.json';
 import QandAJson from '../../solidity/build/contracts/QandA.json';
 import {default as contract} from 'truffle-contract';
-import web3Provider from './web3Provider';
+import web3 from './web3Provider';
 
 const ShareholderContract = contract(ShareholderJson);
-ShareholderContract.setProvider(web3Provider.currentProvider);
+ShareholderContract.setProvider(web3.currentProvider);
 
 const DirectorContract = contract(DirectorJson);
-DirectorContract.setProvider(web3Provider.currentProvider);
+DirectorContract.setProvider(web3.currentProvider);
 
 const QandAContract = contract(QandAJson);
-QandAContract.setProvider(web3Provider.currentProvider);
+QandAContract.setProvider(web3.currentProvider);
 
 const gas = /*'220000'*/ '3000000';
 
