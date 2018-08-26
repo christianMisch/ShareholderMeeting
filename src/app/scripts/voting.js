@@ -81,6 +81,7 @@ $(document).ready(async function() {
             const activeUserAdr = getActiveUserAddress();
             console.log($('main input[type="radio"]:checked'));
             var selectedOptions = $('main input[type="radio"]:checked');
+            
             for (var l = 0; l < selectedOptions.length; l++) {
                 /*console.log(selectedOptions[l]);
                 console.log(parseInt(selectedOptions[l].name));
@@ -102,7 +103,7 @@ $(document).ready(async function() {
             $('#shares').html(shareholder.shares);
             const denomList = $('<ol class="list-group"></ol>');
             for (var i = 1; i <= numOfBlocks; i++) {
-                denomList.append($(`<li class="list-group-item list-group-item-primary id="${i}">${i}. share block:  ${factor}</li>`));
+                denomList.append($(`<li class="list-group-item list-group-item-primary" id="${i}">${i}. share block:  ${factor}</li>`));
             }
             /*
               <ol>
@@ -119,9 +120,11 @@ $(document).ready(async function() {
             console.log(typeof(delegStyle));
             const proxyAdr = $('#proxy-address').val();
             const blockIndex = parseInt($('#block-index').val());
-            delegateToProxy(proxyAdr, delegStyle, blockIndex, getActiveUserAddress());
-
-            $(`main li[id="${blockIndex}"]`).remove();
+            const txId = await delegateToProxy(proxyAdr, delegStyle, blockIndex, getActiveUserAddress());
+            if (txId.charAt(1) === 'x') {
+                $(`main li[id="${blockIndex}"]`).remove();
+            }
+            
             //console.log(getActiveUserAddress());
             //console.log(typeof(getActiveUserAddress()));
             //const currShares = $('main strong[id="shares"]').html();

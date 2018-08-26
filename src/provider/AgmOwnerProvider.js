@@ -84,12 +84,13 @@ export function getOwners() {
 
 
 export function announceAGM() {
-    AgmOwnerContract.deployed().then(function(instance) {
+    return AgmOwnerContract.deployed().then(function(instance) {
         AgmOwner = instance;
     }).then(function() {
-        return AgmOwner.announceAGM.call({from: ownerAccount});
+        return AgmOwner.announceAGM.call();
     }).then(function(result) {
-        alert(result);
+        //alert(result);
+        return result;
     }).catch(function(error) {
         console.log(error);
     })

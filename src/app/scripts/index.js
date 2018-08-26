@@ -1,11 +1,15 @@
 //import {createQuestion, test} from '../provider/ShareholderProvider';
 //import { announceAGM } from '../../provider/AgmOwnerProvider';
 import web3 from '../../provider/web3Provider';
+import {announceAGM} from '../../provider/AgmOwnerProvider';
 import './agmSetup';
-import './authentication';
+import {getActiveUserAddress} from './authentication';
 import './manageSPA';
 import './qAndA';
 import './voting';
+
+var place;
+var date;
 
 export class App {
 
@@ -15,23 +19,15 @@ export class App {
     }
 
     async start() {
-        console.log('Start the app... ');
-        /*var announcement = mappAnnouncement(await announceAGM());
-        this.place = announcement.place;
-        this.date = announcement.date;*/
-        
-    
+        console.log(`Start the app with networkId=${this.network} and default account =${this.account}`);
+        var announcement = mappAnnouncement(await announceAGM());
+        console.log(announcement);
+        place = announcement.place;
+        date = announcement.date;
     }
-    
-
 }
 
-const networkId = web3.version.getNetwork(function(err, res) {
-    if (!err) {
-        return res;
-    }
-}); 
-const app = new App(web3.eth.accounts[0], networkId);
+const app = new App(web3.eth.accounts[0], web3.version.network);
 app.start();
 
 function mappAnnouncement(annArr) {
@@ -41,4 +37,10 @@ function mappAnnouncement(annArr) {
     }
 }
 
-export default web3;
+export function getPlace() {
+    return place;
+}
+
+export function getDate() {
+    return date;
+}

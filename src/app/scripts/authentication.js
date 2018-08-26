@@ -1,7 +1,6 @@
 import { getUserList, getNumOfUsers, getUser } from "../../provider/AgmOwnerProvider";
-import web3 from './index';
-console.log(web3)
-console.log(web3);
+import {getDate, getPlace} from './index';
+
 //import web3Provider from '../../provider/web3Provider';
 //console.log('web3 accounts: ');
 //console.log(web3Provider.eth.accounts);
@@ -64,6 +63,11 @@ $(document).ready(async function() {
                 showLogoutButton();
                 showView('home-link');
                 hideLoginFields();
+                setInterval(function() {
+                    $('main #place').html(getPlace());
+                    $('main #date').html(getDate());
+                }, 100);
+                
                 console.log(inputAdr);
                 console.log('loggedIn as Owner');
 
@@ -81,6 +85,10 @@ $(document).ready(async function() {
                 showLogoutButton();
                 showView('home-link');
                 hideLoginFields();
+                setInterval(function() {
+                    $('main #place').html(getPlace());
+                    $('main #date').html(getDate());
+                }, 100);
                 console.log(inputAdr);
                 console.log('loggedIn as Shareholder');
 
@@ -97,6 +105,10 @@ $(document).ready(async function() {
                 showLogoutButton();
                 showView('home-link');
                 hideLoginFields();
+                setInterval(function() {
+                    $('main #place').html(getPlace());
+                    $('main #date').html(getDate());
+                }, 100);
                 console.log(inputAdr);
                 console.log('loggedIn as Director');
 
@@ -157,13 +169,16 @@ function hideUserCredentials() {
 }
 
 function hideLoginFields() {
+    $('#wallet-div').hide();
+    $('#wallet-address').hide();
     $('#address-label').hide();
-    $('#password-label').hide();
+   
 }
 
 function showLoginFields() {
+    $('#wallet-div').show();
+    $('#wallet-address').show();
     $('#address-label').show();
-    $('#password-label').show();
 }
 
 function showView(viewName) {
@@ -229,3 +244,4 @@ async function isAuthenticated(address) {
     }
     return false;
 }
+

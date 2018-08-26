@@ -27,13 +27,15 @@ export function denominateVotingTokens(numOfBlocks, factor, from) {
 }
 
 export function delegateToProxy(proxyAddress, partialDelegation, voteBlockIndex, from) {
-  ShareholderContract.deployed().then(function (deplShareh) {
+  return ShareholderContract.deployed().then(function (deplShareh) {
     Shareholder = deplShareh;
     return Shareholder.delegateToProxy.sendTransaction(proxyAddress, partialDelegation, voteBlockIndex, {from: from, gas: gas});
   }).then(function (result) {
     alert('delegateToProxy TX was successful: ' + result);
+    return result;
   }).catch(function (error) {
     console.log('error during delegateToProxy TX: ' + error.message);
+    return 'error';
   });
 }
 

@@ -9,27 +9,36 @@
     </head>
     <body>
         <header>
-            <div class="row">
-                <div class="col">
-                    <p id='userAddress'>User: </p>
-                    <p id='userRole'>Role: </p>
-                </div>
-                <div class="col"></div>
-                <div class="col">
-                    <form id="login-form">
-                        <label id="address-label">
-                            Wallet address:
-                            <input type="text" placeholder="0x..." id="wallet-address">
-                        </label>
-                        <!--<label id="password-label">
-                            Enter your password:
-                            <input type="password" id="password">
-                        </label>-->
-                        <input type="button" value="login" id="login-button">
-                        <input type="button" value="logout" id="logout-button">
-                    </form>
-                </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 p-3 mb-2 bg-primary text-white" id="login-content">
+                        
+                        <form id="login-form">
+                            <div class="form-group row" id="login-div">
+                                
+                                <label class="col-0 col-form-label" id="address-label">Wallet address: </label>
+                                <div class="col-4" id="wallet-div">
+                                    <input class="form-control" type="text" placeholder="0x..." id="wallet-address">
+                                </div>
+                                <p id='userAddress'>User: </p>
+                                <p id='userRole'>Role: </p>
+                                <div id="header-buttons">
+                                    <input type="button" class="btn btn-light btn-sm" value="login" id="login-button">
+                                    <input type="button" class="btn btn-light btn-sm" value="logout" id="logout-button">    
+                                </div>
+                                
+                            </div>
+                            
+                            
+                            <!--<label id="password-label">
+                                Enter your password:
+                                <input type="password" id="password">
+                            </label>-->
+                           
+                        </form>
+                    </div>
 
+                </div>
             </div>
 
         </header>
@@ -64,7 +73,7 @@
                 </div>
 
                 <div class="col-xl-9">
-                  <h1 class="col-7">Annual General Meeting 2018</h1>
+                  <h1>Annual General Meeting 2018</h1>
 
                     <main class="row">
                         <!--template content is inserted here-->
@@ -113,8 +122,12 @@
 
 
         <template id="home-template">
+            <!--<article id="announcement" class="col-12">
+                <label>Please insert the place of the AGM: <input type="text" id="place"></label>
+                <label>Please insert the date of the AGM: <input type="datetime" id="date"></label>
+            </article>-->
             <article class="col-xl-12">
-                <p>The 1st Annual General Meeting takes place in the <span id="place"></span> at <span id="date">3pm on 31st of august </span>!</p>
+                <p>The 1st Annual General Meeting takes place in the <span id="place"></span> on <span id="date"></span>!</p>
                 <p>You will receive your the AGM id for participating in a seperate email. If you did not get the email please write an
                     email to our service: serviceAGM@gmail.com
                 </p>
