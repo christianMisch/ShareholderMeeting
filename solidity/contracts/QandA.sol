@@ -9,19 +9,19 @@ contract QandA {
         uint answerId;
         uint questionId;
         address answerCreator;
-        string content;
+        //string content;
         uint timestamp;
-        //string ipfs_hash; 
+        string ipfs_hash; 
     }
 
     struct Question {
         address creator;
         uint questionId;
-        string content;
+        //string content;
         uint timestamp;
         uint upvotes;
         uint downvotes;
-        //string ipfs_hash;
+        string ipfs_hash;
     }
 
     // storing the answers of directors
@@ -43,31 +43,31 @@ contract QandA {
 
         Answer storage answer = answers[answerId];
         return 
-            (answer.answerId, answer.questionId, answer.answerCreator, answer.content, answer.timestamp);
+            (answer.answerId, answer.questionId, answer.answerCreator, answer.ipfs_hash, answer.timestamp);
     }
 
     function getNumOfAnswers() public view returns (uint length) {
         return answers.length;
     }
 
-    function createNewAnswer(uint _questionId, string _content, address sender) public returns(uint answId) {
+    function createNewAnswer(uint _questionId, string _ipfs_hash, address sender) public returns(uint answId) {
 
         answId = answers.length++;
         Answer storage answer = answers[answId];
         answer.answerId = answId;
         answer.questionId = _questionId;
         answer.answerCreator = sender;
-        answer.content = _content;
+        answer.ipfs_hash = _ipfs_hash;
         answer.timestamp = now;
     }
 
-    function createNewQuestion(string _content, address sender) public returns (uint questId) {
+    function createNewQuestion(string _ipfs_hash, address sender) public returns (uint questId) {
 
         questId = questions.length++;
         Question storage question = questions[questId];
         question.questionId = questId;
         question.creator = sender;
-        question.content = _content;
+        question.ipfs_hash = _ipfs_hash;
         question.timestamp = now;
         question.upvotes = 0;
         question.downvotes = 0;
@@ -87,7 +87,7 @@ contract QandA {
     ) {
         Question storage question = questions[questionId];
         return
-            (question.creator, question.questionId, question.content, question.timestamp, question.upvotes, question.downvotes);
+            (question.creator, question.questionId, question.ipfs_hash, question.timestamp, question.upvotes, question.downvotes);
     }
 
     function setRating(uint questionId, uint ratingOpt) public {

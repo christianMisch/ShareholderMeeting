@@ -2,6 +2,8 @@
 //import { announceAGM } from '../../provider/AgmOwnerProvider';
 import web3 from '../../provider/web3Provider';
 import {announceAGM} from '../../provider/AgmOwnerProvider';
+import { upload } from '../../provider/IPFSUploadProvider';
+import { downloadString } from '../../provider/IPFSDownloadProvider';
 import './agmSetup';
 import {getActiveUserAddress} from './authentication';
 import './manageSPA';
@@ -24,6 +26,9 @@ export class App {
         console.log(announcement);
         place = announcement.place;
         date = announcement.date;
+        const hash = await upload('test');
+        console.log(hash);
+        console.log(await downloadString(hash));
     }
 }
 

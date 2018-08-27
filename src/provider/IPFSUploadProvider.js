@@ -1,10 +1,20 @@
-import { Buffer } from 'buffer';
-import getIPFS from './ipfs'
-import promisify from './promisify'
+var Buffer = require('buffer');
+var ipfs = require('./ipfsProvider');
+//import getIPFS from './ipfs'
+//import promisify from './promisify'
 
 exports.upload = async function(data) {
-  const content = Buffer.from(data);
-  const ipfsNode = await getIPFS()
-  const files = await promisify(cb => ipfsNode.files.add({ content }, cb))
-  return files[0].hash
+  //console.log(Buffer.Buffer.from(data));
+  const content = Buffer.Buffer.from(data);
+  const node = await ipfs;
+  //console.log(node);
+  const files = await node.files.add({content: content}); 
+  return files[0].hash;
 }
+
+exports.stop = async function() {
+  const node = await ipfs;
+  //console.log(node);
+  await node.stop();
+}
+

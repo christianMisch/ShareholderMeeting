@@ -52,9 +52,9 @@ contract Shareholder is User, ProposalData {
         emit Voted(userAddress, proposalId, votingOption);
     }
 
-    function createQuestion(string _content) public returns (uint questId) {
+    function createQuestion(string _ipfs_hash) public returns (uint questId) {
 
-        questId = qa.createNewQuestion(_content, msg.sender);
+        questId = qa.createNewQuestion(_ipfs_hash, msg.sender);
 
         emit QuestionCreated(questId, msg.sender);
     }

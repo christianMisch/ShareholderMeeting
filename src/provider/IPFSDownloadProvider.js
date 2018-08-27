@@ -1,9 +1,14 @@
-const getIPFS = require('./ipfs.js');
-const promisify = require('./promisify.js');
+var ipfs = require('./ipfsProvider');
 
 exports.downloadString = async function(hash) {
-  const ipfsNode = await getIPFS()
-  const answers = await promisify(cb => ipfsNode.files.get(hash, cb))
-  return answers[0].content.toString('utf8')
+  const node = await ipfs;
+  const answers = await node.files.cat(hash);
+  return answers.toString();
+}
+
+exports.stop = async function() {
+  const node = await ipfs;
+  //console.log(node);
+  await node.stop();
 }
 
