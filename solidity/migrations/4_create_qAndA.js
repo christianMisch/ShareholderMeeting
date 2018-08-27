@@ -7,9 +7,6 @@ const IPFSDownload = require('../../src/provider/IPFSDownloadProvider.js');
 
 module.exports = async function(deployer, network, accounts) {
 
-    console.log('ipfs-hash: ' + await IPFSUpload.upload('test'));
-
-
     const ShareholderContract = await Shareholder.deployed();
     const DirectorContract = await Director.deployed();
     const f = await Factory.deployed();
@@ -33,8 +30,6 @@ module.exports = async function(deployer, network, accounts) {
     await ShareholderContract.createQuestion.sendTransaction(hash);
     hash = await IPFSUpload.upload('When will the next AGM take place?');
     await ShareholderContract.createQuestion.sendTransaction(hash);
-
-    //console.log('ipfs-content: ' + await IPFSDownload.downloadString(hash));
     
     hash = await IPFSUpload.upload('The company will focus on development and research.');
     await DirectorContract.createAnswer.sendTransaction(0, hash);
@@ -51,7 +46,10 @@ module.exports = async function(deployer, network, accounts) {
     hash = await IPFSUpload.upload('at least one share.');
     await DirectorContract.createAnswer.sendTransaction(2, hash);
     hash = await IPFSUpload.upload('If you are a director then you do not need shares to participate.');
+    console.log(hash);
     await DirectorContract.createAnswer.sendTransaction(2, hash);
+
+    console.log('ipfs-content: ' + await IPFSDownload.downloadString(hash));
     
     await sh1.rateQuestion.sendTransaction(0, 1);
     await sh1.rateQuestion.sendTransaction(4, 1);

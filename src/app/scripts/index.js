@@ -26,9 +26,9 @@ export class App {
         console.log(announcement);
         place = announcement.place;
         date = announcement.date;
-        const hash = await upload('test');
-        console.log(hash);
-        console.log(await downloadString(hash));
+        /*const hash = await upload('test');
+        console.log(hash);*/
+        console.log(await downloadString('QmZEHxrGj7UsDsTPbz9f3L2Nb7ttoydTiuUFwqNgam89VM'));
     }
 }
 
