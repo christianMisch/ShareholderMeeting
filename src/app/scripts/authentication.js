@@ -5,17 +5,6 @@ import {getDate, getPlace} from './index';
 //console.log('web3 accounts: ');
 //console.log(web3Provider.eth.accounts);
 
-/*var authorizedUsers = {
-    '0x011Fc7b12E5EEd718680db16a125378a25ac4b2F': {role: 'AgmOwner', loggedIn: false},
-    '0xd02Dc75c5D17021a71060DeE44b12958fBa069FB': {role: 'AgmOwner', loggedIn: false},
-    '0': {role: 'Shareholder', loggedIn: false, shares: 20},
-    '0x628FBd5a122103e8171BbB2dC70C265f9F775466': {role: 'Shareholder', loggedIn: false, shares: 30},
-    '0xc179a95Ac86AAbf6baF4D97BA161152fE0cc0655': {role: 'Shareholder', loggedIn: false, shares: 45},
-    '0xB78E4A88e140b9ceeC48D569d6ae0ED4F419eFb1': {role: 'Shareholder', loggedIn: false, shares: 12},
-    '0x5E3407E44756371B4D3De80Eb4378b715c444619': {role: 'Shareholder', loggedIn: false, shares: 34},
-    '0x88D7d45b3eBD3Fd8b202D8BF1Ec8e2CC2006692D': {role: 'Director', loggedIn: false}
-};*/
-
 var inputAdr;
 
 $(document).ready(async function() {
@@ -49,7 +38,7 @@ $(document).ready(async function() {
         inputAdr = $('#wallet-address').val().toLowerCase();
         const user = mapUser(await getUser(inputAdr));
         console.log('activeUser: ');
-        console.log(user); 
+        console.log(user);
         if (user && user.role === 0) {
                 createAlert('You have successfully logged in as AgmOwner!');
                 $('nav').show();
@@ -67,7 +56,7 @@ $(document).ready(async function() {
                     $('main #place').html(getPlace());
                     $('main #date').html(getDate());
                 }, 100);
-                
+
                 console.log(inputAdr);
                 console.log('loggedIn as Owner');
 
@@ -172,7 +161,7 @@ function hideLoginFields() {
     $('#wallet-div').hide();
     $('#wallet-address').hide();
     $('#address-label').hide();
-   
+
 }
 
 function showLoginFields() {
@@ -198,10 +187,6 @@ function showWelcomePage() {
     welcomeLink.dispatchEvent(event);
 }
 
-/*export function getActiveUserState() {
-    return authorizedUsers[inputAdr] || {loggedIn: false};
-}*/
-
 export function getActiveUserAddress() {
     return inputAdr.toLowerCase();
 }
@@ -213,18 +198,6 @@ export function removeSecondAlert() {
             wrapper.removeChild(wrapper.lastChild);
         }
 }
-
-/*export function getAuthorizedUsers() {
-  return authorizedUsers;
-}*/
-
-/*export function setUserShares(key, shares) {
-  authorizedUsers[key].shares = shares;
-}*/
-
-/*export function setAuthorizedUsers(adr, val) {
-    authorizedUsers[adr] = val;
-}*/
 
 export function mapUser(userArr) {
     return {
@@ -244,4 +217,3 @@ async function isAuthenticated(address) {
     }
     return false;
 }
-

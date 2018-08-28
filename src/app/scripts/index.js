@@ -1,5 +1,4 @@
 //import {createQuestion, test} from '../provider/ShareholderProvider';
-//import { announceAGM } from '../../provider/AgmOwnerProvider';
 import web3 from '../../provider/web3Provider';
 import {announceAGM} from '../../provider/AgmOwnerProvider';
 import { upload } from '../../provider/IPFSUploadProvider';
@@ -22,13 +21,13 @@ export class App {
 
     async start() {
         console.log(`Start the app with networkId=${this.network} and default account =${this.account}`);
+        //console.log(await announceAGM());
         var announcement = mappAnnouncement(await announceAGM());
         console.log(announcement);
         place = announcement.place;
         date = announcement.date;
-        /*const hash = await upload('test');
-        console.log(hash);*/
-        console.log(await downloadString('QmZEHxrGj7UsDsTPbz9f3L2Nb7ttoydTiuUFwqNgam89VM'));
+
+        //console.log(await downloadString('QmZEHxrGj7UsDsTPbz9f3L2Nb7ttoydTiuUFwqNgam89VM'));
     }
 }
 

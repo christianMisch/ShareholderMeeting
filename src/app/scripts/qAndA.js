@@ -2,6 +2,8 @@ import {getActiveUserAddress, getActiveUserState, createAlert, mapUser} from './
 import {createQuestion, createAnswer, getNumOfAnswers, getNumOfQuestions, getAnswer, getQuestion} from '../../provider/QandAProvider';
 import {rateQuestion} from '../../provider/ShareholderProvider';
 import {getUser} from '../../provider/AgmOwnerProvider';
+import {downloadString} from '../../provider/IPFSDownloadProvider';
+import {upload} from '../../provider/IPFSUploadProvider';
 
 var numOfQuest = 0;
 var numOfAnsw= 0;
@@ -10,13 +12,13 @@ var totalUpDownVoteCount = 0;
 $(function() {
 
     /*$('a[href="#Q&A"]').click(function() {
-        
-        
+
+
     });*/
 
     $('a[href="#list"]').click(async function() {
-        
-        
+
+
         const activeUser = mapUser(await getUser(getActiveUserAddress().toLowerCase()));
         console.log(activeUser);
         console.log($('main textarea[id="qa-placeholder"]'));
@@ -43,33 +45,34 @@ $(function() {
             e.preventDefault();
             const activeUser = mapUser(await getUser(getActiveUserAddress().toLowerCase()));
             const textareaContent = $('main textarea[id="qa-placeholder"]').val();
+            var qaHash = await IPFSUpload.upload(textareaContent);
             const questId = $('main input[id="question-id"]').val();
             const activeUserAdr = getActiveUserAddress();
             console.log(activeUserAdr);
             console.log(textareaContent);
             if (activeUser.role === 2) {
-                createQuestion(textareaContent, activeUserAdr);
+                createQuestion(qaHash, activeUserAdr);
                 getNumOfQuestions();
             } else if (activeUser.role === 1) {
-                createAnswer(questId, textareaContent, activeUserAdr);
+                createAnswer(questId, qaHash, activeUserAdr);
                 getNumOfAnswers();
             }
         });
-        
+
         numOfAnsw = 0;
         numOfQuest = 0;
         setTimeout(function() {
             $('main form[id="select-question-form"]').hide();
         }, 500);
         setInterval(async function() {
-           
+
             const questNum = await getNumOfQuestions();
             const answNum = await getNumOfAnswers();
             var currUpDownVoteCount = 0;
             $('main #num-of-quest').html(`Number of questions: ${questNum}`);
             $('main #num-of-answ').html(`Number of answers: ${answNum}`);
             // rating also not changing because if it changes then it should load again
-            
+
             var visitedArr = [];
             var priorityMetric = 0;
             for (var k = 0; k < questNum.toNumber(); k++) {
@@ -85,26 +88,26 @@ $(function() {
             }
             //console.log('globalSum: ' + typeof(totalUpDownVoteCount));
             //console.log('currSum: ' + typeof(currUpDownVoteCount));
-            
-            if (numOfQuest === questNum.toNumber() 
+
+            if (numOfQuest === questNum.toNumber()
                 && numOfAnsw === answNum.toNumber()
                 && totalUpDownVoteCount === currUpDownVoteCount) {
                 console.log('no change');
                 return;
-                
+
             }
 
             totalUpDownVoteCount = currUpDownVoteCount;
             numOfQuest = questNum.toNumber();
             numOfAnsw = answNum.toNumber();
             clearQandAList();
-            
+
             var questCount = 1;
             var allVisited = false;
-            
+
             //console.log(visitedArr);
-            
-            for (;!allVisited; 
+
+            for (;!allVisited;
                 allVisited = visitedArr.filter(q => q.visited === true).length === questNum.toNumber()
             ) {
                 //priorityMetric = 0;
@@ -112,22 +115,22 @@ $(function() {
                 console.log(visitedArr.filter(q => q.visited === true).length);
                 console.log(allVisited);
                 console.log(visitedArr);*/
-                
+
                 for (var i = 0; i < questNum; i++) {
-                    
+
                     var currQuestArr = await getQuestion(i);
                     //console.log(currQuestArr);
                     var mappQuest = mapQuestion(currQuestArr);
                     var questPriority = mappQuest.upvotes - mappQuest.downvotes;
                     console.log(mappQuest.questionId, questPriority);
                     //console.log(mappQuest.questionId + ': ' + questPriority);
-    
-                    if (questPriority >= priorityMetric 
+
+                    if (questPriority >= priorityMetric
                         && (visitedArr[i].visited === false) ) {
                         //console.log('inner if');
                         //priorityMetric = questPriority;
                         visitedArr[i].visited = true;
-                        
+
                         var date = new Date();
                         var dd = date.getDate();
                         var mm = date.getMonth()+1; //January is 0!
@@ -135,26 +138,27 @@ $(function() {
 
                         if(dd<10) {
                             dd = '0'+dd
-                        } 
+                        }
 
                         if(mm<10) {
                             mm = '0'+mm
-                        } 
+                        }
 
                         date = mm + '.' + dd + '.' + yyyy;
+                        var questContent = await downloadString(mappQuest.ipfs_hash);
                         var qaWrapper = $(
                             // question-i is the real question id
                             `<div>
                                     <a href="#question-${i + 1}" class="list-group-item list-group-item-action flex-column align-items-start list-group-item-danger">
                                         <small class="left-small">user: ${mappQuest.creator}</small>
                                         <small class="right-small">date: ${date} </small>
-                                        <div id="${i + 1}" class="clear-fix"> Question ${questCount++}: ${mappQuest.content} </div>
+                                        <div id="${i + 1}" class="clear-fix"> Question ${questCount++}: ${questContent} </div>
                                         <small class="left-small">upvotes: ${mappQuest.upvotes}</small>
                                         <small class="right-small">downvotes: ${mappQuest.downvotes}</small>
                                     </a>
                             </div>`
                         );
-        
+
                         //console.log(qaWrapper.html());
                         $('main #quest-answ-list').append(qaWrapper.html());
                         var divWrapper = $('<div></div>');
@@ -165,26 +169,27 @@ $(function() {
                             var currAnswArr = await getAnswer(j);
                             //console.log(currAnswArr);
                             var mappAnsw = mapAnswer(currAnswArr);
+                            var answerContent = await downloadString(mappAnsw.ipfs_hash)
                             if (mappAnsw.questionId === i) {
-                                ansWrapper.append(`<li class="list-group-item list-group-item-action flex-column align-items-start list-group-item-success">Answer ${count + 1}: ${mappAnsw.content}</li>`);
+                                ansWrapper.append(`<li class="list-group-item list-group-item-action flex-column align-items-start list-group-item-success">Answer ${count + 1}: ${answerContent}</li>`);
                                 count++;
                             }
                         }
                         divWrapper.append(ansWrapper);
                         //console.log(divWrapper.html());
                         $(`main div[id="${i + 1}"]`).append(divWrapper.html());
-                    
-                        
+
+
                     }
-                    
-                    
+
+
                 }
                 priorityMetric--;
             }
             visitedArr = [];
             console.log('escaped for loop');
-            console.log($('main small.left-small'));
-            console.log($('main small.right-small'));
+            //console.log($('main small.left-small'));
+            //console.log($('main small.right-small'));
             $('main small').css('display', 'block');
             $('main small.left-small').css('float', 'left');
             $('main small.right-small').css('float', 'right');
@@ -214,7 +219,7 @@ $(function() {
             </a>
         </div>
         */
-    
+
     });
 
     $('main').on('click', 'a[href^="#question-"]', async function(e) {
@@ -227,11 +232,12 @@ $(function() {
             console.log(questContent, questId);
             $('main div[id="question-content"]').html(questContent);
 
-            $('main').on('click', 'button[id="submit-question-button"]', function() {
+            $('main').on('click', 'button[id="submit-question-button"]', async function() {
                 //alert('hey');
                 // console.log($('main textarea[id="answer-content"]').val());
                 const answContent = $('main textarea[id="answer-content"]').val();
-                createAnswer(questId-1, answContent, getActiveUserAddress());
+                var answHash = await IPFSUpload.upload(answContent)
+                createAnswer(questId-1, answHash, getActiveUserAddress());
             });
             return;
         }
@@ -241,10 +247,10 @@ $(function() {
         var questId = e.currentTarget.getAttribute('href').substring(10);
         var from = getActiveUserAddress();
         //console.log(e.currentTarget.getAttribute('href').substring(10));
-        
+
         $('#selected-question').append($(`main div[id="${questId}"]`).clone());
         //$(`main div[id="${questId}"]`).clone().appendTo('#selected-question');
-    
+
         $('main div').on('click', 'input[id="upvote-button"]', async function() {
             var txId = await rateQuestion(questId-1 , 1, from);
             $('#selected-question ol:last').remove();
@@ -253,7 +259,7 @@ $(function() {
                 //console.log(await getQuestion(questId-1));
             }
         });
-    
+
         $('main').on('click', 'input[id="downvote-button"]', async function() {
             var txId = await rateQuestion(questId-1, 0, from);
             $('#selected-question ol:last').remove();
@@ -268,7 +274,7 @@ function mapQuestion(questArr) {
     return {
         creator: questArr[0],
         questionId: questArr[1].toNumber(),
-        content: questArr[2],
+        ipfs_hash: questArr[2],
         timestamp: questArr[3].toNumber(),
         upvotes: questArr[4].toNumber(),
         downvotes: questArr[5].toNumber()
@@ -280,7 +286,7 @@ function mapAnswer(answArr) {
         answerId: answArr[0].toNumber(),
         questionId: answArr[1].toNumber(),
         answerCreator: answArr[2],
-        content: answArr[3],
+        ipfs_hash: answArr[3],
         timestamp: answArr[4].toNumber()
     }
 }
@@ -338,17 +344,17 @@ for (;!allVisited; allVisited = visitedArr.filter(q => q.visited === true).lengt
                 console.log(visitedArr.filter(q => q.visited === true).length);
                 console.log(allVisited);
                 console.log(visitedArr);
-                
+
                 for (var i = 0; i < questNum; i++) {
-                    
+
                     var currQuestArr = await getQuestion(i);
                     //console.log(currQuestArr);
                     var mappQuest = mapQuestion(currQuestArr);
                     var questPriority = mappQuest.upvotes - mappQuest.downvotes;
                     console.log(mappQuest.questionId, questPriority);
                     //console.log(mappQuest.questionId + ': ' + questPriority);
-    
-                    if (questPriority >= priorityMetric 
+
+                    if (questPriority >= priorityMetric
                         && !(visitedArr.map(q => q.questId).includes(mappQuest.questionId)) ) {
                         //console.log('inner if');
                         priorityMetric = questPriority;
@@ -360,7 +366,7 @@ for (;!allVisited; allVisited = visitedArr.filter(q => q.visited === true).lengt
                                     </a>
                             </div>`
                         );
-        
+
                         //console.log(qaWrapper.html());
                         $('main #quest-answ-list').append(qaWrapper.html());
                         var divWrapper = $('<div></div>');
@@ -380,8 +386,8 @@ for (;!allVisited; allVisited = visitedArr.filter(q => q.visited === true).lengt
                         //console.log(divWrapper.html());
                         $(`main div[id="${i + 1}"]`).append(divWrapper.html());
                     }
-                    
-                    
+
+
                 }
             }
             visitedArr = [];

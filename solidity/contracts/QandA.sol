@@ -11,17 +11,17 @@ contract QandA {
         address answerCreator;
         //string content;
         uint timestamp;
-        string ipfs_hash; 
+        string ipfs_hash;
     }
 
     struct Question {
         address creator;
         uint questionId;
-        //string content;
+        string ipfs_hash;
         uint timestamp;
         uint upvotes;
         uint downvotes;
-        string ipfs_hash;
+        //string content;
     }
 
     // storing the answers of directors
@@ -37,12 +37,12 @@ contract QandA {
         uint _answerId,
         uint _questionId,
         address _answerCreator,
-        string _content,
+        string _ipfs_hash,
         uint _timestamp
     ) {
 
         Answer storage answer = answers[answerId];
-        return 
+        return
             (answer.answerId, answer.questionId, answer.answerCreator, answer.ipfs_hash, answer.timestamp);
     }
 
@@ -80,7 +80,7 @@ contract QandA {
     function getQuestion(uint questionId) public view returns (
         address _creator,
         uint _questionId,
-        string _content,
+        string _ipfs_hash,
         uint _timestamp,
         uint _upvotes,
         uint _downvotes

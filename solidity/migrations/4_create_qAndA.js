@@ -17,7 +17,7 @@ module.exports = async function(deployer, network, accounts) {
     const sh1 = await Shareholder.new(lowCaseAcc[2], 13, f.address, qa.address);
     const sh2 = await Shareholder.new(lowCaseAcc[3], 16, f.address, qa.address);
     const sh3 = await Shareholder.new(lowCaseAcc[4], 43, f.address, qa.address);
-    
+
     hash = await IPFSUpload.upload('On which financial sector will the company focus in the next year?');
     await ShareholderContract.createQuestion.sendTransaction(hash);
     hash = await IPFSUpload.upload('What is the financial statement from the last year?');
@@ -30,7 +30,7 @@ module.exports = async function(deployer, network, accounts) {
     await ShareholderContract.createQuestion.sendTransaction(hash);
     hash = await IPFSUpload.upload('When will the next AGM take place?');
     await ShareholderContract.createQuestion.sendTransaction(hash);
-    
+
     hash = await IPFSUpload.upload('The company will focus on development and research.');
     await DirectorContract.createAnswer.sendTransaction(0, hash);
     hash = await IPFSUpload.upload('You can check the financial statement in the annual report for the last year.');
@@ -50,7 +50,7 @@ module.exports = async function(deployer, network, accounts) {
     await DirectorContract.createAnswer.sendTransaction(2, hash);
 
     console.log('ipfs-content: ' + await IPFSDownload.downloadString(hash));
-    
+
     await sh1.rateQuestion.sendTransaction(0, 1);
     await sh1.rateQuestion.sendTransaction(4, 1);
     await sh1.rateQuestion.sendTransaction(2, 0);
@@ -63,5 +63,5 @@ module.exports = async function(deployer, network, accounts) {
     await sh1.rateQuestion.sendTransaction(5, 1);
     await sh2.rateQuestion.sendTransaction(5, 1);
 
-    await IPFSUpload.stop();
+    //IPFSUpload.stop((err) => {if (err) {throw(err)}});
 }

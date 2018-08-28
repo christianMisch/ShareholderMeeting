@@ -1,4 +1,5 @@
 var ipfs = require('./ipfsProvider');
+const http = require('http');
 
 exports.downloadString = async function(hash) {
   const node = await ipfs;
@@ -11,4 +12,3 @@ exports.stop = async function() {
   //console.log(node);
   await node.stop();
 }
-

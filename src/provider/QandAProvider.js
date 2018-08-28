@@ -15,26 +15,26 @@ QandAContract.setProvider(web3.currentProvider);
 
 const gas = /*'220000'*/ '3000000';
 
-export function createQuestion(content, from) {
+export function createQuestion(ipfs_hash, from) {
     ShareholderContract.deployed().then(function(instance) {
-        return instance.createQuestion.sendTransaction(content, {from: from, gas: gas});
+        return instance.createQuestion.sendTransaction(ipfs_hash, {from: from, gas: gas});
     }).then(function(txId) {
         alert('createQuestion TX was successful: ' + txId);
     }).catch(function(error) {
-        console.log('error during createQuestion TX: ' + error); 
+        console.log('error during createQuestion TX: ' + error);
     });
-     
+
 }
 
-export function createAnswer(questionId, content, from) {
+export function createAnswer(questionId, ipfs_hash, from) {
     DirectorContract.deployed().then(function(instance) {
-        return instance.createAnswer.sendTransaction(questionId, content, {from: from, gas: gas});
+        return instance.createAnswer.sendTransaction(questionId, ipfs_hash, {from: from, gas: gas});
     }).then(function(txId) {
         alert('createAnswer TX was successful: ' + txId);
     }).catch(function(error) {
-        console.log('error during createAnswer TX: ' + error); 
+        console.log('error during createAnswer TX: ' + error);
     });
-} 
+}
 
 export function getNumOfAnswers() {
     return QandAContract.deployed().then(function(instance) {
@@ -43,7 +43,7 @@ export function getNumOfAnswers() {
         //alert('getNumOfAnswers call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log('error during getNumOfAnswers call: ' + error); 
+        console.log('error during getNumOfAnswers call: ' + error);
     });
 }
 
@@ -54,7 +54,7 @@ export function getNumOfQuestions() {
         //alert('getNumOfAnswers call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log('error during getNumOfAnswers call: ' + error); 
+        console.log('error during getNumOfAnswers call: ' + error);
     });
 }
 
@@ -65,7 +65,7 @@ export function getQuestion(questionId) {
         //alert('getQuestion call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log('error during getQuestion call: ' + error); 
+        console.log('error during getQuestion call: ' + error);
     });
 }
 
@@ -76,7 +76,6 @@ export function getAnswer(answId) {
         //alert('getAnswer call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log('error during getAnswer call: ' + error); 
+        console.log('error during getAnswer call: ' + error);
     });
 }
-
