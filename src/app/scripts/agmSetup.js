@@ -1,6 +1,6 @@
 import {createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission} from '../../provider/AgmOwnerProvider';
-import {getActiveUserAddress, setAuthorizedUsers, createAlert, getAuthorizedUsers} from './authentication';
-import {web3} from './index';
+import {getActiveUserAddress, createAlert} from './authentication';
+//import {web3} from './index';
 
 //const owner = web3Provider.eth.accounts[0];
 //console.log('owner address: ' + owner);
@@ -11,6 +11,7 @@ $(document).ready(function() {
 
         $('main').on('click', 'input[id="proposal-creator-button"]', async function() {
             const activeUserAddress = getActiveUserAddress();
+            console.log('activeUserAddress: ' + activeUserAddress);
             //console.log('ownerAddress: ' + ownerAddress);
             //console.log('activeUserAdr: ' + activeUserAddress);
             //console.log('owner: ' + owner.toUpperCase());
@@ -42,8 +43,8 @@ $(document).ready(function() {
             getNumOfUsers();
             const mapRole = role === 0 ? 'AgmOwner': (role === 1 ? 'Director': 'Shareholder');
             //console.log('mapRole: ' + mapRole);  
-            setAuthorizedUsers(newUserAddress, {role: mapRole, loggedIn: false, shares: parseInt(numOfShares)});
-            console.log(getAuthorizedUsers());
+            //setAuthorizedUsers(newUserAddress, {role: mapRole, loggedIn: false, shares: parseInt(numOfShares)});
+            //console.log(getAuthorizedUsers());
 
         });
 

@@ -99,7 +99,7 @@ export function vote(propId, votOpt, from) {
     Shareholder = deplShareh;
     return Shareholder.vote.sendTransaction(propId, votOpt, {from: from, gas: gas});
   }).then(function (result) {
-    alert('vote TX was successful: ' + result);
+    console.log('vote TX was successful: ' + result);
   }).catch(function (error) {
     console.log('error during vote TX: ' + error.message);
   });

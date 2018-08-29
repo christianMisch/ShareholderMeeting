@@ -33,8 +33,8 @@ $(document).ready(async function() {
     $('#login-button').click(async function(e) {
         e.preventDefault();
 
-        const alertWrapper = $('<div id="wrapper"></div>');
-        $('footer').append(alertWrapper);
+        //const alertWrapper = $('<div id="wrapper"></div>');
+        //$('footer').append(alertWrapper);
         inputAdr = $('#wallet-address').val().toLowerCase();
         const user = mapUser(await getUser(inputAdr));
         console.log('activeUser: ');
@@ -102,17 +102,16 @@ $(document).ready(async function() {
                 console.log('loggedIn as Director');
 
         } else {
-            $('#wrapper').append(`<div role="alert">Login failed!</div>`)
+            $('footer').append(`<div role="alert">Login failed!</div>`)
                 .addClass('alert alert-danger');
         }
         //console.log($('#wrapper div').length);
         //removeSecondAlert();
         //console.log($('#wrapper'));
 
-        //console.log(authorizedUsers);
-        setTimeout(function () {
+        /*setTimeout(function () {
             $('.alert').alert('close');
-        }, 3000);
+        }, 3000);*/
     });
 
     $('#logout-button').click(function() {
@@ -122,27 +121,21 @@ $(document).ready(async function() {
         showWelcomePage();
         hideUserCredentials();
         showLoginFields();
-        //authorizedUsers[inputAdr].loggedIn = false;
-        //console.log(authorizedUsers);
 
     });
 
 });
 
 export function createAlert(message, alertType = 'success') {
-    $('#wrapper').append(`<div role="alert">${message}</div>`)
+    //console.log('wrapper: ' + $('#wrapper').length);
+    $('footer').append(`<div role="alert">${message}</div>`)
         .addClass(`alert alert-${alertType}`);
+    console.log(document.body);
     setTimeout(function () {
-        $('.alert').alert('close');
+        $('footer').empty();
+        $('footer').removeAttr('class');
+        //$('.alert').alert('close');
     }, 3000);
-    /*if (alertType === 'danger') {
-        const aLinks = $('a');
-        for (var i = 0; i < aLinks.length; i++) {
-            if (aLinks[i].attr('class')) {
-                $('a')[i].attr('class', '');
-            }
-        }
-    }*/
     //$('a[href="#home"]').trigger('click');
 }
 
@@ -191,13 +184,13 @@ export function getActiveUserAddress() {
     return inputAdr.toLowerCase();
 }
 
-export function removeSecondAlert() {
+/*export function removeSecondAlert() {
     var numOfAlerts = $('#wrapper div').length;
         if (numOfAlerts > 1) {
             const wrapper = document.querySelector('#wrapper');
             wrapper.removeChild(wrapper.lastChild);
         }
-}
+}*/
 
 export function mapUser(userArr) {
     return {

@@ -21,7 +21,6 @@ export class App {
 
     async start() {
         console.log(`Start the app with networkId=${this.network} and default account =${this.account}`);
-        //console.log(await announceAGM());
         var announcement = mappAnnouncement(await announceAGM());
         console.log(announcement);
         place = announcement.place;

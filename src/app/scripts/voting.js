@@ -1,7 +1,7 @@
 import {getProposal, getNumOfProposals} from '../../provider/ProposalProvider';
 import {denominateVotingTokens, delegateToProxy, getVotingDenominations} from '../../provider/ShareholderProvider';
 import {getShareholder, getNumOfShareholders, vote} from '../../provider/ShareholderProvider';
-import {setUserShares, getActiveUserAddress} from './authentication';
+import {setUserShares, getActiveUserAddress, createAlert} from './authentication';
 
 var numOfProp = 0;
 
@@ -9,6 +9,11 @@ $(document).ready(async function() {
     
   
   //console.log(getAuthorizedUsers());
+    $('main').on('click', 'input[id ^= "deleg-butt-"]', function() {
+        console.log($(this)[0].id);
+        var delegButt = $(this)[0].id;
+        delegateToProxy(, true, delegButt.substring(11));
+    });
 
     $('a[href="#voting"]').click(async function() {
     
@@ -81,6 +86,12 @@ $(document).ready(async function() {
             const activeUserAdr = getActiveUserAddress();
             console.log($('main input[type="radio"]:checked'));
             var selectedOptions = $('main input[type="radio"]:checked');
+            console.log('length: ' + selectedOptions.length);
+            if (selectedOptions.length === 0) {
+                createAlert('You did not choose any option.', 'danger');
+                console.log('no options selected')
+                return;
+            }
             
             for (var l = 0; l < selectedOptions.length; l++) {
                 /*console.log(selectedOptions[l]);
@@ -97,17 +108,24 @@ $(document).ready(async function() {
             const txId = await denominateVotingTokens(numOfBlocks, factor, getActiveUserAddress());
             console.log(txId);
             if (!(txId.charAt(1) === 'x')) {
+                createAlert('You do not own enough shares!', 'danger');
                 return;
             }
             var shareholder = mapShareholder(await getShareholder(getActiveUserAddress()));
             $('#shares').html(shareholder.shares);
             const denomList = $('<ol class="list-group"></ol>');
             for (var i = 1; i <= numOfBlocks; i++) {
-                denomList.append($(`<li class="list-group-item list-group-item-primary" id="${i}">${i}. share block:  ${factor}</li>`));
+                denomList.append($(
+                    `<li class="list-group-item list-group-item-primary" id="${i}">
+                        ${i}. share block:  ${factor}
+                        <input type="text" id=""
+                        <input type="button" value="delegate" id="deleg-butt-${i}"></input>
+                    </li>`
+                ));
             }
             /*
               <ol>
-                <li id="first">1. shareblock:  5</li>
+                <li id="first">1. shareblock:  5 <input id="deleg-butt-first"></input></li>
                 <li id="second">2. shareblock:  5</li>
                 <li>3. shareblock:  5</li>
               <ol>

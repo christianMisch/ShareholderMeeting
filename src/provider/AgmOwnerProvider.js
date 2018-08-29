@@ -97,9 +97,10 @@ export function announceAGM() {
 }
 
 export function addUser(address, role, votingWeight, sender) {
+    console.log('addUser sender: ' + sender);
     QandAContract.deployed().then(function(depQandA) {
         QandA = depQandA;
-        console.log(QandA.address);
+        //console.log(QandA.address);
         return AgmOwnerContract.deployed();
     }).then(function(depAgmOwner) {
         AgmOwner = depAgmOwner;
@@ -156,13 +157,13 @@ export function finishAGM() {
     });
 }
 
-export function createProposal(name, description, options, sender) {   
+export function createProposal(name, description, options, from) {   
     AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
         AgmOwner.userAddress.call().then(function(result) {
             console.log('userAddress: ' + result); 
         });
-        return AgmOwner.createProposal.sendTransaction(name, description, options, {from: sender, gas: gas});
+        return AgmOwner.createProposal.sendTransaction(name, description, options, {from: from, gas: gas});
     }).then(function(result) {
         alert('createProposal TX was successful: ' + result);
     }).catch(function(error) {
