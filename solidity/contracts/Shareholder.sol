@@ -110,7 +110,7 @@ contract Shareholder is User, ProposalData {
 
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
     function delegateToProxy(address proxyAddress, bool partialDelegation, uint voteBlockIndex) public {
-        require(fac.votingWeights(msg.sender) > 0, "Sender does not own enough voting tokens");
+        require(fac.votingWeights(msg.sender) >= 0, "Sender does not own enough voting tokens");
         //require(proxyAddress != msg.sender, "Self-delegation is not allowed");
         //require(userExists(proxyAddress), "Proxy is not a registered user");
         //require(userExists(msg.sender), "the user account is not registered");

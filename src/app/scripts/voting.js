@@ -3,16 +3,27 @@ import {denominateVotingTokens, delegateToProxy, getVotingDenominations} from '.
 import {getShareholder, getNumOfShareholders, vote} from '../../provider/ShareholderProvider';
 import {setUserShares, getActiveUserAddress, createAlert} from './authentication';
 
-var numOfProp = 0;
 
+var votingInterval;
+// logout and login proposals not shown
 $(document).ready(async function() {
     
-  
+  var numOfProp = 0;
   //console.log(getAuthorizedUsers());
-    $('main').on('click', 'input[id ^= "deleg-butt-"]', function() {
-        console.log($(this)[0].id);
+    $('main').on('click', 'input[id ^= "deleg-butt-"]', async function() {
+        var inpButt = $(this);
+        console.log(inpButt[0].parentElement.innerText.substring(16,17));
         var delegButt = $(this)[0].id;
-        delegateToProxy(, true, delegButt.substring(11));
+        var blockIndex = parseInt(delegButt.substring(11));
+        console.log(typeof(blockIndex));
+        console.log('blockIndex: ' + blockIndex);
+        var delegAddr = $(`main input[id="deleg-addr-${blockIndex}"]`).val();
+        console.log('delegAddr: ' + delegAddr);
+        var txId = await delegateToProxy(delegAddr, true, blockIndex, getActiveUserAddress());
+        if (txId.charAt(1) === 'x') {
+            $(`main li[id="${blockIndex}"]`).remove();
+            createAlert(`You succesfully delegated ${inpButt[0].parentElement.innerText.substring(16,17).toString()} shares to the proxy address: ${delegAddr}`);
+        }
     });
 
     $('a[href="#voting"]').click(async function() {
@@ -26,7 +37,7 @@ $(document).ready(async function() {
         $('main #refresh-proposal').css('visibility', 'hidden');
         $('main strong[id="shares"]').html(user.shares);
 
-        setInterval(async function() {
+        votingInterval = setInterval(async function() {
             var proposalCount = parseInt(await getNumOfProposals());
     
             if (numOfProp == proposalCount) {
@@ -44,7 +55,7 @@ $(document).ready(async function() {
             console.log('numOfProp: ' + numOfProp);
           }, 1000);
 
-      }, 100);
+      }, 1000);
 
 
         $('main').on('click', 'input[id="refresh-proposal"]', async function() {
@@ -106,7 +117,7 @@ $(document).ready(async function() {
             const factor = parseInt($('#factor').val());
             console.log('typeof factor: ' + typeof(factor));
             const txId = await denominateVotingTokens(numOfBlocks, factor, getActiveUserAddress());
-            console.log(txId);
+            //console.log(txId);
             if (!(txId.charAt(1) === 'x')) {
                 createAlert('You do not own enough shares!', 'danger');
                 return;
@@ -118,8 +129,8 @@ $(document).ready(async function() {
                 denomList.append($(
                     `<li class="list-group-item list-group-item-primary" id="${i}">
                         ${i}. share block:  ${factor}
-                        <input type="text" id=""
-                        <input type="button" value="delegate" id="deleg-butt-${i}"></input>
+                        <label>Proxy address:<input type="text" id="deleg-addr-${i}"></label>
+                        <input type="button" value="delegate" id="deleg-butt-${i}">
                     </li>`
                 ));
             }
@@ -134,14 +145,20 @@ $(document).ready(async function() {
         });
 
         $('main').on('click', 'input[id="delegate-button"]', async function() {
-            const delegStyle = $('#delegation-style').val();
-            console.log(typeof(delegStyle));
+            //const delegStyle = $('#delegation-style').val();
+            //console.log(typeof(delegStyle));
             const proxyAdr = $('#proxy-address').val();
-            const blockIndex = parseInt($('#block-index').val());
-            const txId = await delegateToProxy(proxyAdr, delegStyle, blockIndex, getActiveUserAddress());
+            var shareholder = mapShareholder(await getShareholder(getActiveUserAddress()));
+            var currShares = shareholder.shares;
+            //const blockIndex = parseInt($('#block-index').val());
+            const txId = await delegateToProxy(proxyAdr, false, 0, getActiveUserAddress());
             if (txId.charAt(1) === 'x') {
-                $(`main li[id="${blockIndex}"]`).remove();
+                shareholder = mapShareholder(await getShareholder(getActiveUserAddress()));
+                $('#shares').html(shareholder.shares);
+                //$(`main li[id="${blockIndex}"]`).remove();
+                createAlert(`You succesfully delegated all your shares: ${currShares} to the proxy: ${proxyAdr}`)
             }
+
             
             //console.log(getActiveUserAddress());
             //console.log(typeof(getActiveUserAddress()));
@@ -176,6 +193,10 @@ function mapShareholder(shArr) {
         role: shArr[1].toNumber(),
         shares: shArr[2].toNumber()
     }
+}
+
+export function getVotingInterval() {
+    return votingInterval;
 }
 
 /*

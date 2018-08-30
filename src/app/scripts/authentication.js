@@ -1,5 +1,7 @@
 import { getUserList, getNumOfUsers, getUser } from "../../provider/AgmOwnerProvider";
 import {getDate, getPlace} from './index';
+import {getQAInterval} from './qAndA';
+import {getVotingInterval} from './voting';
 
 //import web3Provider from '../../provider/web3Provider';
 //console.log('web3 accounts: ');
@@ -121,6 +123,8 @@ $(document).ready(async function() {
         showWelcomePage();
         hideUserCredentials();
         showLoginFields();
+        clearInterval(getQAInterval());
+        clearInterval(getVotingInterval());
 
     });
 

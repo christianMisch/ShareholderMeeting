@@ -22,7 +22,7 @@ export function denominateVotingTokens(numOfBlocks, factor, from) {
     return result;
   }).catch(function (error) {
     return 'error';
-    console.log('error during denominateVotingTokens TX: ' + error.message);
+    //console.log('error during denominateVotingTokens TX: ' + error.message);
   });
 }
 

@@ -8,6 +8,7 @@ import {upload} from '../../provider/IPFSUploadProvider';
 var numOfQuest = 0;
 var numOfAnsw= 0;
 var totalUpDownVoteCount = 0;
+var qaInterval;
 
 $(function() {
 
@@ -45,7 +46,7 @@ $(function() {
             e.preventDefault();
             const activeUser = mapUser(await getUser(getActiveUserAddress().toLowerCase()));
             const textareaContent = $('main textarea[id="qa-placeholder"]').val();
-            var qaHash = await IPFSUpload.upload(textareaContent);
+            var qaHash = await upload(textareaContent);
             const questId = $('main input[id="question-id"]').val();
             const activeUserAdr = getActiveUserAddress();
             console.log(activeUserAdr);
@@ -64,7 +65,7 @@ $(function() {
         setTimeout(function() {
             $('main form[id="select-question-form"]').hide();
         }, 500);
-        setInterval(async function() {
+        qaInterval = setInterval(async function() {
 
             const questNum = await getNumOfQuestions();
             const answNum = await getNumOfAnswers();
@@ -236,7 +237,7 @@ $(function() {
                 //alert('hey');
                 // console.log($('main textarea[id="answer-content"]').val());
                 const answContent = $('main textarea[id="answer-content"]').val();
-                var answHash = await IPFSUpload.upload(answContent)
+                var answHash = await upload(answContent)
                 createAnswer(questId-1, answHash, getActiveUserAddress());
             });
             return;
@@ -293,6 +294,10 @@ function mapAnswer(answArr) {
 
 function clearQandAList() {
     $('#quest-answ-list').empty();
+}
+
+export function getQAInterval() {
+    return qaInterval;
 }
 
 
