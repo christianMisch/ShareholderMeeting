@@ -46,10 +46,14 @@ module.exports = async function(deployer, network, accounts) {
     hash = await IPFSUpload.upload('at least one share.');
     await DirectorContract.createAnswer.sendTransaction(2, hash);
     hash = await IPFSUpload.upload('If you are a director then you do not need shares to participate.');
-    console.log(hash);
     await DirectorContract.createAnswer.sendTransaction(2, hash);
-
-    console.log('ipfs-content: ' + await IPFSDownload.downloadString(hash));
+    /*
+    console.log(hash);
+    var prop = await f.getProposal.call(0);
+    console.log(prop);
+    hash = await IPFSUpload.upload(prop);
+    console.log('ipfs-content: ');
+    console.log(await IPFSDownload.downloadObject(hash));*/ 
 
     await sh1.rateQuestion.sendTransaction(0, 1);
     await sh1.rateQuestion.sendTransaction(4, 1);

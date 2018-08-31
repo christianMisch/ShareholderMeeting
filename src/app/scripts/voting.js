@@ -2,13 +2,14 @@ import {getProposal, getNumOfProposals} from '../../provider/ProposalProvider';
 import {denominateVotingTokens, delegateToProxy, getVotingDenominations} from '../../provider/ShareholderProvider';
 import {getShareholder, getNumOfShareholders, vote} from '../../provider/ShareholderProvider';
 import {setUserShares, getActiveUserAddress, createAlert} from './authentication';
-
+import {downloadString} from '../../provider/IPFSDownloadProvider';
 
 var votingInterval;
+var numOfProp = 0;
 // logout and login proposals not shown
 $(document).ready(async function() {
     
-  var numOfProp = 0;
+  
   //console.log(getAuthorizedUsers());
     $('main').on('click', 'input[id ^= "deleg-butt-"]', async function() {
         var inpButt = $(this);
@@ -27,7 +28,7 @@ $(document).ready(async function() {
     });
 
     $('a[href="#voting"]').click(async function() {
-    
+      numOfProp = 0;
       const activeUserAdr = getActiveUserAddress();
       //console.log(users);
       //console.log(users[activeUser].shares);
@@ -42,6 +43,7 @@ $(document).ready(async function() {
     
             if (numOfProp == proposalCount) {
                 console.log('proposal count has not changed.');
+                console.log('numOfProp: ' + numOfProp);
                 return;
             }
             numOfProp = proposalCount;
@@ -60,12 +62,15 @@ $(document).ready(async function() {
 
         $('main').on('click', 'input[id="refresh-proposal"]', async function() {
             $('main table tr').not('tr[id="table-header"]').empty();
-            var radioCount = 0;
 
+            //console.log('amount of tr elements: ' + $('main table tr').length);
+            var radioCount = 0;
+            console.log('refresh props num: ' + numOfProp);
             for (var i = 0; i < numOfProp; i++) {
                 var currProp = await getProposal(i);
                 const mappedProp = mapProposal(currProp);
-                const splits = mappedProp.options.split(',');
+                console.log(mappedProp.proposalHash);
+                const splits = mappedProp.options.trim().split(',');
                 var wrapper = $('<div></div>');
                 
                 for (var j = 0; j < splits.length; j++) {
@@ -81,16 +86,18 @@ $(document).ready(async function() {
                         <label><input type="radio" id="abstain" name="${radioCount}">abstain</label>
                     </div>`
                 ));
+                var propDescription = await downloadString(mappedProp.proposalHash);
+                console.log('propDescription: ' + propDescription);
                 ++radioCount;
                 $('main table').append(
                     `<tr class="list-group-item-info">
-                        <td>${mappedProp.proposalDescription}</td>
+                        <td>${propDescription}</td>
                         <td>${wrapper.html()}</td>
                     </tr>`
                 );
             }
 
-            console.log(document.body);
+            //console.log(document.body);
         });
 
         $('main').on('click', 'input[id="vote-button"]', async function() {
@@ -179,11 +186,11 @@ function mapProposal(propArr) {
     return {
         proposalId: propArr[0].toNumber(),
         proposalName: propArr[1],
-        proposalDescription: propArr[2],
+        proposalHash: propArr[2],
         options: propArr[3],
         proposalPassed: propArr[4],
-        proposalPercent: propArr[5],
-        proposalCount: propArr[6],
+        proposalPercent: propArr[5].toNumber(),
+        proposalCount: propArr[6].toNumber(),
     }
 }
 

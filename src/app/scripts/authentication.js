@@ -1,5 +1,4 @@
 import { getUserList, getNumOfUsers, getUser } from "../../provider/AgmOwnerProvider";
-import {getDate, getPlace} from './index';
 import {getQAInterval} from './qAndA';
 import {getVotingInterval} from './voting';
 
@@ -54,10 +53,6 @@ $(document).ready(async function() {
                 showLogoutButton();
                 showView('home-link');
                 hideLoginFields();
-                setInterval(function() {
-                    $('main #place').html(getPlace());
-                    $('main #date').html(getDate());
-                }, 100);
 
                 console.log(inputAdr);
                 console.log('loggedIn as Owner');
@@ -76,10 +71,7 @@ $(document).ready(async function() {
                 showLogoutButton();
                 showView('home-link');
                 hideLoginFields();
-                setInterval(function() {
-                    $('main #place').html(getPlace());
-                    $('main #date').html(getDate());
-                }, 100);
+                
                 console.log(inputAdr);
                 console.log('loggedIn as Shareholder');
 
@@ -96,10 +88,7 @@ $(document).ready(async function() {
                 showLogoutButton();
                 showView('home-link');
                 hideLoginFields();
-                setInterval(function() {
-                    $('main #place').html(getPlace());
-                    $('main #date').html(getDate());
-                }, 100);
+                
                 console.log(inputAdr);
                 console.log('loggedIn as Director');
 

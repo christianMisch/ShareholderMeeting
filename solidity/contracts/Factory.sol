@@ -28,12 +28,12 @@ contract Factory is ProposalData {
         
     }
 
-    function createNewProposal(string _name, string _description, string _options) public returns (uint propId) {
+    function createNewProposal(string _name, string _ipfs_hash, string _options) public returns (uint propId) {
         propId = proposals.length++;
         Proposal storage proposal = proposals[propId];
         proposal.proposalId = propId;
         proposal.name = _name;
-        proposal.description = _description;
+        proposal.ipfs_hash = _ipfs_hash;
         proposal.options = _options;
         proposal.proposalPassed = false;
         proposal.passedPercent = 0;
@@ -47,7 +47,7 @@ contract Factory is ProposalData {
     function getProposal(uint proposalId) public view returns (
         uint _proposalId,
         string _name,
-        string _description,
+        string _ipfs_hash,
         string _options,
         bool _proposalPassed,
         uint _passedPercent,
@@ -55,7 +55,7 @@ contract Factory is ProposalData {
     ) {
         Proposal storage proposal = proposals[proposalId];
         return
-        (proposal.proposalId, proposal.name, proposal.description, proposal.options, proposal.proposalPassed,
+        (proposal.proposalId, proposal.name, proposal.ipfs_hash, proposal.options, proposal.proposalPassed,
         proposal.passedPercent, proposal.voteCount);
     }
 

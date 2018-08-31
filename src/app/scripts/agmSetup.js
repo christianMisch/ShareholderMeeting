@@ -1,5 +1,6 @@
 import {createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission} from '../../provider/AgmOwnerProvider';
 import {getActiveUserAddress, createAlert} from './authentication';
+import {upload} from '../../provider/IPFSUploadProvider';
 //import {web3} from './index';
 
 //const owner = web3Provider.eth.accounts[0];
@@ -24,9 +25,10 @@ $(document).ready(function() {
             
             const propName = $('#proposal-name').val();
             const propDescription = $('#proposal-description').val();
+            var propHash = await upload(propDescription);
             const propOptions = $('#proposal-options').val();
             //console.log(activeUserAddress, propName, propDescription, propOptions);
-            createProposal(propName, propDescription, propOptions, activeUserAddress);
+            createProposal(propName, propHash, propOptions, activeUserAddress);
         });
 
         $('main').on('click', 'input[id="add-user-button"]', async function() {

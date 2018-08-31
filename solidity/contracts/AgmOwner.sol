@@ -161,10 +161,10 @@ contract AgmOwner is User {
         return (meetingDate, meetingPlace);
     }
 
-    function createProposal(string _name, string _description, string _options)
+    function createProposal(string _name, string _ipfs_hash, string _options)
         public /*onlyOwner*/ returns(uint propId) {
 
-        propId = fac.createNewProposal(_name, _description, _options);
+        propId = fac.createNewProposal(_name, _ipfs_hash, _options);
         emit ProposalCreated(propId, msg.sender);
 
         return propId;

@@ -25,8 +25,14 @@ export class App {
         console.log(announcement);
         place = announcement.place;
         date = announcement.date;
-
-        //console.log(await downloadString('QmZEHxrGj7UsDsTPbz9f3L2Nb7ttoydTiuUFwqNgam89VM'));
+        
+        $('a[href="#home"]').click(function() {
+            setTimeout(function() {
+                $('main #place').html(place);
+                $('main #date').html(date);  
+            }, 100);
+        });
+        
     }
 }
 
@@ -38,12 +44,4 @@ function mappAnnouncement(annArr) {
         date: annArr[0],
         place: annArr[1]
     }
-}
-
-export function getPlace() {
-    return place;
-}
-
-export function getDate() {
-    return date;
 }
