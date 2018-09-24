@@ -9,7 +9,7 @@ module.exports = async function(deployer, network, accounts) {
     const QandAContract = await QandA.deployed();
     const uppCaseAcc = accounts.map(acc => acc.toLowerCase());
     console.log('accounts: ' + uppCaseAcc);
-    var hash;
+    var deshash;
 
     // await AgmOwnerContract.addUser.sendTransaction('0x0', true, 0, QandAContract.address);
     await AgmOwnerContract.addUser.sendTransaction('0xd02Dc75c5D17021a71060DeE44b12958fBa069FB'.toLowerCase(), 0, 0, QandAContract.address);
@@ -18,14 +18,16 @@ module.exports = async function(deployer, network, accounts) {
     await AgmOwnerContract.addUser.sendTransaction('0xB78E4A88e140b9ceeC48D569d6ae0ED4F419eFb1'.toLowerCase(), 2, 12, QandAContract.address);
     await AgmOwnerContract.addUser.sendTransaction('0x92130D033C5846d2653D088c74D844f61717794d'.toLowerCase(), 1, 0, QandAContract.address);
 
-    hash = await IPFSUpload.upload('Who should be the new chairperson for the next year?');
-    await AgmOwnerContract.createProposal.sendTransaction('board election', hash, 'Schmidt, Mueller, Guenther');
-    hash = await IPFSUpload.upload('How much percentage should be increased the dividend for shareholders?');
-    await AgmOwnerContract.createProposal.sendTransaction('dividend distribution', hash, '3%, 4%, 5%');
-    hash = await IPFSUpload.upload('Should the research into new technologies be more fostered?');
-    await AgmOwnerContract.createProposal.sendTransaction('foster research', hash, 'yes, no');
-    console.log(hash);
-    console.log('3. ipfs-content: ' + await IPFSDownload.downloadString(hash));
+    deshash = await IPFSUpload.upload('Who should be the new chairperson for the next year?');
+    await AgmOwnerContract.createProposal.sendTransaction('board election', deshash, 'Schmidt, Mueller, Guenther');
+    //console.log('3.1 ipfs-content: ' + await IPFSDownload.downloadString(deshash));
+    deshash = await IPFSUpload.upload('How much percentage should be increased the dividend for shareholders?');
+    await AgmOwnerContract.createProposal.sendTransaction('dividend distribution', deshash, '3%, 4%, 5%');
+    //console.log('3.2 ipfs-content: ' + await IPFSDownload.downloadString(deshash));
+    deshash = await IPFSUpload.upload('Should the research into new technologies be more fostered?');
+    await AgmOwnerContract.createProposal.sendTransaction('foster research', deshash, 'yes, no');
+    console.log('deshash: ' + deshash);
+    //console.log('3.3 ipfs-content: ' + await IPFSDownload.downloadString(deshash));
 }
 
 /*

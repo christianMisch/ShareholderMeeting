@@ -20,8 +20,9 @@
                                 <div class="col-4" id="wallet-div">
                                     <input class="form-control" type="text" placeholder="0x..." id="wallet-address">
                                 </div>
-                                <p id='userAddress'>User: </p>
-                                <p id='userRole'>Role: </p>
+                                <p id="userAddress">User: </p>
+                                <p id="userRole">Role: </p>
+                                <p id="date">Date: </p>
                                 <div id="header-buttons">
                                     <input type="button" class="btn btn-light btn-sm" value="login" id="login-button">
                                     <input type="button" class="btn btn-light btn-sm" value="logout" id="logout-button">    
@@ -57,10 +58,13 @@
                                 <a href="#welcome" id="welcome-link">Welcome</a>
                             </li>
                             <li>
-                                <a href="#home" id="home-link">Home</a>
+                                <a href="#timer" id="timer-link">Agm Timers</a>
                             </li>
-                            <li id="setup-link">
-                                <a href="#setup">Setup</a>
+                            <li>
+                                <a href="#material" id="material-link">Material</a>
+                            </li>
+                            <li>
+                                <a href="#setup" id="setup-link">Setup</a>
                             </li>
                             <li>
                                 <a href="#voting" id="voting-link">Voting</a>
@@ -84,8 +88,29 @@
 
         <template id="welcome-template">
             <article class="col-xl-12">
+                <p>The 1st Annual General Meeting takes place in <strong id="place"></strong>. It will start on <strong id="start"></strong>
+                    and end on <strong id="end"></strong>!</p>
+                <p>You will receive your the AGM id for participating in a seperate email. If you did not get the email please
+                    write an
+                    email to our service: serviceAGM@gmail.com
+                </p>
+                <p>Remaining days to the AGM: <strong id="day-diff"></strong></p>
                 <strong>Please sign in with your Ethereum wallet address and your password</strong>
                 <p>If you are a <strong>shareholder</strong> then you receive your password via mail</p>
+            </article>
+        </template>
+
+        <template id="timer-template">
+            <article class="col-xl-12">
+                <form>
+                    <label> When shall the AGM start?<input type="datetime-local" id="agm-start"></label>
+                    <label> When shall the AGM end?<input type="datetime-local" id="agm-end"></label>
+                    <label>Where shall the physical AGM take place?<input type="text" id="place"></label>
+                    <label>Please input the agenda <textarea id="agenda-content"></textarea></label>
+                    <label>Upload annual report <input type="file" id="annual-report"></label>
+                    <label>Upload app guide <input type="file" id="guide"></label>
+                    <input type="submit" id="time-submit-button" value="submit">
+                </form>
             </article>
         </template>
 
@@ -121,16 +146,12 @@
         </template>
 
 
-        <template id="home-template">
+        <template id="material-template">
             <!--<article id="announcement" class="col-12">
                 <label>Please insert the place of the AGM: <input type="text" id="place"></label>
                 <label>Please insert the date of the AGM: <input type="datetime" id="date"></label>
             </article>-->
             <article class="col-xl-12">
-                <p>The 1st Annual General Meeting takes place in the <span id="place"></span> on <span id="date"></span>!</p>
-                <p>You will receive your the AGM id for participating in a seperate email. If you did not get the email please write an
-                    email to our service: serviceAGM@gmail.com
-                </p>
                 <p>Here you find a list of the AGM material: </p>
                 <ul>
                     <li>Annual report from 2017</li>

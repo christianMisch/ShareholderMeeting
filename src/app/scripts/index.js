@@ -2,15 +2,12 @@
 import web3 from '../../provider/web3Provider';
 import {announceAGM} from '../../provider/AgmOwnerProvider';
 import { upload } from '../../provider/IPFSUploadProvider';
-import { downloadString } from '../../provider/IPFSDownloadProvider';
+import {downloadString} from '../../provider/IPFSDownloadProvider';
 import './agmSetup';
 import {getActiveUserAddress} from './authentication';
 import './manageSPA';
 import './qAndA';
 import './voting';
-
-var place;
-var date;
 
 export class App {
 
@@ -21,7 +18,7 @@ export class App {
 
     async start() {
         console.log(`Start the app with networkId=${this.network} and default account =${this.account}`);
-        var announcement = mappAnnouncement(await announceAGM());
+        /*var announcement = mappAnnouncement(await announceAGM());
         console.log(announcement);
         place = announcement.place;
         date = announcement.date;
@@ -31,8 +28,11 @@ export class App {
                 $('main #place').html(place);
                 $('main #date').html(date);  
             }, 100);
-        });
-        
+        });*/
+        console.log('before');
+        //const hash = await upload('hey this is an example string');
+        console.log('ipfs-content: ' + await downloadString('QmQ6ZVFzcg6JKNwwL98iSpDaHxgx9HbPDHKCCTctS2r5oM'));
+        console.log('after');
     }
 }
 

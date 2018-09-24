@@ -1,12 +1,15 @@
 import { getUserList, getNumOfUsers, getUser } from "../../provider/AgmOwnerProvider";
 import {getQAInterval} from './qAndA';
 import {getVotingInterval} from './voting';
-
-//import web3Provider from '../../provider/web3Provider';
+import web3Provider from '../../provider/web3Provider';
 //console.log('web3 accounts: ');
 //console.log(web3Provider.eth.accounts);
 
 var inputAdr;
+var timersAreDefined = false;
+var place;
+var startDate;
+var endDate;
 
 $(document).ready(async function() {
     //authorizedUsers[`${web3Provider.eth.accounts[0].toLowerCase()}`] = {role: 'AgmOwner', loggedIn: false, shares: 0};
@@ -14,6 +17,7 @@ $(document).ready(async function() {
     showWelcomePage();
     // hide logout button, welcome link in sidebar and user credentials
     $('#logout-button').hide();
+    $('#date').hide();
     $('nav').hide();
 
     /*console.log('isAuthenticated');
@@ -38,25 +42,38 @@ $(document).ready(async function() {
         //$('footer').append(alertWrapper);
         inputAdr = $('#wallet-address').val().toLowerCase();
         const user = mapUser(await getUser(inputAdr));
-        console.log('activeUser: ');
-        console.log(user);
+        $('#timer-link').hide();
+        //console.log('activeUser: ');
+        //console.log(user);
         if (user && user.role === 0) {
                 createAlert('You have successfully logged in as AgmOwner!');
-                $('nav').show();
-                $('#setup-link').show();
-                $('#welcome-link').hide();
-                $('#voting-link').hide();
-                $('#qa-link').hide();
+                console.log('web3 acc: ' + web3Provider.eth.accounts[0]);
+                console.log('user acc:' + inputAdr);
+                if (inputAdr === web3Provider.eth.accounts[0] && !timersAreDefined) {
+                    console.log('test');
+                    timersAreDefined = true;
+                    showView('timer-link');
+                } else {
+                    $('nav').show();
+                    $('#setup-link').show();
+                    $('#welcome-link').hide();
+                    $('#voting-link').hide();
+                    $('#qa-link').hide();
+                    
+                    showView('setup-link');
+                    
+                }
+
                 showUserCredentials();
                 $('#userAddress').html('User: ' + inputAdr);
                 $('#userRole').html('Role: AgmOwner');
+                var strDate = computeDate();
+                $('#date').html('Date: ' + strDate);
                 showLogoutButton();
-                showView('home-link');
                 hideLoginFields();
 
                 console.log(inputAdr);
                 console.log('loggedIn as Owner');
-
 
         } else if (user && user.role === 2) {
 
@@ -68,8 +85,9 @@ $(document).ready(async function() {
                 showUserCredentials();
                 $('#userAddress').html('User: ' + inputAdr);
                 $('#userRole').html('Role: Shareholder');
+                $('#date').html('Date: ' + computeDate());
                 showLogoutButton();
-                showView('home-link');
+                showView('material-link');
                 hideLoginFields();
                 
                 console.log(inputAdr);
@@ -85,8 +103,9 @@ $(document).ready(async function() {
                 showUserCredentials();
                 $('#userAddress').html('User: ' + inputAdr);
                 $('#userRole').html('Role: Director');
+                $('#date').html('Date: ' + computeDate());
                 showLogoutButton();
-                showView('home-link');
+                showView('material-link');
                 hideLoginFields();
                 
                 console.log(inputAdr);
@@ -117,6 +136,30 @@ $(document).ready(async function() {
 
     });
 
+    $('main').on('click', 'input[id = "time-submit-button"]', function() {
+        place = $('main #place').val();
+        startDate = $('main #agm-start').val();
+        endDate = $('main #agm-end').val();
+        console.log(place, startDate, endDate);
+        showView('login-button');
+    });
+
+    $('a[href="#welcome"]').click(function() {
+        console.log('should display place and date');
+        setTimeout(function() {
+            $('main #place').html(place);
+            $('main #start').html(startDate.replace('T', ' '));
+            $('main #end').html(endDate.replace('T', ' '));
+            const MS_PER_DAY = 1000 * 60 * 60 * 24;
+            var date = new Date();
+            //console.log(startDate.substring(0,4), startDate.substring(5,7), startDate.substring(8,10));
+            var utc1 = Date.UTC(startDate.substring(0,4), startDate.substring(5,7), startDate.substring(8,10));
+            var utc2 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+            var dayDiff = Math.floor((utc1 - utc2) / MS_PER_DAY);
+            $('main #day-diff').html(dayDiff);
+        }, 100); 
+    });
+
 });
 
 export function createAlert(message, alertType = 'success') {
@@ -132,10 +175,17 @@ export function createAlert(message, alertType = 'success') {
     //$('a[href="#home"]').trigger('click');
 }
 
+function computeDate() {
+    var date = new Date();
+    var strDate = date.getFullYear() + "-" + ("0" + date.getMonth()).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
+    console.log(strDate);
+    return strDate;
+}
 
 function showUserCredentials() {
     $('#userAddress').show();
     $('#userRole').show();
+    $('#date').show();
 }
 
 function hideUserCredentials() {

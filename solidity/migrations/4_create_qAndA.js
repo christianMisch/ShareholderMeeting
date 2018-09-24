@@ -5,6 +5,9 @@ const QandA = artifacts.require("./QandA.sol");
 const IPFSUpload = require('../../src/provider/IPFSUploadProvider.js');
 const IPFSDownload = require('../../src/provider/IPFSDownloadProvider.js');
 
+const AgmOwner = artifacts.require("./AgmOwner.sol");
+//const QandA = artifacts.require("./QandA.sol");
+
 module.exports = async function(deployer, network, accounts) {
 
     const ShareholderContract = await Shareholder.deployed();
@@ -47,9 +50,10 @@ module.exports = async function(deployer, network, accounts) {
     await DirectorContract.createAnswer.sendTransaction(2, hash);
     hash = await IPFSUpload.upload('If you are a director then you do not need shares to participate.');
     await DirectorContract.createAnswer.sendTransaction(2, hash);
-    /*
+    
     console.log(hash);
-    var prop = await f.getProposal.call(0);
+    console.log(await IPFSDownload.downloadString(hash));
+    /*var prop = await f.getProposal.call(0);
     console.log(prop);
     hash = await IPFSUpload.upload(prop);
     console.log('ipfs-content: ');
@@ -66,6 +70,4 @@ module.exports = async function(deployer, network, accounts) {
     await sh3.rateQuestion.sendTransaction(2, 1);
     await sh1.rateQuestion.sendTransaction(5, 1);
     await sh2.rateQuestion.sendTransaction(5, 1);
-
-    //IPFSUpload.stop((err) => {if (err) {throw(err)}});
 }

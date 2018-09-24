@@ -2,7 +2,8 @@ import {getProposal, getNumOfProposals} from '../../provider/ProposalProvider';
 import {denominateVotingTokens, delegateToProxy, getVotingDenominations} from '../../provider/ShareholderProvider';
 import {getShareholder, getNumOfShareholders, vote} from '../../provider/ShareholderProvider';
 import {setUserShares, getActiveUserAddress, createAlert} from './authentication';
-import {downloadString} from '../../provider/IPFSDownloadProvider';
+//import {downloadString} from '../../provider/IPFSDownloadProvider';
+var  IPFSDownloadProvider = require('../../provider/IPFSDownloadProvider.js'); 
 
 var votingInterval;
 var numOfProp = 0;
@@ -70,7 +71,7 @@ $(document).ready(async function() {
                 var currProp = await getProposal(i);
                 const mappedProp = mapProposal(currProp);
                 console.log(mappedProp.proposalHash);
-                const splits = mappedProp.options.trim().split(',');
+                const splits = mappedProp.options.split(',');
                 var wrapper = $('<div></div>');
                 
                 for (var j = 0; j < splits.length; j++) {
@@ -86,7 +87,10 @@ $(document).ready(async function() {
                         <label><input type="radio" id="abstain" name="${radioCount}">abstain</label>
                     </div>`
                 ));
-                var propDescription = await downloadString(mappedProp.proposalHash);
+                console.log('before download');
+                console.log('prop hash: ' + mappedProp.proposalHash);
+                var propDescription = await IPFSDownloadProvider.downloadString(mappedProp.proposalHash);
+                console.log('after download');
                 console.log('propDescription: ' + propDescription);
                 ++radioCount;
                 $('main table').append(

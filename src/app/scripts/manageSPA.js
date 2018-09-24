@@ -53,8 +53,11 @@ function insertTemplate(strHash) {
         case "welcome":
             templateContent = document.getElementById("welcome-template").content;
             break;
-        case "home":
-            templateContent = document.getElementById("home-template").content;
+        case "timer":
+            templateContent = document.getElementById("timer-template").content;
+            break;
+        case "material":
+            templateContent = document.getElementById("material-template").content;
             break;
         case "setup":
             templateContent = document.getElementById("setup-template").content;
@@ -69,7 +72,7 @@ function insertTemplate(strHash) {
             templateContent = document.getElementById("QandA-list-template").content;
             break;
         default:
-            templateContent = document.getElementById("home-template").content;
+            templateContent = document.getElementById("welcome-template").content;
             break;
     }
 
