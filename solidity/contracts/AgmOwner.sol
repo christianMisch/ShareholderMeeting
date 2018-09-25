@@ -21,14 +21,14 @@ contract AgmOwner is User {
 
     bool public isFinished = false;
 
-    uint public minimumVotingQuorum;
-    uint public marginOfVotesForMajority;
+    //uint public minimumVotingQuorum;
+    //uint public marginOfVotesForMajority;
     string public meetingName;
     string public meetingDescription;
-    string public meetingDate;
-    string public meetingPlace;
-    uint public meetingStartTime;
-    uint public meetingEndTime;
+    //string public meetingDate;
+    //string public meetingPlace;
+    //uint public meetingStartTime;
+    //uint public meetingEndTime;
 
     struct VotingOption {
         string optionName;
@@ -57,27 +57,27 @@ contract AgmOwner is User {
 
     constructor(
         address _userAddress,
-        uint _minimumVotingQuorum,
-        uint _marginOfVotesForMajority,
+        //uint _minimumVotingQuorum,
+        //uint _marginOfVotesForMajority,
         string _meetingName,
         string _meetingDescription,
-        string _meetingDate,
-        string _meetingPlace,
-        uint _meetingStartTime,
-        uint _meetingEndTime,
+        //string _meetingDate,
+        //string _meetingPlace,
+        //uint _meetingStartTime,
+        //uint _meetingEndTime,
         Factory _fac
     )
 
             User(_userAddress, Role.AGMOWNER) public {
 
-        minimumVotingQuorum = _minimumVotingQuorum;
-        marginOfVotesForMajority = _marginOfVotesForMajority;
+        //minimumVotingQuorum = _minimumVotingQuorum;
+        //marginOfVotesForMajority = _marginOfVotesForMajority;
         meetingName = _meetingName;
         meetingDescription = _meetingDescription;
-        meetingDate = _meetingDate;
-        meetingPlace = _meetingPlace;
-        meetingStartTime = _meetingStartTime;
-        meetingEndTime = _meetingEndTime;
+        //meetingDate = _meetingDate;
+        //meetingPlace = _meetingPlace;
+        //meetingStartTime = _meetingStartTime;
+        //meetingEndTime = _meetingEndTime;
         fac = _fac;
         owners.push(_userAddress);
         users.push(User(address(this)));
@@ -157,9 +157,9 @@ contract AgmOwner is User {
 
     }
 
-    function announceAGM() public onlyOwner view returns (string recordDate, string recordPlace) {
+    /*function announceAGM() public onlyOwner view returns (string recordDate, string recordPlace) {
         return (meetingDate, meetingPlace);
-    }
+    }*/
 
     function createProposal(string _name, string _ipfs_hash, string _options)
         public /*onlyOwner*/ returns(uint propId) {

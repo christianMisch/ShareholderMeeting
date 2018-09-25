@@ -29,10 +29,23 @@ export class App {
                 $('main #date').html(date);  
             }, 100);
         });*/
-        console.log('before');
+        //console.log('before');
         //const hash = await upload('hey this is an example string');
-        console.log('ipfs-content: ' + await downloadString('QmQ6ZVFzcg6JKNwwL98iSpDaHxgx9HbPDHKCCTctS2r5oM'));
-        console.log('after');
+        //console.log('ipfs-content: ' + await downloadString('QmQ6ZVFzcg6JKNwwL98iSpDaHxgx9HbPDHKCCTctS2r5oM'));
+        //console.log('after');
+        
+        /*var templateParams = {
+            name: 'James',
+            notes: 'Check this out!'
+        };
+        emailjs.send('gmail', 'template_hQCxCp47', templateParams)
+            .then(function(response) {
+                console.log('SUCCESS!', response.status, response.text);
+            }, function(error) {
+                console.log('FAILED...', error);
+            });
+        console.log('EMAIL WAS SENT!!!');*/
+
     }
 }
 

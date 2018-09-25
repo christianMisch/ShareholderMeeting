@@ -10,12 +10,42 @@ var timersAreDefined = false;
 var place;
 var startDate;
 var endDate;
+var dayDiff;
+var dayDiffInterval;
+var announceInterval;
+var votingQuorum;
 
 $(document).ready(async function() {
+
+    announceInterval = setInterval(function() {
+        // has to be enabled in production
+        //computeDayDiff();
+        if (dayDiff === 14) {
+            var templateParams = {
+                from_name: 'AGM administrator',
+                to_name: 'Chris',
+                from_mail: 'service_AGM@gmail.com',
+                to_mail: 'mischok.christian@web.de',
+                message: 'encrypted password'
+            };
+            emailjs.send('gmail', 'authentication_template', templateParams)
+                .then(function(response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                }, function(error) {
+                    console.log('FAILED...', error);
+                });
+            console.log('EMAIL WAS SENT!!!');
+        }
+    }, 5000);
     //authorizedUsers[`${web3Provider.eth.accounts[0].toLowerCase()}`] = {role: 'AgmOwner', loggedIn: false, shares: 0};
     //console.log('Num of users should be 5: ' + await getNumOfUsers());
     showWelcomePage();
     // hide logout button, welcome link in sidebar and user credentials
+    if (!timersAreDefined) {
+        $('main #announce-wrapper').hide();
+    }
+    
+    
     $('#logout-button').hide();
     $('#date').hide();
     $('nav').hide();
@@ -61,6 +91,7 @@ $(document).ready(async function() {
                     $('#qa-link').hide();
                     
                     showView('setup-link');
+                    setDayDiff(14);
                     
                 }
 
@@ -131,6 +162,8 @@ $(document).ready(async function() {
         showWelcomePage();
         hideUserCredentials();
         showLoginFields();
+        clearInterval(dayDiffInterval);
+        clearInterval(announceInterval);
         clearInterval(getQAInterval());
         clearInterval(getVotingInterval());
 
@@ -140,23 +173,30 @@ $(document).ready(async function() {
         place = $('main #place').val();
         startDate = $('main #agm-start').val();
         endDate = $('main #agm-end').val();
-        console.log(place, startDate, endDate);
+        votingQuorum = $('main #voting-quorum').val();
+        console.log(place, startDate, endDate, votingQuorum);
         showView('login-button');
     });
 
     $('a[href="#welcome"]').click(function() {
         console.log('should display place and date');
         setTimeout(function() {
-            $('main #place').html(place);
-            $('main #start').html(startDate.replace('T', ' '));
-            $('main #end').html(endDate.replace('T', ' '));
-            const MS_PER_DAY = 1000 * 60 * 60 * 24;
-            var date = new Date();
-            //console.log(startDate.substring(0,4), startDate.substring(5,7), startDate.substring(8,10));
-            var utc1 = Date.UTC(startDate.substring(0,4), startDate.substring(5,7), startDate.substring(8,10));
-            var utc2 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
-            var dayDiff = Math.floor((utc1 - utc2) / MS_PER_DAY);
-            $('main #day-diff').html(dayDiff);
+            computeDayDiff();
+            if (dayDiff >= 30) {
+                $('main #announce-wrapper').show();
+                $('main #place').html(place);
+                $('main #start').html(startDate.replace('T', ' '));
+                $('main #end').html(endDate.replace('T', ' '));
+            } else {
+                createAlert('The AGM can only be announced at least 30 days in prior!', 'danger');
+            }
+            
+            
+            dayDiffInterval = setInterval(function() {
+                computeDayDiff();
+            }, 86400000);
+            console.log('day diff interval escaped...');
+            
         }, 100); 
     });
 
@@ -180,6 +220,21 @@ function computeDate() {
     var strDate = date.getFullYear() + "-" + ("0" + date.getMonth()).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
     console.log(strDate);
     return strDate;
+}
+
+function computeDayDiff() {
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    var date = new Date();
+    //console.log(startDate.substring(0,4), startDate.substring(5,7), startDate.substring(8,10));
+    var utc1 = Date.UTC(startDate.substring(0, 4), startDate.substring(5, 7), startDate.substring(8, 10));
+    var utc2 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+    dayDiff = Math.floor((utc1 - utc2) / MS_PER_DAY) - 30;
+    $('main #day-diff').html(dayDiff);
+}
+
+function setDayDiff(diff) {
+    dayDiff = diff;
+    $('main #day-diff').html(dayDiff);
 }
 
 function showUserCredentials() {
@@ -252,4 +307,8 @@ async function isAuthenticated(address) {
         }
     }
     return false;
+}
+
+function setDayDiff(newDiff) {
+    dayDiff = newDiff;
 }

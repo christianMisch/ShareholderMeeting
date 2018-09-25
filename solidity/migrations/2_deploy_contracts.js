@@ -33,14 +33,14 @@ module.exports = function(deployer, network, accounts) {
         return deployer.deploy(
             AgmOwner,
             uppCaseAcc[0],
-            3,
-            50,
+            //3,
+            //50,
             'Siemens AGM 2018',
             'Annual General Meeting 2018',
-            '01.01.2018, 3pm',
-            'ICC Berlin',
-            0,
-            240,
+            //'01.01.2018, 3pm',
+            //'ICC Berlin',
+            //0,
+            //240,
             f.address
         );
     }).then(async function(agmOwner) {

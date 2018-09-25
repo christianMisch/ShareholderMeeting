@@ -6,6 +6,12 @@
         <title>AGM</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
         <link rel="stylesheet" href="./styles/styles.css">
+        <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.2.4/email.min.js"></script>
+        <script type="text/javascript">
+            (function(){
+                emailjs.init("user_C8orQh3VVC8LorCBAAdSK");
+            })();
+        </script>
     </head>
     <body>
         <header>
@@ -88,13 +94,16 @@
 
         <template id="welcome-template">
             <article class="col-xl-12">
-                <p>The 1st Annual General Meeting takes place in <strong id="place"></strong>. It will start on <strong id="start"></strong>
-                    and end on <strong id="end"></strong>!</p>
-                <p>You will receive your the AGM id for participating in a seperate email. If you did not get the email please
-                    write an
-                    email to our service: serviceAGM@gmail.com
-                </p>
-                <p>Remaining days to the AGM: <strong id="day-diff"></strong></p>
+                <div id="announce-wrapper">
+                    <p>The 1st Annual General Meeting takes place in <strong id="place"></strong>. It will start on <strong id="start"></strong>
+                        and end on <strong id="end"></strong>!</p>
+                    <p>You will receive your the AGM id for participating in a seperate email. If you did not get the email please
+                        write an
+                        email to our service: serviceAGM@gmail.com
+                    </p>
+                    <p>Remaining days to the AGM: <strong id="day-diff"></strong></p>
+                </div>
+                
                 <strong>Please sign in with your Ethereum wallet address and your password</strong>
                 <p>If you are a <strong>shareholder</strong> then you receive your password via mail</p>
             </article>
@@ -109,6 +118,8 @@
                     <label>Please input the agenda <textarea id="agenda-content"></textarea></label>
                     <label>Upload annual report <input type="file" id="annual-report"></label>
                     <label>Upload app guide <input type="file" id="guide"></label>
+                    <label>Input the the voting quorum <input type="number" id="voting-quorum"></label>
+                    <label></label>
                     <input type="submit" id="time-submit-button" value="submit">
                 </form>
             </article>
