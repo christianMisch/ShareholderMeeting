@@ -107,6 +107,42 @@
                 <strong>Please sign in with your Ethereum wallet address and your password</strong>
                 <p>If you are a <strong>shareholder</strong> then you receive your password via mail</p>
             </article>
+
+            <form class="modal multi-step" id="demo-modal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title step-1" data-step="1">Step 1</h4>
+                            <h4 class="modal-title step-2" data-step="2">Step 2</h4>
+                        </div>
+                        <div class="modal-body step step-1" id="step-1">
+                            
+                            <label>Please input your private key 
+                                <div><input type="text" id="privateKey" weight="48"></div>
+                            </label>
+                            <label>Please input the encrypted password 
+                                <div><input type="text" id="encrPW" weight="48"></div>
+                            </label>
+                                
+                            <div>
+                                <input type="submit" value="Decrypt" id="decr-button">
+                                <div>
+                                    The decrypted PW is <strong id="decrPW"></strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-body step step-2" id="step-2">
+                            <label>Please input the decrypted password <input type="text" id="decPassword"></label>
+                        </div>
+                        <div class="modal-footer">
+                            
+                            <button type="button" class="btn btn-secondary step step-1" data-step="1">Continue</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <button class="btn btn-default" data-toggle="modal" data-target="#demo-modal" id="auth-modal">Show</button>
+            
         </template>
 
         <template id="timer-template">
@@ -316,5 +352,6 @@
         <script src="../../dist/qAndA.bundle.js"></script>-->
         <!--<script src= "../../dist/ShareholderProvider.bundle.js"></script>
         <script src="../../dist/app.bundle.js"></script>-->
+        <script src="./scripts/multi-step-modal.js"></script>
     </body>
 </html>

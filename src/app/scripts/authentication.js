@@ -3,7 +3,9 @@ import {getQAInterval} from './qAndA';
 import {getVotingInterval} from './voting';
 import web3Provider from '../../provider/web3Provider';
 import ecies from 'eth-ecies';
-import {pubToAddress} from 'ethereumjs-util';
+import util from 'ethereumjs-util';
+import web3 from '../../provider/web3Provider';
+
 //console.log('web3 accounts: ');
 //console.log(web3Provider.eth.accounts);
 
@@ -31,8 +33,11 @@ $(document).ready(async function() {
                 $('#login-button').prop('disabled', true);
             }, 100);
         } else if (dayDiff === 14) {
+            console.log('encrypt data...');
             var encryptedData = encrypt(inputAdr, generateRandomString());
             console.log('encrData: ' + encryptedData);
+            /*var decryptedData = decrypt('', encryptedData);
+            console.log('decrData: ' + decryptedData);*/
             var templateParams = {
                 from_name: 'AGM administrator',
                 to_name: 'Chris',
@@ -56,11 +61,10 @@ $(document).ready(async function() {
         $('main #announce-wrapper').hide();
     }
     
-    
     $('#logout-button').hide();
     $('#date').hide();
     $('nav').hide();
-
+    $('main #auth-modal').css('visibility', 'hidden');
     hideUserCredentials();
 
     /*const links = $('ul[class="list-unstyled components"] a');
@@ -79,85 +83,14 @@ $(document).ready(async function() {
         $('#timer-link').hide();
         //console.log('activeUser: ');
         //console.log(user);
-        if (user && user.role === 0) {
-                createAlert('You have successfully logged in as AgmOwner!');
-                console.log('web3 acc: ' + web3Provider.eth.accounts[0]);
-                console.log('user acc:' + inputAdr);
-                if (inputAdr === web3Provider.eth.accounts[0] && !timersAreDefined) {
-                    console.log('test');
-                    timersAreDefined = true;
-                    showView('timer-link');
-                } else {
-                    console.log('set time diff...');
-                    $('nav').show();
-                    $('#setup-link').show();
-                    $('#welcome-link').hide();
-                    $('#voting-link').hide();
-                    $('#qa-link').hide();
-                    
-                    showView('setup-link');
-                    
-                    setDayDiff(14);
-                    
-                    setTimeout(function() {
-                        //setDayDiff(5);
-                        console.log(dayDiff);
-                    }, 1000);
-                    
-                }
-
-                showUserCredentials();
-                $('#userAddress').html('User: ' + inputAdr);
-                $('#userRole').html('Role: AgmOwner');
-                var strDate = computeDate();
-                $('#date').html('Date: ' + strDate);
-                showLogoutButton();
-                hideLoginFields();
-
-                console.log(inputAdr);
-                console.log('loggedIn as Owner');
-                console.log('dayDiff: ' + dayDiff);
-
-        } else if (user && user.role === 2) {
-
-                createAlert('You have successfully logged in as Shareholder!');
-                $('nav').show();
-                $('#voting-link').show();
-                $('#setup-link').hide();
-                $('#welcome-link').hide();
-                showUserCredentials();
-                $('#userAddress').html('User: ' + inputAdr);
-                $('#userRole').html('Role: Shareholder');
-                $('#date').html('Date: ' + computeDate());
-                showLogoutButton();
-                showView('material-link');
-                hideLoginFields();
-                
-                console.log(inputAdr);
-                console.log('loggedIn as Shareholder');
-
-        } else if (user && user.role === 1) {
-
-                createAlert('You have successfully logged in as Director!');
-                $('nav').show();
-                $('#setup-link').hide();
-                $('#welcome-link').hide();
-                $('#voting-link').hide();
-                showUserCredentials();
-                $('#userAddress').html('User: ' + inputAdr);
-                $('#userRole').html('Role: Director');
-                $('#date').html('Date: ' + computeDate());
-                showLogoutButton();
-                showView('material-link');
-                hideLoginFields();
-                
-                console.log(inputAdr);
-                console.log('loggedIn as Director');
-
+        if (inputAdr === web3Provider.eth.accounts[0] && !timersAreDefined) {
+            console.log('test');
+            timersAreDefined = true;
+            showView('timer-link');
         } else {
-            $('footer').append(`<div role="alert">Login failed!</div>`)
-                .addClass('alert alert-danger');
+            $('main #auth-modal').trigger('click');
         }
+         
     });
 
     $('#logout-button').click(function() {
@@ -168,8 +101,8 @@ $(document).ready(async function() {
         showWelcomePage();
         hideUserCredentials();
         showLoginFields();
-        //clearInterval(dayDiffInterval);
-        //clearInterval(announceInterval);
+        clearInterval(dayDiffInterval);
+        clearInterval(announceInterval);
         clearInterval(getQAInterval());
         clearInterval(getVotingInterval());
 
@@ -203,6 +136,93 @@ $(document).ready(async function() {
         }, 100); 
         showView('login-button');
     });
+
+    $('main').on('click', '#decr-button', function() {
+        var privateKey = $('#privateKey').val();
+        console.log('privateKey: ' + privateKey);
+        var encrData = $('#encrPW').val();
+        console.log('encrData: ' + encrData);
+        var decrData = decrypt(privateKey, encrData);
+        $('#decrPW').html(decrData);
+
+        
+    });
+
+    $('main').on('click', '#finish-button', function() {
+        const user = mapUser(await getUser(inputAdr));
+        
+        if (user && user.role === 0) {
+            createAlert('You have successfully logged in as AgmOwner!');
+            /*console.log('web3 acc: ' + web3Provider.eth.accounts[0]);
+            console.log('user acc:' + inputAdr);
+            console.log('set time diff...');*/
+            $('nav').show();
+            $('#setup-link').show();
+            $('#welcome-link').hide();
+            $('#voting-link').hide();
+            $('#qa-link').hide();
+
+            showView('setup-link');
+
+            setDayDiff(14);
+
+            setTimeout(function () {
+                //setDayDiff(5);
+                console.log(dayDiff);
+            }, 1000);
+
+            showUserCredentials();
+            $('#userAddress').html('User: ' + inputAdr);
+            $('#userRole').html('Role: AgmOwner');
+            var strDate = computeDate();
+            $('#date').html('Date: ' + strDate);
+            showLogoutButton();
+            hideLoginFields();
+
+            console.log(inputAdr);
+            console.log('loggedIn as Owner');
+            console.log('dayDiff: ' + dayDiff);
+                    
+        } else if (user && user.role === 2) {
+            createAlert('You have successfully logged in as Shareholder!');
+            $('nav').show();
+            $('#voting-link').show();
+            $('#setup-link').hide();
+            $('#welcome-link').hide();
+            showUserCredentials();
+            $('#userAddress').html('User: ' + inputAdr);
+            $('#userRole').html('Role: Shareholder');
+            $('#date').html('Date: ' + computeDate());
+            showLogoutButton();
+            showView('material-link');
+            hideLoginFields();
+
+            console.log(inputAdr);
+            console.log('loggedIn as Shareholder');
+        
+        } else if (user && user.role === 1) {
+
+            createAlert('You have successfully logged in as Director!');
+            $('nav').show();
+            $('#setup-link').hide();
+            $('#welcome-link').hide();
+            $('#voting-link').hide();
+            showUserCredentials();
+            $('#userAddress').html('User: ' + inputAdr);
+            $('#userRole').html('Role: Director');
+            $('#date').html('Date: ' + computeDate());
+            showLogoutButton();
+            showView('material-link');
+            hideLoginFields();
+            
+            console.log(inputAdr);
+            console.log('loggedIn as Director');
+
+        } else {
+            $('footer').append(`<div role="alert">Login failed!</div>`)
+                .addClass('alert alert-danger');
+        }
+    })
 
 });
 
@@ -308,16 +328,37 @@ function setDayDiff(newDiff) {
 }
 
 function generateRandomString() {
-    return Math.random().toString(36).slice(-11);
+    return Math.random().toString(36).slice(-10);
 }
 
-function encrypt(publicKey, data) {
+function encrypt(data) {
     //var ethAddress = pubToAddress(new Buffer(publicKey));
     //console.log('ethAddress: ' + ethAddress);
-    let userPublicKey = new Buffer('e0d262b939cd0267cfbe3f004e2863d41d1f631ce33701a8920ba73925189f5d15be92cea3c58987aa47ca70216182ba6bd89026fc15edfe2092a66f59a14003', 'hex');
-    let bufferData = new Buffer(data);
+    const msg = new Buffer('msgToRetrieveThePublicKey');
+    const sig = web3.eth.sign(getActiveUserAddress(), '0x' + msg.toString('hex'));
+    const res = util.fromRpcSig(sig);
+
+    const prefix = new Buffer("\x19Ethereum Signed Message:\n");
+    const prefixedMsg = util.sha3(
+        Buffer.concat([prefix, new Buffer(String(msg.length)), msg])
+    );
+
+    const pubKey  = util.ecrecover(prefixedMsg, res.v, res.r, res.s);
+    console.log('pubKey: ' + pubKey);
+    let userPublicKey = new Buffer(pubKey, 'hex');
+    let bufferData = new Buffer('c361a95Ac86AAbf6baF4D97BA161132f456c08g4');
 
     let encryptedData = ecies.encrypt(userPublicKey, bufferData);
 
     return encryptedData.toString('base64')
 }
+
+function decrypt(privateKey, encryptedData) {
+    let userPrivateKey = new Buffer(privateKey, 'hex');
+    let bufferEncryptedData = new Buffer(encryptedData, 'base64');
+
+    let decryptedData = ecies.decrypt(userPrivateKey, bufferEncryptedData);
+    
+    return decryptedData.toString('utf8');
+}
+
