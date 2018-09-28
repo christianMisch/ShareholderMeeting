@@ -1,13 +1,14 @@
 import { getUserList, getNumOfUsers, getUser } from "../../provider/AgmOwnerProvider";
 import {getQAInterval} from './qAndA';
 import {getVotingInterval} from './voting';
-import web3Provider from '../../provider/web3Provider';
 import ecies from 'eth-ecies';
 import util from 'ethereumjs-util';
 import web3 from '../../provider/web3Provider';
 
 //console.log('web3 accounts: ');
 //console.log(web3Provider.eth.accounts);
+
+var addrDecrPwMapping = [];
 
 var inputAdr;
 var timersAreDefined = false;
@@ -79,16 +80,20 @@ $(document).ready(async function() {
         e.preventDefault();
 
         inputAdr = $('#wallet-address').val().toLowerCase();
-        const user = mapUser(await getUser(inputAdr));
+        
         $('#timer-link').hide();
+        //const user = mapUser(await getUser(inputAdr));
         //console.log('activeUser: ');
         //console.log(user);
-        if (inputAdr === web3Provider.eth.accounts[0] && !timersAreDefined) {
+        if (inputAdr === web3.eth.accounts[0] && !timersAreDefined) {
             console.log('test');
             timersAreDefined = true;
             showView('timer-link');
+        } else if (inputAdr === web3.eth.accounts[0] || addrDecrPwMapping.includes(inputAdr)) {
+            showRoleBasedView();
         } else {
             $('main #auth-modal').trigger('click');
+            $('button[data-step="1"]').prop('disabled', true);
         }
          
     });
@@ -99,8 +104,41 @@ $(document).ready(async function() {
         $('#login-button').show();
         
         showWelcomePage();
+        setTimeout(function() {
+            if ($('#place').html() === '' && $('#start').html() === '' && $('#end').html() === '') {
+                $('#announce-wrapper').hide();
+            }
+        },100);
+        
         hideUserCredentials();
         showLoginFields();
+        setTimeout(function() {
+            $('main #auth-modal').css('visibility', 'hidden');
+        }, 100);
+        
+
+        if (inputAdr === web3.eth.accounts[0]) {
+            setTimeout(function() {
+                computeDayDiff();
+                if (dayDiff >= 30) {
+                    $('main #announce-wrapper').show();
+                    $('main #place').html(place);
+                    $('main #start').html(startDate.replace('T', ' '));
+                    $('main #end').html(endDate.replace('T', ' '));
+                    console.log(document.body);
+                } else {
+                    createAlert('The AGM can only be announced at least 30 days in prior!', 'danger');
+                }
+                
+                
+                dayDiffInterval = setInterval(function() {
+                    computeDayDiff();
+                }, 86400000);
+                //console.log('day diff interval escaped...');
+                
+            }, 100);
+        }
+         
         clearInterval(dayDiffInterval);
         clearInterval(announceInterval);
         clearInterval(getQAInterval());
@@ -116,25 +154,21 @@ $(document).ready(async function() {
         console.log(place, startDate, endDate, votingQuorum);
         
         console.log('should display place and date');
-        setTimeout(function() {
-            computeDayDiff();
-            if (dayDiff >= 30) {
-                $('main #announce-wrapper').show();
-                $('main #place').html(place);
-                $('main #start').html(startDate.replace('T', ' '));
-                $('main #end').html(endDate.replace('T', ' '));
-            } else {
-                createAlert('The AGM can only be announced at least 30 days in prior!', 'danger');
-            }
-            
-            
-            dayDiffInterval = setInterval(function() {
-                computeDayDiff();
-            }, 86400000);
-            //console.log('day diff interval escaped...');
-            
-        }, 100); 
-        showView('login-button');
+
+        createAlert('You have successfully logged in as AgmOwner!');
+        $('nav').show();
+        $('#setup-link').show();
+        $('#welcome-link').hide();
+        $('#voting-link').hide();
+        $('#qa-link').hide();
+        showView('setup-link');
+        showUserCredentials();
+        $('#userAddress').html('User: ' + inputAdr);
+        $('#userRole').html('Role: AgmOwner');
+        var strDate = computeDate();
+        $('#date').html('Date: ' + strDate);
+        showLogoutButton();
+        hideLoginFields();
     });
 
     $('main').on('click', '#decr-button', function() {
@@ -144,97 +178,112 @@ $(document).ready(async function() {
         console.log('encrData: ' + encrData);
         var decrData = decrypt(privateKey, encrData);
         $('#decrPW').html(decrData);
+        $('button[data-step="1"]').prop('disabled', false);
 
         
     });
 
-    $('main').on('click', '#finish-button', function() {
-        const user = mapUser(await getUser(inputAdr));
-        
-        if (user && user.role === 0) {
-            createAlert('You have successfully logged in as AgmOwner!');
-            /*console.log('web3 acc: ' + web3Provider.eth.accounts[0]);
-            console.log('user acc:' + inputAdr);
-            console.log('set time diff...');*/
-            $('nav').show();
-            $('#setup-link').show();
-            $('#welcome-link').hide();
-            $('#voting-link').hide();
-            $('#qa-link').hide();
-
-            showView('setup-link');
-
-            setDayDiff(14);
-
-            setTimeout(function () {
-                //setDayDiff(5);
-                console.log(dayDiff);
-            }, 1000);
-
-            showUserCredentials();
-            $('#userAddress').html('User: ' + inputAdr);
-            $('#userRole').html('Role: AgmOwner');
-            var strDate = computeDate();
-            $('#date').html('Date: ' + strDate);
-            showLogoutButton();
-            hideLoginFields();
-
-            console.log(inputAdr);
-            console.log('loggedIn as Owner');
-            console.log('dayDiff: ' + dayDiff);
-                    
-        } else if (user && user.role === 2) {
-            createAlert('You have successfully logged in as Shareholder!');
-            $('nav').show();
-            $('#voting-link').show();
-            $('#setup-link').hide();
-            $('#welcome-link').hide();
-            showUserCredentials();
-            $('#userAddress').html('User: ' + inputAdr);
-            $('#userRole').html('Role: Shareholder');
-            $('#date').html('Date: ' + computeDate());
-            showLogoutButton();
-            showView('material-link');
-            hideLoginFields();
-
-            console.log(inputAdr);
-            console.log('loggedIn as Shareholder');
-        
-        } else if (user && user.role === 1) {
-
-            createAlert('You have successfully logged in as Director!');
-            $('nav').show();
-            $('#setup-link').hide();
-            $('#welcome-link').hide();
-            $('#voting-link').hide();
-            showUserCredentials();
-            $('#userAddress').html('User: ' + inputAdr);
-            $('#userRole').html('Role: Director');
-            $('#date').html('Date: ' + computeDate());
-            showLogoutButton();
-            showView('material-link');
-            hideLoginFields();
-            
-            console.log(inputAdr);
-            console.log('loggedIn as Director');
-
+    $('main').on('input', '#decPassword', function() {
+        if ($('#decrPW').html() === $('#decPassword').val()) {
+            $('#finish-button').attr('disabled', false);
         } else {
-            $('footer').append(`<div role="alert">Login failed!</div>`)
-                .addClass('alert alert-danger');
+            createAlert('Please paste the decrypted PW in the input field again to finish the login', 'danger', 'div[class="modal-footer"]');
         }
+    })
+
+    $('main').on('click', '#finish-button', function() {
+        //console.log($('#decrPW').html());
+        //console.log($('#decPassword').val());
+        addrDecrPwMapping.push(inputAdr);
+        showRoleBasedView();
     })
 
 });
 
-export function createAlert(message, alertType = 'success') {
-    $('footer').append(`<div role="alert">${message}</div>`)
+export function createAlert(message, alertType = 'success', place = 'footer') {
+    $(place).append(`<div role="alert">${message}</div>`)
         .addClass(`alert alert-${alertType}`);
-    console.log(document.body);
+    //console.log(document.body);
     setTimeout(function () {
         $('footer').empty();
         $('footer').removeAttr('class');
         //$('.alert').alert('close');
     }, 3000);
+}
+
+async function showRoleBasedView() {
+    const user = mapUser(await getUser(inputAdr));
+    if (user && user.role === 0) {
+        createAlert('You have successfully logged in as AgmOwner!');
+        /*console.log('web3 acc: ' + web3Provider.eth.accounts[0]);
+        console.log('user acc:' + inputAdr);
+        console.log('set time diff...');*/
+        $('nav').show();
+        $('#setup-link').show();
+        $('#welcome-link').hide();
+        $('#voting-link').hide();
+        $('#qa-link').hide();
+
+        showView('setup-link');
+
+        setDayDiff(14);
+
+        setTimeout(function () {
+            //setDayDiff(5);
+            console.log(dayDiff);
+        }, 1000);
+
+        showUserCredentials();
+        $('#userAddress').html('User: ' + inputAdr);
+        $('#userRole').html('Role: AgmOwner');
+        var strDate = computeDate();
+        $('#date').html('Date: ' + strDate);
+        showLogoutButton();
+        hideLoginFields();
+
+        console.log(inputAdr);
+        console.log('loggedIn as Owner');
+        console.log('dayDiff: ' + dayDiff);
+
+    } else if (user && user.role === 2) {
+        createAlert('You have successfully logged in as Shareholder!');
+        $('nav').show();
+        $('#voting-link').show();
+        $('#setup-link').hide();
+        $('#welcome-link').hide();
+        showUserCredentials();
+        $('#userAddress').html('User: ' + inputAdr);
+        $('#userRole').html('Role: Shareholder');
+        $('#date').html('Date: ' + computeDate());
+        showLogoutButton();
+        showView('material-link');
+        hideLoginFields();
+
+        console.log(inputAdr);
+        console.log('loggedIn as Shareholder');
+
+    } else if (user && user.role === 1) {
+
+        createAlert('You have successfully logged in as Director!');
+        $('nav').show();
+        $('#setup-link').hide();
+        $('#welcome-link').hide();
+        $('#voting-link').hide();
+        showUserCredentials();
+        $('#userAddress').html('User: ' + inputAdr);
+        $('#userRole').html('Role: Director');
+        $('#date').html('Date: ' + computeDate());
+        showLogoutButton();
+        showView('material-link');
+        hideLoginFields();
+
+        console.log(inputAdr);
+        console.log('loggedIn as Director');
+
+    } else {
+        $('footer').append(`<div role="alert">Login failed!</div>`)
+            .addClass('alert alert-danger');
+    }
 }
 
 function computeDate() {
