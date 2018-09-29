@@ -1,12 +1,9 @@
-import { getUserList, getNumOfUsers, getUser } from "../../provider/AgmOwnerProvider";
+import { getUserList, getNumOfUsers, getUser, getIsAnnounced, getIsFinished } from "../../provider/AgmOwnerProvider";
 import {getQAInterval} from './qAndA';
 import {getVotingInterval} from './voting';
 import ecies from 'eth-ecies';
 import util from 'ethereumjs-util';
 import web3 from '../../provider/web3Provider';
-
-//console.log('web3 accounts: ');
-//console.log(web3Provider.eth.accounts);
 
 var addrDecrPwMapping = [];
 
@@ -19,42 +16,10 @@ var dayDiff = 14;
 var dayDiffInterval;
 var announceInterval;
 var votingQuorum;
+var annReport;
+var guide;
 
 $(document).ready(async function() {
-
-    announceInterval = setInterval(function() {
-        // has to be enabled in production
-        //computeDayDiff();
-        if (dayDiff < 6) {
-            setTimeout(function() {
-                console.log('dayDiff is lower than 6');
-                createAlert('You cannot login into the application anymore.', 'danger');
-                console.log($('#login-button').length);
-                $('#login-button').attr('class', 'btn btn-danger');
-                $('#login-button').prop('disabled', true);
-            }, 100);
-        } else if (dayDiff === 14) {
-            console.log('encrypt data...');
-            var encryptedData = encrypt(inputAdr, generateRandomString());
-            console.log('encrData: ' + encryptedData);
-            /*var decryptedData = decrypt('', encryptedData);
-            console.log('decrData: ' + decryptedData);*/
-            var templateParams = {
-                from_name: 'AGM administrator',
-                to_name: 'Chris',
-                from_mail: 'service_AGM@gmail.com',
-                to_mail: 'mischok.christian@web.de',
-                message: encryptedData
-            };
-            /*emailjs.send('gmail', 'authentication_template', templateParams)
-                .then(function(response) {
-                    console.log('SUCCESS!', response.status, response.text);
-                }, function(error) {
-                    console.log('FAILED...', error);
-                });*/
-            console.log('EMAIL WAS SENT!!!');
-        }
-    }, 1000);
     
     showWelcomePage();
     // hide logout button, welcome link in sidebar and user credentials
@@ -65,7 +30,11 @@ $(document).ready(async function() {
     $('#logout-button').hide();
     $('#date').hide();
     $('nav').hide();
-    $('main #auth-modal').css('visibility', 'hidden');
+    setTimeout(function() {
+        $('main #auth-modal').css('visibility', 'hidden');
+        $('main #auth-modal').css('color', 'white');
+    },100);
+    
     hideUserCredentials();
 
     /*const links = $('ul[class="list-unstyled components"] a');
@@ -85,23 +54,60 @@ $(document).ready(async function() {
         //const user = mapUser(await getUser(inputAdr));
         //console.log('activeUser: ');
         //console.log(user);
+
+        announceInterval = setInterval(function() {
+            // has to be enabled in production
+            //computeDayDiff();
+            if (dayDiff < 6) {
+                setTimeout(async function() {
+                    console.log('dayDiff is lower than 6');
+                    if (mapUser(await getUser(inputAdr)).userAddress === '') {
+                        createAlert('You cannot login into the application anymore.', 'danger');
+                        //console.log($('#login-button').length);
+                        $('#login-button').attr('class', 'btn btn-danger');
+                        $('#login-button').prop('disabled', true);
+                    }
+                    
+                }, 100);
+            } else if (dayDiff === 14) {
+                console.log('encrypt data...');
+                var encryptedData = encrypt(inputAdr, generateRandomString());
+                console.log('encrData: ' + encryptedData);
+                /*var decryptedData = decrypt('', encryptedData);
+                console.log('decrData: ' + decryptedData);*/
+                var templateParams = {
+                    from_name: 'AGM administrator',
+                    to_name: 'Chris',
+                    from_mail: 'service_AGM@gmail.com',
+                    to_mail: 'mischok.christian@web.de',
+                    message: encryptedData
+                };
+                /*emailjs.send('gmail', 'authentication_template', templateParams)
+                    .then(function(response) {
+                        console.log('SUCCESS!', response.status, response.text);
+                    }, function(error) {
+                        console.log('FAILED...', error);
+                    });*/
+                console.log('EMAIL WAS SENT!!!');
+            }
+        }, 1000);
+
         if (inputAdr === web3.eth.accounts[0] && !timersAreDefined) {
             console.log('test');
-            timersAreDefined = true;
             showView('timer-link');
         } else if (inputAdr === web3.eth.accounts[0] || addrDecrPwMapping.includes(inputAdr)) {
             showRoleBasedView();
         } else {
             $('main #auth-modal').trigger('click');
             $('button[data-step="1"]').prop('disabled', true);
-        }
-         
+        } 
     });
 
     $('#logout-button').click(function() {
         $('nav').hide();
         $('#logout-button').hide();
         $('#login-button').show();
+        $('main #auth-modal').css('color', 'white');
         
         showWelcomePage();
         setTimeout(function() {
@@ -118,9 +124,9 @@ $(document).ready(async function() {
         
 
         if (inputAdr === web3.eth.accounts[0]) {
-            setTimeout(function() {
+            setTimeout(async function() {
                 computeDayDiff();
-                if (dayDiff >= 30) {
+                if (dayDiff >= 30 && !(await getIsAnnounced()) )  {
                     $('main #announce-wrapper').show();
                     $('main #place').html(place);
                     $('main #start').html(startDate.replace('T', ' '));
@@ -150,25 +156,32 @@ $(document).ready(async function() {
         place = $('main #place').val();
         startDate = $('main #agm-start').val();
         endDate = $('main #agm-end').val();
-        votingQuorum = $('main #voting-quorum').val();
-        console.log(place, startDate, endDate, votingQuorum);
-        
-        console.log('should display place and date');
+        if (!(startDate.substring(0,10) === endDate.substring(0,10)) 
+            || startDate.substring(11,13) > endDate.substring(11,13)) {
+               createAlert('The AGM should start, end on the same date and the start time should be smaller than the end time!', 'danger');
+               showView('timer-link');
+        } else {
+            votingQuorum = $('main #voting-quorum').val();
+            
+            /*var f = new File('[example test]', 'example.txt');
+            var fileReader = new FileReader();
+            var fileWriter = new FileWriter(f);
+            
+            fileReader.onload = function(e) {
+                fileWriter.write(e.target.result);
+            }
+            
+            annReport = $('#annual-report')[0].files[0];
+            guide = $('#guide')[0].files[0];
+            
 
-        createAlert('You have successfully logged in as AgmOwner!');
-        $('nav').show();
-        $('#setup-link').show();
-        $('#welcome-link').hide();
-        $('#voting-link').hide();
-        $('#qa-link').hide();
-        showView('setup-link');
-        showUserCredentials();
-        $('#userAddress').html('User: ' + inputAdr);
-        $('#userRole').html('Role: AgmOwner');
-        var strDate = computeDate();
-        $('#date').html('Date: ' + strDate);
-        showLogoutButton();
-        hideLoginFields();
+            fileReader.readAsText(annReport);*/
+            
+            timersAreDefined = true;
+            console.log(annReport, guide);
+            showRoleBasedView();
+        }
+        
     });
 
     $('main').on('click', '#decr-button', function() {
@@ -229,7 +242,7 @@ async function showRoleBasedView() {
         setDayDiff(14);
 
         setTimeout(function () {
-            //setDayDiff(5);
+            setDayDiff(5);
             console.log(dayDiff);
         }, 1000);
 

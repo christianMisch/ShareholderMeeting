@@ -20,6 +20,7 @@ contract AgmOwner is User {
     address[] owners;
 
     bool public isFinished = false;
+    bool public isAnnounced = false;
 
     //uint public minimumVotingQuorum;
     //uint public marginOfVotesForMajority;
@@ -157,9 +158,9 @@ contract AgmOwner is User {
 
     }
 
-    /*function announceAGM() public onlyOwner view returns (string recordDate, string recordPlace) {
-        return (meetingDate, meetingPlace);
-    }*/
+    function announceAGM() public onlyOwner {
+        isAnnounced = true;
+    }
 
     function createProposal(string _name, string _ipfs_hash, string _options)
         public /*onlyOwner*/ returns(uint propId) {
@@ -176,6 +177,14 @@ contract AgmOwner is User {
 
     function getOwners() public view returns (address[] ownerAdr) {
         return owners;
+    }
+
+    function getIsFinished() public view returns (bool finished) {
+        return isFinished;
+    }
+
+    function getIsAnnounced() public view returns (bool announced) {
+        return isAnnounced;
     }
 
     // executes the pending proposal

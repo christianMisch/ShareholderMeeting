@@ -81,13 +81,37 @@ export function getOwners() {
     });   
 }
 
+export function getIsAnnounced() {
+    return AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+        return AgmOwner.getIsAnnounced.call();
+    }).then(function(result) {
+        console.log(result);
+        //alert('getOwners call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log(error);
+    });   
+}
 
+export function getIsFinished() {
+    return AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+        return AgmOwner.getIsFinished.call();
+    }).then(function(result) {
+        console.log(result);
+        //alert('getOwners call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log(error);
+    });   
+}
 
 export function announceAGM() {
     return AgmOwnerContract.deployed().then(function(instance) {
         AgmOwner = instance;
     }).then(function() {
-        return AgmOwner.announceAGM.call();
+        return AgmOwner.announceAGM.sendTransaction({from: sender, gas: gas});
     }).then(function(result) {
         //alert(result);
         return result;
