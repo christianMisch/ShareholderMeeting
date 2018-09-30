@@ -1,6 +1,7 @@
-import {createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission} from '../../provider/AgmOwnerProvider';
+import {finishAGM, createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission} from '../../provider/AgmOwnerProvider';
 import {getActiveUserAddress, createAlert} from './authentication';
 import {upload} from '../../provider/IPFSUploadProvider';
+import './statistics';
 //import {web3} from './index';
 
 //const owner = web3Provider.eth.accounts[0];
@@ -71,6 +72,11 @@ $(document).ready(function() {
             console.log(newOwnerAddress);
             await transferOwnership(newOwnerAddress, activeUserAddress);
         
+        });
+
+        $('main').on('click', '#finish-AGM-button', async function() {
+            await finishAGM();
+            createAlert('The AGM was successfully finished');
         });
     });
 

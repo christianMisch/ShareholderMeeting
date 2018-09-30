@@ -78,6 +78,9 @@
                             <li>
                                 <a href="#list" id="list-link">Q&A List</a>
                             </li>
+                            <li>
+                                <a href="#statistics" id="statistics-link">Statistics</a>
+                            </li>
                         </ul>
                     </nav>
                 </div>
@@ -156,7 +159,7 @@
                     <label>Upload app guide <input type="file" id="guide"></label>
                     <label>Input the the voting quorum <input type="number" id="voting-quorum"></label>
                     <label></label>
-                    <input type="submit" id="time-submit-button" value="submit">
+                    <input type="submit" id="time-submit-button" value="Announce">
                 </form>
             </article>
         </template>
@@ -189,6 +192,14 @@
                     <label>Type the address of the user who shall be removed: <input type="text" id="remove-user-address"></label>
                     <input type="button" value="remove User" id="remove-user-button">
                 </article>
+            </section>
+
+            <section class="col-12">
+                <label>Press this button <strong>ONLY</strong> if the AGM shall be finished. Also, the calculation of the voting stastics will be triggered. 
+                    <div>
+                        <input type="button" value="Finish" id="finish-AGM-button">
+                    </div>
+                </label>
             </section>
         </template>
 
@@ -328,12 +339,19 @@
                   </div>
                 </div>
               </div>
-
         </template>
 
-        <footer>
+        <template id="statistics-template">
+            <section class="col-6">
+                <canvas id="voteCountCanvas"></canvas>
+            </section>
+            <section class="col-6">
+                <canvas id="shareCanvas"></canvas>
+            </section>
+        </template>
 
-        </footer>
+
+        <footer></footer>
         <noscript>
             JavaScript is required to run this app.
         </noscript>

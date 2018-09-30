@@ -1,6 +1,7 @@
-import { getUserList, getNumOfUsers, getUser, getIsAnnounced, getIsFinished } from "../../provider/AgmOwnerProvider";
+import { getUserList, getNumOfUsers, getUser, getIsAnnounced, getIsFinished, announceAGM } from "../../provider/AgmOwnerProvider";
 import {getQAInterval} from './qAndA';
 import {getVotingInterval} from './voting';
+import {setMinimumVotingQuorum} from '../../provider/ProposalProvider'
 import ecies from 'eth-ecies';
 import util from 'ethereumjs-util';
 import web3 from '../../provider/web3Provider';
@@ -21,6 +22,7 @@ var guide;
 
 $(document).ready(async function() {
     
+    console.log('isAnnounced: ' + await getIsAnnounced());
     showWelcomePage();
     // hide logout button, welcome link in sidebar and user credentials
     if (!timersAreDefined) {
@@ -63,11 +65,9 @@ $(document).ready(async function() {
                     console.log('dayDiff is lower than 6');
                     if (mapUser(await getUser(inputAdr)).userAddress === '') {
                         createAlert('You cannot login into the application anymore.', 'danger');
-                        //console.log($('#login-button').length);
                         $('#login-button').attr('class', 'btn btn-danger');
-                        $('#login-button').prop('disabled', true);
+                        $('#login-button').prop('disabled', true);   
                     }
-                    
                 }, 100);
             } else if (dayDiff === 14) {
                 console.log('encrypt data...');
@@ -92,11 +92,18 @@ $(document).ready(async function() {
             }
         }, 1000);
 
+        console.log(dayDiff);
+        console.log(addrDecrPwMapping);
         if (inputAdr === web3.eth.accounts[0] && !timersAreDefined) {
             console.log('test');
             showView('timer-link');
         } else if (inputAdr === web3.eth.accounts[0] || addrDecrPwMapping.includes(inputAdr)) {
             showRoleBasedView();
+        } else if (!addrDecrPwMapping.includes(inputAdr) && dayDiff < 6) {
+            console.log('not allowed to login');
+            createAlert('You cannot login into the application anymore.', 'danger');
+            //$('#login-button').attr('class', 'btn btn-danger');
+            //$('#login-button').prop('disabled', true);
         } else {
             $('main #auth-modal').trigger('click');
             $('button[data-step="1"]').prop('disabled', true);
@@ -113,26 +120,23 @@ $(document).ready(async function() {
         setTimeout(function() {
             if ($('#place').html() === '' && $('#start').html() === '' && $('#end').html() === '') {
                 $('#announce-wrapper').hide();
+                $('main #auth-modal').css('visibility', 'hidden');
             }
         },100);
         
         hideUserCredentials();
         showLoginFields();
-        setTimeout(function() {
-            $('main #auth-modal').css('visibility', 'hidden');
-        }, 100);
-        
 
         if (inputAdr === web3.eth.accounts[0]) {
             setTimeout(async function() {
-                computeDayDiff();
+                //computeDayDiff();
                 if (dayDiff >= 30 && !(await getIsAnnounced()) )  {
                     $('main #announce-wrapper').show();
                     $('main #place').html(place);
                     $('main #start').html(startDate.replace('T', ' '));
                     $('main #end').html(endDate.replace('T', ' '));
-                    console.log(document.body);
-                } else {
+                    //console.log(document.body);
+                } else if (!await getIsAnnounced()) {
                     createAlert('The AGM can only be announced at least 30 days in prior!', 'danger');
                 }
                 
@@ -152,7 +156,7 @@ $(document).ready(async function() {
 
     });
 
-    $('main').on('click', 'input[id = "time-submit-button"]', function() {
+    $('main').on('click', 'input[id = "time-submit-button"]', async function() {
         place = $('main #place').val();
         startDate = $('main #agm-start').val();
         endDate = $('main #agm-end').val();
@@ -162,7 +166,7 @@ $(document).ready(async function() {
                showView('timer-link');
         } else {
             votingQuorum = $('main #voting-quorum').val();
-            
+            await setMinimumVotingQuorum(votingQuorum);
             /*var f = new File('[example test]', 'example.txt');
             var fileReader = new FileReader();
             var fileWriter = new FileWriter(f);
@@ -179,7 +183,9 @@ $(document).ready(async function() {
             
             timersAreDefined = true;
             console.log(annReport, guide);
+            await announceAGM();
             showRoleBasedView();
+
         }
         
     });
@@ -239,12 +245,12 @@ async function showRoleBasedView() {
 
         showView('setup-link');
 
-        setDayDiff(14);
+        /*setDayDiff(14);
 
         setTimeout(function () {
             setDayDiff(5);
-            console.log(dayDiff);
-        }, 1000);
+            console.log('dayDiff: ' + dayDiff);
+        }, 100);*/
 
         showUserCredentials();
         $('#userAddress').html('User: ' + inputAdr);

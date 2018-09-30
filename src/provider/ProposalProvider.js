@@ -33,4 +33,16 @@ export function getNumOfProposals() {
     }); 
 }
 
+export function setMinimumVotingQuorum(quorum, from) {
+    return FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
+        return Factory.setMinimumVotingQuorum.sendTransaction(quorum, {gas: gas, from: from});
+    }).then(function(result) {
+        //alert('getNumOfProposals call was successful: ' + result);
+    }).catch(function(error) {
+        console.log('Error during getNumOfProposals call: ' + error.message);
+    }); 
+}
+
 

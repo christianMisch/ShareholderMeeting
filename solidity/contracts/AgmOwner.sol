@@ -14,15 +14,12 @@ contract AgmOwner is User {
     User[] public users;
     // stores user's address with corresponding id
     mapping(address => uint) public userId;
-    // store options to every proposal
-    VotingOption[] public votingOptions;
     // owners which have permission to setup the AGM
     address[] owners;
 
     bool public isFinished = false;
     bool public isAnnounced = false;
 
-    //uint public minimumVotingQuorum;
     //uint public marginOfVotesForMajority;
     string public meetingName;
     string public meetingDescription;
@@ -30,11 +27,6 @@ contract AgmOwner is User {
     //string public meetingPlace;
     //uint public meetingStartTime;
     //uint public meetingEndTime;
-
-    struct VotingOption {
-        string optionName;
-        uint optionCount;
-    }
 
     modifier onlyOwner {
         bool isOwner;
@@ -51,10 +43,10 @@ contract AgmOwner is User {
     event ProposalCreated(uint propId, address creator);
     event Voted(address userAddress, uint proposalId, string votingOption);
     event AgmFinished(bool isFinished);
-    event ProposalExecuted(uint proposalId, bool proposalPassed, uint passedPercentage, VotingOption[] options);
     event OwnershipSharedTo(address newOwner);
     event UserCreated(uint userId, address userAddress, string role);
     event UserRemoved(uint userId, address userAddress, uint role);
+    event AgmAnnounced(bool isAnnounced);
 
     constructor(
         address _userAddress,
@@ -159,7 +151,10 @@ contract AgmOwner is User {
     }
 
     function announceAGM() public onlyOwner {
+        require(!isAnnounced, "AGM has already been announced");
         isAnnounced = true;
+
+        emit AgmAnnounced(isAnnounced);
     }
 
     function createProposal(string _name, string _ipfs_hash, string _options)
@@ -188,54 +183,8 @@ contract AgmOwner is User {
     }
 
     // executes the pending proposal
-    /*function executeProposal(uint proposalId) public {
-
-        Proposal storage prop = proposals[proposalId];
-        var optionString = proposals[proposalId].options.toSlice();
-        var delim = ";".toSlice();
-        var options = new string[](optionString.count(delim) + 1);
-        for (uint l = 0; l < options.length; l++) {
-            options[l] = optionString.split(delim).toString();
-        }
-
-        require(now > meetingEndTime, "meeting has not finished yet");
-
-
-        // iterate over all options to store default options in the map
-        for (uint k = 0; k < options.length; k++) {
-            uint id = votingOptions.length++;
-            votingOptions[id] = VotingOption({optionName: options[k], optionCount: 0});
-
-            // iterate over all votes to check which voter voted for option k
-            for (uint i = 0; i < prop.votes.length; i++) {
-
-                Vote storage v = prop.votes[i];
-                if (keccak256(v.voterDecision) == keccak256(options[k])) {
-                    votingOptions[k].optionCount++;
-                }
-            }
-        }
-        uint winningOptionCount = 0;
-        uint countSum = 0;
-
-        for (uint j = 0; j < votingOptions.length; j++) {
-            countSum += votingOptions[j].optionCount;
-            if (winningOptionCount < votingOptions[j].optionCount) {
-                winningOptionCount = votingOptions[j].optionCount;
-            }
-        }
-
-        if (winningOptionCount > minimumVotingQuorum
-            && (winningOptionCount * 100 / countSum) > marginOfVotesForMajority) {
-            prop.proposalPassed = true;
-        } else {
-            prop.proposalPassed = false;
-        }
-
-        prop.passedPercent = winningOptionCount * 100 / countSum;
-
-        delete votingOptions;
-
-        emit ProposalExecuted(proposalId, prop.proposalPassed, prop.passedPercent, votingOptions);
-    }*/
+    function executeProposal(uint proposalId) public returns (bool success) {
+        bool isExecuted = fac.executeProposal(proposalId);
+        return isExecuted;
+    }
 }

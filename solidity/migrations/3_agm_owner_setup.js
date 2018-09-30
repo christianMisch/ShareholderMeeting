@@ -28,6 +28,8 @@ module.exports = async function(deployer, network, accounts) {
     await AgmOwnerContract.createProposal.sendTransaction('foster research', deshash, 'yes, no');
     console.log('deshash: ' + deshash);
     //console.log('3.3 ipfs-content: ' + await IPFSDownload.downloadString(deshash));
+
+    await AgmOwnerContract.announceAGM.sendTransaction();
 }
 
 /*

@@ -12,6 +12,17 @@ contract Factory is ProposalData {
     mapping(address => Shareholder) public shareholders;
     Proposal[] public proposals;
     mapping(address => uint) public votingWeights;
+    // store options to every proposal
+    VotingOption[] public votingOptions;
+    uint public minimumVotingQuorum;
+
+    struct VotingOption {
+        string optionName;
+        uint optionCount;
+    }
+
+    event ProposalExecuted(uint proposalId, bool proposalPassed, uint passedPercentage);
+
 
     function createNewShareholder(address _userAddress, uint votingTok, QandA qa) public returns (Shareholder) {
         Shareholder sh = new Shareholder(_userAddress, votingTok, this, qa);
@@ -55,8 +66,7 @@ contract Factory is ProposalData {
     ) {
         Proposal storage proposal = proposals[proposalId];
         return
-        (proposal.proposalId, proposal.name, proposal.ipfs_hash, proposal.options, proposal.proposalPassed,
-        proposal.passedPercent, proposal.voteCount);
+        (proposal.proposalId, proposal.name, proposal.ipfs_hash, proposal.options, proposal.proposalPassed, proposal.passedPercent, proposal.voteCount);
     }
 
     function setVote(uint proposalId, string votingOption) public {
@@ -103,6 +113,15 @@ contract Factory is ProposalData {
             (sh.userAddress(), sh.role(), votingWeights[sh.userAddress()]);
     }
 
+    function setMinimumVotingQuorum(uint quorum) public view {
+        minimumVotingQuorum = quorum;
+    }
+
+    function getVotingOptions(uint optionId) public view returns (string votingOption, uint votingCount) {
+        VotingOption storage votOpt = votingOptions[optionId];
+        return (votOpt.optionName, votOpt.optionCount);
+    }
+
     /*function getNumOfShareholders() public view returns (uint length) {
         return shareholders.length;
     }*/
@@ -110,4 +129,46 @@ contract Factory is ProposalData {
     /*function getShareholderList() public view returns (Shareholder[]) {
         return shareholders;
     }*/
+
+    function executeProposal(uint proposalId) public returns (bool success) {
+        Proposal storage prop = proposals[proposalId];
+
+        //require(isFinished, "meeting has not finished yet");
+
+        // iterate over all options to store default options in the array
+        for (uint k = 0; k < prop.options.length; k++) {
+            uint id = votingOptions.length++;
+            votingOptions[id] = VotingOption({optionName: prop.options[k], optionCount: 0});
+
+            // iterate over all votes to check which voter voted for option k
+            for (uint i = 0; i < prop.votes.length; i++) {
+
+                Vote storage v = prop.votes[i];
+                /*if (keccak256(v.voterDecision) == keccak256(prop.options[k])) {
+                    votingOptions[k].optionCount++;
+                }*/
+            }
+        }
+        uint winningOptionCount = 0;
+        uint countSum = 0;
+
+        for (uint j = 0; j < votingOptions.length; j++) {
+            countSum += votingOptions[j].optionCount;
+            if (winningOptionCount < votingOptions[j].optionCount) {
+                winningOptionCount = votingOptions[j].optionCount;
+            }
+        }
+    
+        if (countSum >= minimumVotingQuorum
+            /*&& (winningOptionCount * 100 / countSum) > marginOfVotesForMajority*/) {
+            prop.proposalPassed = true;
+        } else {
+            prop.proposalPassed = false;
+        }
+
+        prop.passedPercent = winningOptionCount * 100 / countSum;
+
+        emit ProposalExecuted(proposalId, prop.proposalPassed, prop.passedPercent);
+        return true;
+    }
 }
