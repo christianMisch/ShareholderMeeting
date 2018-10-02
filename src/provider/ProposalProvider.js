@@ -45,4 +45,66 @@ export function setMinimumVotingQuorum(quorum, from) {
     }); 
 }
 
+export function appendOption(opt, from) {
+    return FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
+        return Factory.appendOption.sendTransaction(opt, {gas: gas, from: from});
+    }).then(function(result) {
+        //alert('getNumOfProposals call was successful: ' + result);
+    }).catch(function(error) {
+        console.log('Error during getNumOfProposals call: ' + error.message);
+    }); 
+}
 
+export function getNumOfVotingOptions() {
+    return FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
+        return Factory.getNumOfVotingOptions.call();
+    }).then(function(result) {
+        //alert('getNumOfProposals call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log('Error during getNumOfProposals call: ' + error.message);
+    }); 
+}
+
+export function getVotingOption() {
+    return FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
+        return Factory.getVotingOption.call();
+    }).then(function(result) {
+        //alert('getNumOfProposals call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log('Error during getNumOfProposals call: ' + error.message);
+    }); 
+}
+
+export function getWeightOfShareholder() {
+    return FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
+        return Factory.getWeightOfShareholder.call();
+    }).then(function(result) {
+        //alert('getNumOfProposals call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log('Error during getNumOfProposals call: ' + error.message);
+    }); 
+}
+
+export function getNumOfVotingShareholders() {
+    return FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
+        return Factory.getNumOfVotingShareholders.call();
+    }).then(function(result) {
+        //alert('getNumOfProposals call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log('Error during getNumOfProposals call: ' + error.message);
+    }); 
+}

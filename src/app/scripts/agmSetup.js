@@ -2,6 +2,7 @@ import {finishAGM, createProposal, addUser, removeUser, getUser, getNumOfUsers, 
 import {getActiveUserAddress, createAlert} from './authentication';
 import {upload} from '../../provider/IPFSUploadProvider';
 import './statistics';
+import {appendOption, getNumOfVotingOptions, getVotingOption, getWeightOfShareholder, getNumOfVotingShareholders} from '../../provider/ProposalProvider';
 //import {web3} from './index';
 
 //const owner = web3Provider.eth.accounts[0];
@@ -28,8 +29,12 @@ $(document).ready(function() {
             const propDescription = $('#proposal-description').val();
             var propHash = await upload(propDescription);
             const propOptions = $('#proposal-options').val();
+            const parts = propOptions.split(',');
+            for (var i = 0; i < parts.length; i++) {
+                await appendOption(parts[i]);
+            }
             //console.log(activeUserAddress, propName, propDescription, propOptions);
-            createProposal(propName, propHash, propOptions, activeUserAddress);
+            createProposal(propName, propHash, activeUserAddress);
         });
 
         $('main').on('click', 'input[id="add-user-button"]', async function() {
@@ -77,7 +82,41 @@ $(document).ready(function() {
         $('main').on('click', '#finish-AGM-button', async function() {
             await finishAGM();
             createAlert('The AGM was successfully finished');
+            // show the statistics view
+            var data = {};
+            var voteCountCanvas = $('main #voteCountCanvas');
+            var colors = ["#fde23e","#f16e23", "#57d9ff","#937e88", "#ffffff"];
+            var usedColors = colors.slice(0, await getNumOfVotingOptions());
+            for (var i = 0; i < await getNumOfVotingOptions(); i++) {
+                var votingOptionEntry = await getVotingOption(i);
+                data[votingOptionEntry[0]] = votingOptionEntry[1];
+            }
+            
+            createPiechart(voteCountCanvas, data, usedColors);
+            
+            for (var i = 0; i < await getNumOfVotingShareholders(); i++) {
+                var votingSharehEntry = await getWeightOfShareholder();
+                $('main #shareTable').append(
+                    `<tr>
+                        <td>${votingSharehEntry[0]}</td>
+                        <td>${votingSharehEntry[1]}</td>
+                    </tr>`
+                );
+            }
+            
         });
+
     });
 
 });
+
+function createPiechart(canvas, data, colors) {
+    var piechart = new Piechart(
+        {
+            canvas: canvas,
+            data: data,
+            colors: colors
+        }
+    );
+    piechart.draw();
+}

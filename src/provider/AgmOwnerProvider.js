@@ -181,13 +181,13 @@ export function finishAGM() {
     });
 }
 
-export function createProposal(name, hash, options, from) {   
+export function createProposal(name, hash, from) {   
     AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
         AgmOwner.userAddress.call().then(function(result) {
             console.log('userAddress: ' + result); 
         });
-        return AgmOwner.createProposal.sendTransaction(name, hash, options, {from: from, gas: gas});
+        return AgmOwner.createProposal.sendTransaction(name, hash, {from: from, gas: gas});
     }).then(function(result) {
         alert('createProposal TX was successful: ' + result);
     }).catch(function(error) {

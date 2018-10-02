@@ -6,12 +6,16 @@ import "./Shareholder.sol";
 import "./ProposalData.sol";
 import "./QandA.sol";
 import "./AgmOwner.sol";
+import "../lib/solidity-stringutils/strings.sol";
 
 contract Factory is ProposalData {
 
+    //using strings for *;
     mapping(address => Shareholder) public shareholders;
+    address[] public votingShareholders;
     Proposal[] public proposals;
     mapping(address => uint) public votingWeights;
+    string[] public propOptions;
     // store options to every proposal
     VotingOption[] public votingOptions;
     uint public minimumVotingQuorum;
@@ -45,7 +49,7 @@ contract Factory is ProposalData {
         proposal.proposalId = propId;
         proposal.name = _name;
         proposal.ipfs_hash = _ipfs_hash;
-        proposal.options = _options;
+        //proposal.options = _options;
         proposal.proposalPassed = false;
         proposal.passedPercent = 0;
         proposal.voteCount = 0;
@@ -59,14 +63,14 @@ contract Factory is ProposalData {
         uint _proposalId,
         string _name,
         string _ipfs_hash,
-        string _options,
+        //string _options,
         bool _proposalPassed,
         uint _passedPercent,
         uint _voteCount
     ) {
         Proposal storage proposal = proposals[proposalId];
         return
-        (proposal.proposalId, proposal.name, proposal.ipfs_hash, proposal.options, proposal.proposalPassed, proposal.passedPercent, proposal.voteCount);
+        (proposal.proposalId, proposal.name, proposal.ipfs_hash, /*proposal.options, */proposal.proposalPassed, proposal.passedPercent, proposal.voteCount);
     }
 
     function setVote(uint proposalId, string votingOption) public {
@@ -83,6 +87,7 @@ contract Factory is ProposalData {
         );
         prop.votedOnProposal[msg.sender] = true;
         prop.voteCount++;
+        votingShareholders.push(msg.sender);
     }
 
     function getVote(uint proposalID, uint voteId) public view returns (address user, string option, uint weight) {
@@ -113,13 +118,26 @@ contract Factory is ProposalData {
             (sh.userAddress(), sh.role(), votingWeights[sh.userAddress()]);
     }
 
-    function setMinimumVotingQuorum(uint quorum) public view {
+    function setMinimumVotingQuorum(uint quorum) public {
         minimumVotingQuorum = quorum;
     }
 
-    function getVotingOptions(uint optionId) public view returns (string votingOption, uint votingCount) {
+    function getVotingOption(uint optionId) public view returns (string votingOption, uint votingCount) {
         VotingOption storage votOpt = votingOptions[optionId];
         return (votOpt.optionName, votOpt.optionCount);
+    }
+
+    function getNumOfVotingOptions() public view returns (uint length) {
+        return votingOptions.length;
+    }
+
+    function getWeightOfShareholder(uint shareholderId) public view returns (address adr, uint weight) {
+        return (votingShareholders[shareholderId], 
+            votingWeights[votingShareholders[shareholderId]]);
+    }
+
+    function getNumOfVotingShareholders() public view returns (uint length) {
+        return votingShareholders.length;
     }
 
     /*function getNumOfShareholders() public view returns (uint length) {
@@ -130,23 +148,27 @@ contract Factory is ProposalData {
         return shareholders;
     }*/
 
+    function appendVotingOption(string opt) public {
+        propOptions.push(opt);
+    }
+
     function executeProposal(uint proposalId) public returns (bool success) {
         Proposal storage prop = proposals[proposalId];
 
         //require(isFinished, "meeting has not finished yet");
 
         // iterate over all options to store default options in the array
-        for (uint k = 0; k < prop.options.length; k++) {
+        for (uint k = 0; k < propOptions.length; k++) {
             uint id = votingOptions.length++;
-            votingOptions[id] = VotingOption({optionName: prop.options[k], optionCount: 0});
+            votingOptions[id] = VotingOption({optionName: propOptions[k], optionCount: 0});
 
             // iterate over all votes to check which voter voted for option k
             for (uint i = 0; i < prop.votes.length; i++) {
 
                 Vote storage v = prop.votes[i];
-                /*if (keccak256(v.voterDecision) == keccak256(prop.options[k])) {
+                if (keccak256(v.voterDecision) == keccak256(propOptions[k])) {
                     votingOptions[k].optionCount++;
-                }*/
+                }
             }
         }
         uint winningOptionCount = 0;
