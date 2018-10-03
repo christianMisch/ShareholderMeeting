@@ -41,15 +41,15 @@ export function setMinimumVotingQuorum(quorum, from) {
     }).then(function(result) {
         //alert('getNumOfProposals call was successful: ' + result);
     }).catch(function(error) {
-        console.log('Error during getNumOfProposals call: ' + error.message);
+        console.log('Error during setMinimumVotingQuorum TX: ' + error.message);
     }); 
 }
 
-export function appendOption(opt, from) {
+export function appendVotingOption(opt, from) {
     return FactoryContract.deployed().then(function(deplFac) {
         Factory = deplFac;
         //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
-        return Factory.appendOption.sendTransaction(opt, {gas: gas, from: from});
+        return Factory.appendVotingOption.sendTransaction(opt, {gas: gas, from: from});
     }).then(function(result) {
         //alert('getNumOfProposals call was successful: ' + result);
     }).catch(function(error) {
@@ -79,7 +79,7 @@ export function getVotingOption() {
         //alert('getNumOfProposals call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log('Error during getNumOfProposals call: ' + error.message);
+        console.log('Error during getVotingOption call: ' + error.message);
     }); 
 }
 
@@ -92,7 +92,7 @@ export function getWeightOfShareholder() {
         //alert('getNumOfProposals call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log('Error during getNumOfProposals call: ' + error.message);
+        console.log('Error during getWeightOfShareholder call: ' + error.message);
     }); 
 }
 
@@ -105,6 +105,6 @@ export function getNumOfVotingShareholders() {
         //alert('getNumOfProposals call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log('Error during getNumOfProposals call: ' + error.message);
+        console.log('Error during getNumOfVotingShareholders call: ' + error.message);
     }); 
 }

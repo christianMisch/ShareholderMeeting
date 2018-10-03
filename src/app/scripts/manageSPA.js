@@ -71,6 +71,10 @@ function insertTemplate(strHash) {
         case "list":
             templateContent = document.getElementById("QandA-list-template").content;
             break;
+        case "statistics":
+            console.log('show the statistics template...');
+            templateContent = document.getElementById("statistics-template").content;
+            break;
         default:
             templateContent = document.getElementById("welcome-template").content;
             break;

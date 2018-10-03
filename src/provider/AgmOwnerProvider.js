@@ -107,11 +107,11 @@ export function getIsFinished() {
     });   
 }
 
-export function announceAGM() {
+export function announceAGM(from) {
     return AgmOwnerContract.deployed().then(function(instance) {
         AgmOwner = instance;
     }).then(function() {
-        return AgmOwner.announceAGM.sendTransaction({from: sender, gas: gas});
+        return AgmOwner.announceAGM.sendTransaction({from: from, gas: gas});
     }).then(function(result) {
         //alert(result);
         return result;
@@ -170,12 +170,12 @@ export function getUser(address) {
     });
 }
 
-export function finishAGM() {
+export function finishAGM(from) {
     AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
-        return AgmOwner.finishAGM();
+        return AgmOwner.finishAGM.sendTransaction({gas: gas, from: from});
     }).then(function(result) {
-        alert('finishAGM TX was successful: ' + result);
+        //alert('finishAGM TX was successful: ' + result);
     }).catch(function(error) {
         console.log('Error during finishAGM TX: ' + error.message);
     });
@@ -205,5 +205,18 @@ export function getUserList() {
     }).catch(function(error) {
         console.log('Error during getUserList call: ' + error.message);
     });
+}
+
+export function executeProposal(proposalId, from) {
+    AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+    }).then(function() {
+        return AgmOwner.executeProposal.sendTransaction(proposalId, {from: from, gas: gas});
+    }).then(function(result) {
+        alert('executeProposal TX was successful: ' + result);
+        //return result;
+    }).catch(function(error) {
+        console.log('Error during executeProposal TX: ' + error);
+    })
 }
 

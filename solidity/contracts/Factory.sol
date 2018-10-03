@@ -12,11 +12,13 @@ contract Factory is ProposalData {
 
     //using strings for *;
     mapping(address => Shareholder) public shareholders;
+    //mapping(uint => string[]) public propToOptMapping;
     address[] public votingShareholders;
     Proposal[] public proposals;
     mapping(address => uint) public votingWeights;
+    // stores all option names
     string[] public propOptions;
-    // store options to every proposal
+    // stores the counter to every voting option
     VotingOption[] public votingOptions;
     uint public minimumVotingQuorum;
 
@@ -26,7 +28,6 @@ contract Factory is ProposalData {
     }
 
     event ProposalExecuted(uint proposalId, bool proposalPassed, uint passedPercentage);
-
 
     function createNewShareholder(address _userAddress, uint votingTok, QandA qa) public returns (Shareholder) {
         Shareholder sh = new Shareholder(_userAddress, votingTok, this, qa);
@@ -53,6 +54,8 @@ contract Factory is ProposalData {
         proposal.proposalPassed = false;
         proposal.passedPercent = 0;
         proposal.voteCount = 0;
+
+
     }
 
     function getNumOfProposals() public view returns (uint length) {
@@ -152,43 +155,47 @@ contract Factory is ProposalData {
         propOptions.push(opt);
     }
 
-    function executeProposal(uint proposalId) public returns (bool success) {
-        Proposal storage prop = proposals[proposalId];
+    function getOptionsLength() public view returns (uint length) {
+        return propOptions.length;
+    }
+
+    function evaluateProposal() public returns (bool success) {
 
         //require(isFinished, "meeting has not finished yet");
-
         // iterate over all options to store default options in the array
         for (uint k = 0; k < propOptions.length; k++) {
             uint id = votingOptions.length++;
             votingOptions[id] = VotingOption({optionName: propOptions[k], optionCount: 0});
+            // iterate over all votes of all proposals to check which voter voted for option k
+            for (uint l = 0; l < proposals.length; l++) {
+                Proposal storage prop = proposals[l];
+                for (uint i = 0; i < prop.votes.length; i++) {
 
-            // iterate over all votes to check which voter voted for option k
-            for (uint i = 0; i < prop.votes.length; i++) {
-
-                Vote storage v = prop.votes[i];
-                if (keccak256(v.voterDecision) == keccak256(propOptions[k])) {
-                    votingOptions[k].optionCount++;
-                }
+                    Vote storage v = prop.votes[i];
+                    if (keccak256(v.voterDecision) == keccak256(propOptions[k])) {
+                        votingOptions[k].optionCount++;
+                    }
+                }  
             }
-        }
-        uint winningOptionCount = 0;
-        uint countSum = 0;
+        }           
+        // uint winningOptionCount = 0;
+        // uint countSum = 0;
 
-        for (uint j = 0; j < votingOptions.length; j++) {
-            countSum += votingOptions[j].optionCount;
-            if (winningOptionCount < votingOptions[j].optionCount) {
-                winningOptionCount = votingOptions[j].optionCount;
-            }
-        }
+        // for (uint j = 0; j < votingOptions.length; j++) {
+        //     countSum += votingOptions[j].optionCount;
+        //     if (winningOptionCount < votingOptions[j].optionCount) {
+        //         winningOptionCount = votingOptions[j].optionCount;
+        //     }
+        // }
     
-        if (countSum >= minimumVotingQuorum
-            /*&& (winningOptionCount * 100 / countSum) > marginOfVotesForMajority*/) {
-            prop.proposalPassed = true;
-        } else {
-            prop.proposalPassed = false;
-        }
+        // if (countSum >= minimumVotingQuorum
+        //     /*&& (winningOptionCount * 100 / countSum) > marginOfVotesForMajority*/) {
+        //     prop.proposalPassed = true;
+        // } else {
+        //     prop.proposalPassed = false;
+        // }
 
-        prop.passedPercent = winningOptionCount * 100 / countSum;
+        // prop.passedPercent = winningOptionCount * 100 / countSum;
 
         emit ProposalExecuted(proposalId, prop.proposalPassed, prop.passedPercent);
         return true;

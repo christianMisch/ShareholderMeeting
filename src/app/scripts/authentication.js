@@ -1,7 +1,7 @@
 import { getUserList, getNumOfUsers, getUser, getIsAnnounced, getIsFinished, announceAGM } from "../../provider/AgmOwnerProvider";
 import {getQAInterval} from './qAndA';
 import {getVotingInterval} from './voting';
-import {setMinimumVotingQuorum} from '../../provider/ProposalProvider'
+import {setMinimumVotingQuorum, appendVotingOption} from '../../provider/ProposalProvider'
 import ecies from 'eth-ecies';
 import util from 'ethereumjs-util';
 import web3 from '../../provider/web3Provider';
@@ -53,6 +53,7 @@ $(document).ready(async function() {
         inputAdr = $('#wallet-address').val().toLowerCase();
         
         $('#timer-link').hide();
+        $('#statistics-link').hide();
         //const user = mapUser(await getUser(inputAdr));
         //console.log('activeUser: ');
         //console.log(user);
@@ -70,9 +71,9 @@ $(document).ready(async function() {
                     }
                 }, 100);
             } else if (dayDiff === 14) {
-                console.log('encrypt data...');
+                //console.log('encrypt data...');
                 var encryptedData = encrypt(inputAdr, generateRandomString());
-                console.log('encrData: ' + encryptedData);
+                //console.log('encrData: ' + encryptedData);
                 /*var decryptedData = decrypt('', encryptedData);
                 console.log('decrData: ' + decryptedData);*/
                 var templateParams = {
@@ -88,15 +89,17 @@ $(document).ready(async function() {
                     }, function(error) {
                         console.log('FAILED...', error);
                     });*/
-                console.log('EMAIL WAS SENT!!!');
+                //console.log('EMAIL WAS SENT!!!');
             }
         }, 1000);
 
         console.log(dayDiff);
         console.log(addrDecrPwMapping);
         if (inputAdr === web3.eth.accounts[0] && !timersAreDefined) {
+            await appendVotingOption('abstain', inputAdr);
             console.log('test');
             showView('timer-link');
+            showLogoutButton();
         } else if (inputAdr === web3.eth.accounts[0] || addrDecrPwMapping.includes(inputAdr)) {
             showRoleBasedView();
         } else if (!addrDecrPwMapping.includes(inputAdr) && dayDiff < 6) {
@@ -165,7 +168,7 @@ $(document).ready(async function() {
                createAlert('The AGM should start, end on the same date and the start time should be smaller than the end time!', 'danger');
                showView('timer-link');
         } else {
-            votingQuorum = $('main #voting-quorum').val();
+            votingQuorum = parseInt($('main #voting-quorum').val());
             await setMinimumVotingQuorum(votingQuorum);
             /*var f = new File('[example test]', 'example.txt');
             var fileReader = new FileReader();
@@ -183,7 +186,7 @@ $(document).ready(async function() {
             
             timersAreDefined = true;
             console.log(annReport, guide);
-            await announceAGM();
+            await announceAGM(inputAdr);
             showRoleBasedView();
 
         }
@@ -231,6 +234,7 @@ export function createAlert(message, alertType = 'success', place = 'footer') {
 }
 
 async function showRoleBasedView() {
+    $('#statistics-link').hide();
     const user = mapUser(await getUser(inputAdr));
     if (user && user.role === 0) {
         createAlert('You have successfully logged in as AgmOwner!');
@@ -351,7 +355,7 @@ function showLoginFields() {
     $('#address-label').show();
 }
 
-function showView(viewName) {
+export function showView(viewName) {
     const event = new Event('click');
     const homeLink = document.getElementById(viewName);
     homeLink.dispatchEvent(event);
@@ -412,7 +416,7 @@ function encrypt(data) {
     );
 
     const pubKey  = util.ecrecover(prefixedMsg, res.v, res.r, res.s);
-    console.log('pubKey: ' + pubKey);
+    //console.log('pubKey: ' + pubKey);
     let userPublicKey = new Buffer(pubKey, 'hex');
     let bufferData = new Buffer('c361a95Ac86AAbf6baF4D97BA161132f456c08g4');
 

@@ -143,7 +143,7 @@ contract AgmOwner is User {
     }
 
     function finishAGM() public /*onlyOwner*/ {
-        require(!isFinished, "AGM has already been finished");
+        //require(!isFinished, "AGM has already been finished");
         isFinished = true;
 
         emit AgmFinished(isFinished);
@@ -184,7 +184,7 @@ contract AgmOwner is User {
 
     // executes the pending proposal
     function executeProposal(uint proposalId) public returns (bool success) {
-        bool isExecuted = fac.executeProposal(proposalId);
+        bool isExecuted = fac.evaluateProposal(proposalId);
         return isExecuted;
     }
 }
