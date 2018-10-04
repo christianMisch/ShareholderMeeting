@@ -1,4 +1,4 @@
-import {finishAGM, createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission, executeProposal} from '../../provider/AgmOwnerProvider';
+import {finishAGM, createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission, executeProposals} from '../../provider/AgmOwnerProvider';
 import {getActiveUserAddress, createAlert} from './authentication';
 import {upload} from '../../provider/IPFSUploadProvider';
 import {getNumOfVotingOptions, getVotingOption, getWeightOfShareholder, getNumOfVotingShareholders, getNumOfProposals} from '../../provider/ProposalProvider';
@@ -8,6 +8,8 @@ import {showView} from './authentication';
 
 //const owner = web3Provider.eth.accounts[0];
 //console.log('owner address: ' + owner);
+
+var votingShareholders = [];
 
 $(document).ready(function() {
 
@@ -86,9 +88,9 @@ $(document).ready(function() {
             createAlert('The AGM was successfully finished');
             var proposalNum = await getNumOfProposals();
             console.log('proposalNum: ' + proposalNum); 
-            for (var k = 0; k < proposalNum; k++) {
-                await executeProposal(k, getActiveUserAddress());
-            }
+            //for (var k = 0; k < proposalNum; k++) {
+            await executeProposals(getActiveUserAddress());
+            //}
             //console.log(document.body);
 
             setTimeout(async function() {
@@ -103,23 +105,28 @@ $(document).ready(function() {
                 for (var i = 0; i < await getNumOfVotingOptions(); i++) {
                     var votingOptionEntry = await getVotingOption(i);
                     console.log(votingOptionEntry);
-                    data[votingOptionEntry[0]] = votingOptionEntry[1];
+                    data[votingOptionEntry[0]] = votingOptionEntry[1].toNumber();
                 }
                 
                 var myLegend = $('#myLegend')[0];
                 console.log('myLegend: ' + myLegend);
-                console.log('data: ' + data);
+                console.log('data: ');
+                console.log(data);
                 console.log('usedColors: ' + usedColors);
                 createPiechart(voteCountCanvas, data, usedColors, myLegend);
                 
                 for (var i = 0; i < await getNumOfVotingShareholders(); i++) {
-                    var votingSharehEntry = await getWeightOfShareholder();
-                    $('main #shareTable').append(
-                        `<tr>
-                            <td>${votingSharehEntry[0]}</td>
-                            <td>${votingSharehEntry[1]}</td>
-                        </tr>`
-                    );
+                    var votingSharehEntry = await getWeightOfShareholder(i);
+                    if (!votingShareholders.includes(votingSharehEntry[0])) {
+                        votingShareholders.push(votingSharehEntry[0]);
+                        $('main #shareTable').append(
+                            `<tr>
+                                <td>${votingSharehEntry[0]}</td>
+                                <td>${votingSharehEntry[1]}</td>
+                            </tr>`
+                        );
+                    }
+                    
                 }
             }, 100);
         });
@@ -206,4 +213,13 @@ var Piechart = function(options){
         }
  
     }
+}
+
+function drawPieSlice(ctx,centerX, centerY, radius, startAngle, endAngle, color ){
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(centerX,centerY);
+    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+    ctx.closePath();
+    ctx.fill();
 }

@@ -27,7 +27,7 @@ contract Factory is ProposalData {
         uint optionCount;
     }
 
-    event ProposalExecuted(uint proposalId, bool proposalPassed, uint passedPercentage);
+    event ProposalsExecuted(bool isExecuted, uint countSum, uint percOfWinningOpt);
 
     function createNewShareholder(address _userAddress, uint votingTok, QandA qa) public returns (Shareholder) {
         Shareholder sh = new Shareholder(_userAddress, votingTok, this, qa);
@@ -159,7 +159,7 @@ contract Factory is ProposalData {
         return propOptions.length;
     }
 
-    function evaluateProposal() public returns (bool success) {
+    function evaluateProposals() public returns (uint numOfVotes, uint winnCount, uint winnPerc) {
 
         //require(isFinished, "meeting has not finished yet");
         // iterate over all options to store default options in the array
@@ -170,34 +170,46 @@ contract Factory is ProposalData {
             for (uint l = 0; l < proposals.length; l++) {
                 Proposal storage prop = proposals[l];
                 for (uint i = 0; i < prop.votes.length; i++) {
-
                     Vote storage v = prop.votes[i];
-                    if (keccak256(v.voterDecision) == keccak256(propOptions[k])) {
+                    if (utilCompareInternal(v.voterDecision, propOptions[k])) {
                         votingOptions[k].optionCount++;
                     }
                 }  
             }
-        }           
-        // uint winningOptionCount = 0;
-        // uint countSum = 0;
+        }         
+        uint winningOptionCount = 0;
+        uint countSum = 0;
 
-        // for (uint j = 0; j < votingOptions.length; j++) {
-        //     countSum += votingOptions[j].optionCount;
-        //     if (winningOptionCount < votingOptions[j].optionCount) {
-        //         winningOptionCount = votingOptions[j].optionCount;
-        //     }
-        // }
+        for (uint j = 0; j < votingOptions.length; j++) {
+            countSum += votingOptions[j].optionCount;
+            if (winningOptionCount < votingOptions[j].optionCount) {
+                winningOptionCount = votingOptions[j].optionCount;
+            }
+        }
     
-        // if (countSum >= minimumVotingQuorum
-        //     /*&& (winningOptionCount * 100 / countSum) > marginOfVotesForMajority*/) {
-        //     prop.proposalPassed = true;
-        // } else {
-        //     prop.proposalPassed = false;
-        // }
+        /*if (countSum >= minimumVotingQuorum
+            /*&& (winningOptionCount * 100 / countSum) > marginOfVotesForMajority) {
+            prop.proposalPassed = true;
+        } else {
+            prop.proposalPassed = false;
+        }*/
 
-        // prop.passedPercent = winningOptionCount * 100 / countSum;
+        uint winnOptPerc = winningOptionCount * 100 / countSum;
 
-        emit ProposalExecuted(proposalId, prop.proposalPassed, prop.passedPercent);
+        emit ProposalsExecuted(true, countSum, winningOptionCount);
+        return (countSum, winningOptionCount, winnOptPerc);
+    }
+
+    function utilCompareInternal(string a, string b) public pure returns (bool) {
+        if (bytes(a).length != bytes(b).length) {
+            return false;
+        }
+        for (uint i = 0; i < bytes(a).length; i ++) {
+            if(bytes(a)[i] != bytes(b)[i]) {
+                return false;
+            }
+        }
         return true;
     }
+
 }

@@ -42,6 +42,9 @@ module.exports = async function(deployer, network, accounts) {
     //console.log('3.3 ipfs-content: ' + await IPFSDownload.downloadString(deshash));
 
     //await AgmOwnerContract.announceAGM.sendTransaction();
+
+    //await FactoryContract..sendTransaction('no');
+
 }
 
 /*

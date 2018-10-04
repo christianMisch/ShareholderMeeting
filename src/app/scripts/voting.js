@@ -119,7 +119,7 @@ $(document).ready(async function() {
                 /*console.log(selectedOptions[l]);
                 console.log(parseInt(selectedOptions[l].name));
                 console.log(selectedOptions[l].nextSibling.data.trim());*/
-                vote(parseInt(selectedOptions[l].name), selectedOptions[l].nextSibling.data.trim(), activeUserAdr);
+                await vote(parseInt(selectedOptions[l].name), selectedOptions[l].nextSibling.data.trim(), activeUserAdr);
             }
         });
 

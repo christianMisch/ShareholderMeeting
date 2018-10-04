@@ -70,11 +70,11 @@ export function getNumOfVotingOptions() {
     }); 
 }
 
-export function getVotingOption() {
+export function getVotingOption(optionId) {
     return FactoryContract.deployed().then(function(deplFac) {
         Factory = deplFac;
         //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
-        return Factory.getVotingOption.call();
+        return Factory.getVotingOption.call(optionId);
     }).then(function(result) {
         //alert('getNumOfProposals call was successful: ' + result);
         return result;
@@ -83,11 +83,11 @@ export function getVotingOption() {
     }); 
 }
 
-export function getWeightOfShareholder() {
+export function getWeightOfShareholder(shareholId) {
     return FactoryContract.deployed().then(function(deplFac) {
         Factory = deplFac;
         //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
-        return Factory.getWeightOfShareholder.call();
+        return Factory.getWeightOfShareholder.call(shareholId);
     }).then(function(result) {
         //alert('getNumOfProposals call was successful: ' + result);
         return result;
