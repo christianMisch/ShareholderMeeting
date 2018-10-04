@@ -1,9 +1,9 @@
 import {finishAGM, createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission, executeProposals} from '../../provider/AgmOwnerProvider';
-import {getActiveUserAddress, createAlert} from './authentication';
+import {getActiveUserAddress, createAlert, showView} from './authentication';
 import {upload} from '../../provider/IPFSUploadProvider';
 import {getNumOfVotingOptions, getVotingOption, getWeightOfShareholder, getNumOfVotingShareholders, getNumOfProposals} from '../../provider/ProposalProvider';
+import {mapProposal} from './voting';
 //import {Piechart} from './statistics';
-import {showView} from './authentication';
 //import {web3} from './index';
 
 //const owner = web3Provider.eth.accounts[0];
@@ -88,45 +88,63 @@ $(document).ready(function() {
             createAlert('The AGM was successfully finished');
             var proposalNum = await getNumOfProposals();
             console.log('proposalNum: ' + proposalNum); 
-            //for (var k = 0; k < proposalNum; k++) {
-            await executeProposals(getActiveUserAddress());
-            //}
+            for (var k = 0; k < proposalNum; k++) {
+                await executeProposals(k, getActiveUserAddress());
+            }
             //console.log(document.body);
 
             setTimeout(async function() {
-                var data = {};
-                var voteCountCanvas = $('main #voteCountCanvas')[0];
-                console.log('voteCountCanvas: ' + voteCountCanvas);
-                //console.log(document.getElementById('voteCountCanvas'));
-                var colors = ["#fde23e","#f16e23", "#57d9ff","#937e88", "#5ad75a", "#d75ad7", "#ffffff"];
-                var numOfVotOpt = await getNumOfVotingOptions();
-                console.log('numOfVotOpt: ' + numOfVotOpt);
-                var usedColors = colors.slice(0, numOfVotOpt);
-                for (var i = 0; i < await getNumOfVotingOptions(); i++) {
-                    var votingOptionEntry = await getVotingOption(i);
-                    console.log(votingOptionEntry);
-                    data[votingOptionEntry[0]] = votingOptionEntry[1].toNumber();
-                }
-                
-                var myLegend = $('#myLegend')[0];
-                console.log('myLegend: ' + myLegend);
-                console.log('data: ');
-                console.log(data);
-                console.log('usedColors: ' + usedColors);
-                createPiechart(voteCountCanvas, data, usedColors, myLegend);
-                
-                for (var i = 0; i < await getNumOfVotingShareholders(); i++) {
-                    var votingSharehEntry = await getWeightOfShareholder(i);
-                    if (!votingShareholders.includes(votingSharehEntry[0])) {
-                        votingShareholders.push(votingSharehEntry[0]);
-                        $('main #shareTable').append(
-                            `<tr>
-                                <td>${votingSharehEntry[0]}</td>
-                                <td>${votingSharehEntry[1]}</td>
-                            </tr>`
-                        );
+
+                for (var n = 0; n < await getNumOfProposals(); n++) {
+                    var prop = mapProposal(await getProposal(n));
+                    var data = {};
+                    $('main #canvas-list').append(
+                        `
+                        <li>
+                            <h3>Proposal id: ${prop.proposalId}          Proposal name: ${prop.proposalName}</h3>
+                            <canvas id="voteCountCanvas-${n}"></canvas>
+                            <div id="myLegend-${n}"></div>
+                        </li>
+                        `
+                    )
+                    var voteCountCanvas = $(`main #voteCountCanvas-${n}`)[0];
+                    console.log('voteCountCanvas: ');
+                    console.log(voteCountCanvas);
+                    //console.log(document.getElementById('voteCountCanvas'));
+                    var colors = ["#fde23e","#f16e23", "#57d9ff","#937e88", "#5ad75a", "#d75ad7", "#ffffff"];
+                    var optionParts = prop.options.split(',');
+                    optionParts.forEach(function(val) {val.trim()});
+                    var numOfVotOptPerProposal = optionParts.length;
+                    console.log('numOfVotOptPerProposal: ' + numOfVotOptPerProposal);
+                    var usedColors = colors.slice(0, numOfVotOptPerProposal);
+                    
+                    for (var i = 0; i < await getNumOfVotingOptions(); i++) {
+                        var votingOptionEntry = await getVotingOption(i);
+                        console.log(votingOptionEntry);
+                        data[votingOptionEntry[0]] = votingOptionEntry[1].toNumber();
                     }
                     
+                    var myLegend = $('#myLegend')[0];
+                    console.log('myLegend: ' + myLegend);
+                    console.log('data: ');
+                    console.log(data);
+                    console.log('usedColors: ' + usedColors);
+                    createPiechart(voteCountCanvas, data, usedColors, myLegend);
+                    console.log('numOfVotingSh: ' + await getNumOfVotingShareholders());
+                    for (var i = 0; i < await getNumOfVotingShareholders(); i++) {
+                        var votingSharehEntry = await getWeightOfShareholder(i);
+                        console.log(votingSharehEntry);
+                        if (!votingShareholders.includes(votingSharehEntry[0])) {
+                            votingShareholders.push(votingSharehEntry[0]);
+                            $('main #shareTable').append(
+                                `<tr>
+                                    <td>${votingSharehEntry[0]}</td>
+                                    <td>${votingSharehEntry[1].toNumber()}</td>
+                                </tr>`
+                            );
+                        }
+                        
+                    }
                 }
             }, 100);
         });

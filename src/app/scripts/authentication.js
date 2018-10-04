@@ -169,7 +169,7 @@ $(document).ready(async function() {
                showView('timer-link');
         } else {
             votingQuorum = parseInt($('main #voting-quorum').val());
-            await setMinimumVotingQuorum(votingQuorum);
+            await setMinimumVotingQuorum(votingQuorum, getActiveUserAddress());
             /*var f = new File('[example test]', 'example.txt');
             var fileReader = new FileReader();
             var fileWriter = new FileWriter(f);

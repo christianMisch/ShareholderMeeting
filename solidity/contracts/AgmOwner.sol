@@ -183,8 +183,8 @@ contract AgmOwner is User {
     }
 
     // executes the pending proposal
-    function executeProposals() public returns (bool success) {
-        bool isExecuted = fac.evaluateProposals();
-        return isExecuted;
+    function executeProposal(uint proposalId) public returns (uint countSum, uint winnOptCount) {
+        (countSum, winnOptCount) = fac.evaluateProposal(proposalId);
+        return (countSum, winnOptCount);
     }
 }

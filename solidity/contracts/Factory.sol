@@ -12,12 +12,12 @@ contract Factory is ProposalData {
 
     //using strings for *;
     mapping(address => Shareholder) public shareholders;
-    //mapping(uint => string[]) public propToOptMapping;
+    mapping(uint => string[]) public propToOptMapping;
     address[] public votingShareholders;
     Proposal[] public proposals;
     mapping(address => uint) public votingWeights;
     // stores all option names
-    string[] public propOptions;
+    //string[] public propOptions;
     // stores the counter to every voting option
     VotingOption[] public votingOptions;
     uint public minimumVotingQuorum;
@@ -29,9 +29,10 @@ contract Factory is ProposalData {
 
     event ProposalsExecuted(bool isExecuted, uint countSum, uint percOfWinningOpt);
 
-    function createNewShareholder(address _userAddress, uint votingTok, QandA qa) public returns (Shareholder) {
-        Shareholder sh = new Shareholder(_userAddress, votingTok, this, qa);
+    function createNewShareholder(address _userAddress, uint weight, QandA qa) public returns (Shareholder) {
+        Shareholder sh = new Shareholder(_userAddress, weight, this, qa);
         shareholders[_userAddress] = sh;
+        //votingWeights[_userAddress] = weight;
         return sh;
     }
 
@@ -76,21 +77,21 @@ contract Factory is ProposalData {
         (proposal.proposalId, proposal.name, proposal.ipfs_hash, /*proposal.options, */proposal.proposalPassed, proposal.passedPercent, proposal.voteCount);
     }
 
-    function setVote(uint proposalId, string votingOption) public {
+    function setVote(uint proposalId, string votingOption, address sender) public {
         Proposal storage prop = proposals[proposalId];
-
+        //bool isContained = false;
         /*require(!prop.votedOnProposal[msg.sender], "The shareholder already voted");
         require(delegate == address(0), "Proxy is not allowed to vote");*/
 
         uint voteId = prop.votes.length++;
         prop.votes[voteId] = Vote({
-            voterAddress: msg.sender,
+            voterAddress: sender,
             voterDecision: votingOption,
-            voterWeight: votingWeights[msg.sender]}
+            voterWeight: votingWeights[sender]}
         );
-        prop.votedOnProposal[msg.sender] = true;
+        prop.votedOnProposal[sender] = true;
         prop.voteCount++;
-        votingShareholders.push(msg.sender);
+        votingShareholders.push(sender);
     }
 
     function getVote(uint proposalID, uint voteId) public view returns (address user, string option, uint weight) {
@@ -151,19 +152,19 @@ contract Factory is ProposalData {
         return shareholders;
     }*/
 
-    function appendVotingOption(string opt) public {
-        propOptions.push(opt);
+    function appendVotingOptionToProposal(uint proposalId, string opt) public {
+        propToOptMapping[proposalId].push(opt);
     }
 
-    function getOptionsLength() public view returns (uint length) {
-        return propOptions.length;
+    function getOptionsLengthForProposal(uint proposalId) public view returns (uint length) {
+        return propToOptMapping[proposalId].length;
     }
 
-    function evaluateProposals() public returns (uint numOfVotes, uint winnCount, uint winnPerc) {
+    function evaluateProposal(uint proposalId) public returns (uint numOfVotes, uint winnCount) {
 
         //require(isFinished, "meeting has not finished yet");
         // iterate over all options to store default options in the array
-        for (uint k = 0; k < propOptions.length; k++) {
+        /*for (uint k = 0; k < propOptions.length; k++) {
             uint id = votingOptions.length++;
             votingOptions[id] = VotingOption({optionName: propOptions[k], optionCount: 0});
             // iterate over all votes of all proposals to check which voter voted for option k
@@ -176,7 +177,22 @@ contract Factory is ProposalData {
                     }
                 }  
             }
-        }         
+        }*/
+
+        for (uint k = 0; k < propToOptMapping[proposalId].length; k++) {
+            uint id = votingOptions.length++;
+            votingOptions[id] = VotingOption({optionName: propToOptMapping[proposalId][k], optionCount: 0});
+            // iterate over all votes of all proposals to check which voter voted for option k
+            Proposal storage prop = proposals[proposalId];
+            for (uint i = 0; i < prop.votes.length; i++) {
+                Vote storage v = prop.votes[i];
+                if (utilCompareInternal(v.voterDecision, votingOptions[k].optionName)) {
+                    votingOptions[k].optionCount++;
+                }
+            }  
+        }
+
+
         uint winningOptionCount = 0;
         uint countSum = 0;
 
@@ -194,10 +210,10 @@ contract Factory is ProposalData {
             prop.proposalPassed = false;
         }*/
 
-        uint winnOptPerc = winningOptionCount * 100 / countSum;
+        //uint winnOptPerc = winningOptionCount * 100 / countSum;
 
         emit ProposalsExecuted(true, countSum, winningOptionCount);
-        return (countSum, winningOptionCount, winnOptPerc);
+        return (countSum, winningOptionCount);
     }
 
     function utilCompareInternal(string a, string b) public pure returns (bool) {

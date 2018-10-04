@@ -186,7 +186,7 @@ $(document).ready(async function() {
 
 });
 
-function mapProposal(propArr) {
+export function mapProposal(propArr) {
     return {
         proposalId: propArr[0].toNumber(),
         proposalName: propArr[1],

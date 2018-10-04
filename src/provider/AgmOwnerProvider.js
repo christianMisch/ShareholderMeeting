@@ -207,11 +207,11 @@ export function getUserList() {
     });
 }
 
-export function executeProposals(from) {
+export function executeProposal(proposalId, from) {
     AgmOwnerContract.deployed().then(function(instance) {
         AgmOwner = instance;
     }).then(function() {
-        return AgmOwner.executeProposals.sendTransaction({from: from, gas: gas});
+        return AgmOwner.executeProposals.sendTransaction(proposalId, {from: from, gas: gas});
     }).then(function(result) {
         alert('executeProposal TX was successful: ' + result);
         //return result;

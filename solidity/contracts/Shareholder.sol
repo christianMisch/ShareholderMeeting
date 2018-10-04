@@ -47,7 +47,7 @@ contract Shareholder is User, ProposalData {
     }
 
     function vote(uint proposalId, string votingOption) public {
-        fac.setVote(proposalId, votingOption);
+        fac.setVote(proposalId, votingOption, msg.sender);
 
         emit Voted(userAddress, proposalId, votingOption);
     }
