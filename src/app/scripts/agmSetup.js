@@ -1,16 +1,21 @@
-import {finishAGM, createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission, executeProposal} from '../../provider/AgmOwnerProvider';
+import {finishAGM, createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission, executeProposal, getIsFinished} from '../../provider/AgmOwnerProvider';
 import {getActiveUserAddress, createAlert, showView} from './authentication';
 import {upload} from '../../provider/IPFSUploadProvider';
 import {getNumOfVotingOptions, getVotingOption, getWeightOfShareholder, getNumOfVotingShareholders, getNumOfProposals, getTotalVoteCount, appendVotingOptionToProposal, getProposal} from '../../provider/ProposalProvider';
 import {mapProposal} from './voting';
+import {getShareholderWithOption, getShareholderWithOptionLength} from '../../provider/ShareholderProvider'
+//import {showStatistics} from './statistics';
 //import {Piechart} from './statistics';
 //import {web3} from './index';
 
 //const owner = web3Provider.eth.accounts[0];
 //console.log('owner address: ' + owner);
 
-var votingShareholders = [];
+// only once executed, show stat link, show voting options of every sh who voted, show winning opt with special color, abstain
+
 var propId = 0;
+var votingShareholders = [];
+var shareholdersSortedByWeight = [];
 
 $(document).ready(function() {
 
@@ -37,6 +42,7 @@ $(document).ready(function() {
             for (var i = 0; i < parts.length; i++) {
                 await appendVotingOptionToProposal(propId, parts[i].trim());
             }
+            //await appendVotingOptionToProposal(propId, 'abstain');
             var txId = createProposal(propName, propHash, propOptions, activeUserAddress);
             if (txId.charAt(1) === 'x') {
                 ++propId;
@@ -88,84 +94,121 @@ $(document).ready(function() {
         });
 
         $('main').on('click', '#finish-AGM-button', async function() {
-            showView('statistics-link');
-            await finishAGM(getActiveUserAddress());
-            createAlert('The AGM was successfully finished');
-            var proposalNum = await getNumOfProposals();
-            console.log('proposalNum: ' + proposalNum); 
-            //console.log(document.body);
-
-            setTimeout(async function() {
-                for (var n = 0; n < await getNumOfProposals(); n++) {
-                    await executeProposal(n, getActiveUserAddress());
-                    var prop = mapProposal(await getProposal(n));
-                    console.log(prop);
-                    var data = {};
-                    $('main #canvas-list').append(
-                        `
-                        <li>
-                            <h3>${n+1}. Proposal    Proposal name: ${prop.proposalName}</h3>
-                            <canvas id="voteCountCanvas-${n}"></canvas>
-                            <div id="myLegend-${n}"></div>
-                        </li>
-                        `
-                    )
-                    var voteCountCanvas = $(`main #voteCountCanvas-${n}`)[0];
-                    console.log('voteCountCanvas: ');
-                    console.log(voteCountCanvas);
-                    //console.log(document.getElementById('voteCountCanvas'));
-                    var colors = ["#fde23e","#f16e23", "#57d9ff","#937e88", "#5ad75a", "#d75ad7", "#ffffff"];
-                    var optionParts = prop.options.split(',');
-                    optionParts.forEach(function(val) {val.trim()});
-                    var numOfVotOptPerProposal = optionParts.length;
-                    console.log('numOfVotOptPerProposal: ' + numOfVotOptPerProposal);
-                    var usedColors = colors.slice(0, numOfVotOptPerProposal);
-                    
-                    for (var i = 0; i < numOfVotOptPerProposal; i++) {
-                        var votingOptionEntry = await getVotingOption(i);
-                        console.log(votingOptionEntry);
-                        data[votingOptionEntry[0]] = votingOptionEntry[1].toNumber();
-                    }
-                    
-                    var myLegend = $(`#myLegend-${n}`)[0];
-                    console.log('myLegend: ' + myLegend);
-                    console.log('data: ');
-                    console.log(data);
-                    console.log('usedColors: ' + usedColors);
-                    createPiechart(voteCountCanvas, data, usedColors, myLegend);
-                    console.log('numOfVotingSh: ' + await getNumOfVotingShareholders());
-                    
-                    for (var i = 0; i < await getNumOfVotingShareholders(); i++) {
-                        var votingSharehEntry = await getWeightOfShareholder(i);
-                        
-                        if (!votingShareholders.includes(votingSharehEntry[0])) {
-                            //console.log(votingSharehEntry);
-                            votingShareholders.push(votingSharehEntry[0]);
-                            $('main #shareTable').append(
-                                `<tr>
-                                    <td>${votingSharehEntry[0]}</td>
-                                    <td>${votingSharehEntry[1].toNumber()}</td>
-                                </tr>`
-                            );
-                        }
-                        
-                    }
-                }
-                $('main #total-vote-count').html((await getTotalVoteCount()).toNumber());
-            }, 100);
+            console.log('before: ' + await getIsFinished());
+            if (!(await getIsFinished())) {
+                showView('statistics-link');
+                await finishAGM(getActiveUserAddress());
+                console.log('after: ' + await getIsFinished());
+                createAlert('The AGM was successfully finished');
+                //var proposalNum = await getNumOfProposals();
+                //console.log('proposalNum: ' + proposalNum); 
+                //console.log(document.body);
+                showStatistics();
+                
+            } else {
+                createAlert('The AGM has already been finished. It cannot be finished again. The same statistics will be shown again!', 'danger');
+            }
+            
         });
+    });
 
+    $('a[href="#statistics"]').click(function() {
+
+        setTimeout(async function() {
+            if (!(await getIsFinished())) {
+                $('main #statistic-sections').hide();
+            } else {
+                $('main #statistic-sections').show();
+                $('main #statistic-info').hide();
+
+                showStatistics();
+            }
+        }, 100)
     });
 
 });
 
-function createPiechart(canvas, data, colors, legend) {
+function showStatistics() {
+    setTimeout(async function() {
+        for (var n = 0; n < await getNumOfProposals(); n++) {
+            var executePropEntry = await executeProposal(n, getActiveUserAddress());
+            executePropEntry = executePropEntry.logs[0].args;
+            console.log(executePropEntry);
+            var prop = mapProposal(await getProposal(n));
+            console.log(prop);
+            var data = {};
+            $('main #canvas-list').append(
+                `
+                <li>
+                    <h3>${n+1}. Proposal    Proposal name: ${prop.proposalName}   Proposal vote sum: ${prop.proposalCount}</h3>
+                    <canvas id="voteCountCanvas-${n}"></canvas>
+                    <div id="myLegend-${n}"></div>
+                </li>
+                `
+            )
+            var voteCountCanvas = $(`main #voteCountCanvas-${n}`)[0];
+            console.log('voteCountCanvas: ');
+            console.log(voteCountCanvas);
+            //console.log(document.getElementById('voteCountCanvas'));
+            var colors = ["#fde23e","#f16e23", "#57d9ff","#937e88", "#5ad75a", "#d75ad7", "#ffffff"];
+            var optionParts = prop.options.split(',');
+            optionParts.forEach(function(val) {val.trim()});
+            var numOfVotOptPerProposal = optionParts.length;
+            console.log('numOfVotOptPerProposal: ' + numOfVotOptPerProposal);
+            var usedColors = colors.slice(0, numOfVotOptPerProposal);
+            
+            for (var i = 0; i < numOfVotOptPerProposal; i++) {
+                var votingOptionEntry = await getVotingOption(i);
+                console.log(votingOptionEntry);
+                data[votingOptionEntry[0]] = votingOptionEntry[1].toNumber();
+            }
+            
+            var myLegend = $(`#myLegend-${n}`)[0];
+            console.log('myLegend: ' + myLegend);
+            console.log('data: ');
+            console.log(data);
+            console.log('usedColors: ' + usedColors);
+            createPiechart(voteCountCanvas, data, usedColors, myLegend, executePropEntry.winnOptCount.toNumber());
+            
+            console.log('numOfVotingSh: ' + await getNumOfVotingShareholders());
+            
+            for (var i = 0; i < await getNumOfVotingShareholders(); i++) {
+                var votingSharehEntry = await getWeightOfShareholder(i);
+                if (!votingShareholders.includes(votingSharehEntry[0])) {
+                    shareholdersSortedByWeight.push({adr: votingSharehEntry[0], weight: votingSharehEntry[1].toNumber()})
+                    //console.log(votingSharehEntry);
+                    votingShareholders.push(votingSharehEntry[0]);   
+                }
+            }
+            shareholdersSortedByWeight.sort(function(sh1, sh2) {sh2.weight - sh1.weight});
+            shareholdersSortedByWeight.slice(0, 50);
+            for (var b = 0; b < shareholdersSortedByWeight.length; b++) {
+                var selOpt = '';
+                var currAdr = shareholdersSortedByWeight[b].adr
+                for (var f = 0; f < await getShareholderWithOptionLength(currAdr); f++) {
+                    selOpt += await getShareholderWithOption(currAdr, f) + ', ';
+                }
+                $('main #shareTable').append(
+                    `<tr>
+                        <td>${shareholdersSortedByWeight[b].adr}</td>
+                        <td>${selOpt}</td>
+                        <td>${shareholdersSortedByWeight[b].weight}</td>
+                    </tr>`
+                );
+            } 
+        }
+        $('main #total-vote-count').html((await getTotalVoteCount()).toNumber());
+    }, 100);
+}
+
+function createPiechart(canvas, data, colors, legend, winnCount) {
     var piechart = new Piechart(
         {
             canvas: canvas,
             data: data,
             colors: colors,
-            legend: legend
+            legend: legend,
+            winnCount: winnCount
         }
     );
     piechart.draw();
@@ -187,8 +230,13 @@ var Piechart = function(options){
         }
  
         var start_angle = 0;
-        for (categ in this.options.data){
+        for (categ in this.options.data) {
             val = this.options.data[categ];
+            var isWinnOpt = occurenceOfWinnOptCountOnlyOnce(this.options.winnCount, this.options.data) && isWinningOption(val, this.options.data);
+            /*console.log('occ: ' + occurenceOfWinnOptCountOnlyOnce(this.options.winnCount, this.options.data));
+            console.log('isWin: ' + isWinningOption(val, this.options.data));
+            console.log(this.options.data);
+            console.log(this.options.winnCount);*/
             var slice_angle = 2 * Math.PI * val / total_value;
  
             drawPieSlice(
@@ -198,7 +246,8 @@ var Piechart = function(options){
                 Math.min(this.canvas.width/2,this.canvas.height/2),
                 start_angle,
                 start_angle+slice_angle,
-                this.colors[color_index%this.colors.length]
+                this.colors[color_index%this.colors.length],
+                isWinnOpt
             );
  
             start_angle += slice_angle;
@@ -239,11 +288,35 @@ var Piechart = function(options){
     }
 }
 
-function drawPieSlice(ctx,centerX, centerY, radius, startAngle, endAngle, color ){
-    ctx.fillStyle = color;
+function drawPieSlice(ctx, centerX, centerY, radius, startAngle, endAngle, color, isWinnOpt){
+    //console.log('isWinnOpt: ' + isWinnOpt)
+    isWinnOpt ? ctx.fillStyle = '#ff0000' : ctx.fillStyle = color;
     ctx.beginPath();
     ctx.moveTo(centerX,centerY);
     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
     ctx.closePath();
     ctx.fill();
+}
+
+function occurenceOfWinnOptCountOnlyOnce(winnOptCount, data) {
+    var count = 0;
+    var values = Object.values(data);
+    //console.log(values);
+    for (var i = 0; i < values.length; i++) {
+        if (values[i] === winnOptCount) {++count}
+    }
+
+    if (count === 1) {
+        return true
+    } else {
+        return false;
+    } 
+     
+}
+
+function isWinningOption(val, data) {
+    /*console.log(Object.values(data));
+    console.log('val: ' + val);
+    console.log('max: ' + Math.max(...Object.values(data)));*/
+    return val === Math.max(...Object.values(data));
 }

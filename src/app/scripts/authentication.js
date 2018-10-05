@@ -53,7 +53,7 @@ $(document).ready(async function() {
         inputAdr = $('#wallet-address').val().toLowerCase();
         
         $('#timer-link').hide();
-        $('#statistics-link').hide();
+        //$('#statistics-link').hide();
         //const user = mapUser(await getUser(inputAdr));
         //console.log('activeUser: ');
         //console.log(user);
@@ -234,7 +234,7 @@ export function createAlert(message, alertType = 'success', place = 'footer') {
 }
 
 async function showRoleBasedView() {
-    $('#statistics-link').hide();
+    //$('#statistics-link').hide();
     const user = mapUser(await getUser(inputAdr));
     if (user && user.role === 0) {
         createAlert('You have successfully logged in as AgmOwner!');

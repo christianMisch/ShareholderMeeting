@@ -105,4 +105,40 @@ export function vote(propId, votOpt, from) {
   });
 }
 
+export function getSelVotOpt(optId) {
+  return ShareholderContract.deployed().then(function (deplFac) {
+    Factory = deplFac;
+    return Factory.selectVotOptions.call(optId);
+  }).then(function (result) {
+    //alert('getShareholder call was successful: ' + result);
+    return result;
+  }).catch(function (error) {
+    console.log('error during getSelVotOpt call: ' + error.message);
+  });
+}
+
+export function getShareholderWithOption(adr, optId) {
+  return ShareholderContract.deployed().then(function (deplFac) {
+    Factory = deplFac;
+    return Factory.getShareholderWithOption.call(adr, optId);
+  }).then(function (result) {
+    //alert('getShareholder call was successful: ' + result);
+    return result;
+  }).catch(function (error) {
+    console.log('error during getShareholderWithOption call: ' + error.message);
+  });
+}
+
+export function getShareholderWithOptionLength(adr) {
+  return ShareholderContract.deployed().then(function (deplFac) {
+    Factory = deplFac;
+    return Factory.getShareholderWithOptionLength.call(adr);
+  }).then(function (result) {
+    //alert('getShareholder call was successful: ' + result);
+    return result;
+  }).catch(function (error) {
+    console.log('error during getShareholderWithOptionLength call: ' + error.message);
+  });
+}
+
 

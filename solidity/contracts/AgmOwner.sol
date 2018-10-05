@@ -40,6 +40,7 @@ contract AgmOwner is User {
         _;
     }
 
+    event ProposalExecuted(bool isExecuted, uint propId, uint winnOptCount);
     event ProposalCreated(uint propId, address creator);
     event Voted(address userAddress, uint proposalId, string votingOption);
     event AgmFinished(bool isFinished);
@@ -183,8 +184,10 @@ contract AgmOwner is User {
     }
 
     // executes the pending proposal
-    function executeProposal(uint proposalId) public returns (uint countSum, uint winnOptCount) {
-        (countSum, winnOptCount) = fac.evaluateProposal(proposalId);
-        return (countSum, winnOptCount);
+    function executeProposal(uint proposalId) public returns (bool isExecuted) {
+        uint winnOptCount;
+        (winnOptCount) = fac.evaluateProposal(proposalId);
+        emit ProposalExecuted(true, proposalId, winnOptCount);
+        return true;
     }
 }

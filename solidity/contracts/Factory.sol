@@ -28,8 +28,6 @@ contract Factory is ProposalData {
         uint optionCount;
     }
 
-    event ProposalsExecuted(bool isExecuted, uint countSum, uint percOfWinningOpt);
-
     function createNewShareholder(address _userAddress, uint weight, QandA qa) public returns (Shareholder) {
         Shareholder sh = new Shareholder(_userAddress, weight, this, qa);
         shareholders[_userAddress] = sh;
@@ -123,6 +121,22 @@ contract Factory is ProposalData {
             (sh.userAddress(), sh.role(), votingWeights[sh.userAddress()]);
     }
 
+    function getShareholderWithOption(address shAdr, uint optId) public view returns (
+        address _userAddress,
+        uint _role,
+        uint _shares,
+        string _opt
+    ) {
+        Shareholder sh = shareholders[shAdr];
+        return
+            (sh.userAddress(), sh.role(), votingWeights[sh.userAddress()], sh.selectVotOptions(optId));
+    }
+
+    function getShareholderWithOptionLength(address shAdr) public view returns (uint length) {
+        Shareholder sh = shareholders[shAdr];
+        return sh.getNumOfSelectVotOptions();
+    }
+
     function setMinimumVotingQuorum(uint quorum) public {
         minimumVotingQuorum = quorum;
     }
@@ -165,7 +179,7 @@ contract Factory is ProposalData {
         return propToOptMapping[proposalId][optId];
     }
 
-    function evaluateProposal(uint proposalId) public returns (uint numOfVotes, uint winnCount) {
+    function evaluateProposal(uint proposalId) public returns (uint winnCount) {
 
         //require(isFinished, "meeting has not finished yet");
         // iterate over all options to store default options in the array
@@ -216,9 +230,7 @@ contract Factory is ProposalData {
         }*/
 
         //uint winnOptPerc = winningOptionCount * 100 / countSum;
-
-        emit ProposalsExecuted(true, countSum, winningOptionCount);
-        return (prop.voteCount, winningOptionCount);
+        return (winningOptionCount);
     }
 
     function utilCompareInternal(string a, string b) public pure returns (bool) {

@@ -13,6 +13,7 @@ contract Shareholder is User, ProposalData {
     //address public delegate;
     uint[] public votingDenominations;
     Delegate[] public delegations;
+    string[] public selectVotOptions;
     mapping (uint => address) public ratings;
 
     enum RatingOption {DOWNVOTE, UPVOTE}
@@ -47,9 +48,14 @@ contract Shareholder is User, ProposalData {
     }
 
     function vote(uint proposalId, string votingOption) public {
+        selectVotOptions.push(votingOption);
         fac.setVote(proposalId, votingOption, msg.sender);
 
         emit Voted(userAddress, proposalId, votingOption);
+    }
+
+    function getNumOfSelectVotOptions() public view returns (uint length) {
+        return selectVotOptions.length;
     }
 
     function createQuestion(string _ipfs_hash) public returns (uint questId) {

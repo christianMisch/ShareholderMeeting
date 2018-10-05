@@ -209,13 +209,13 @@ export function getUserList() {
 }
 
 export function executeProposal(proposalId, from) {
-    AgmOwnerContract.deployed().then(function(instance) {
+    return AgmOwnerContract.deployed().then(function(instance) {
         AgmOwner = instance;
     }).then(function() {
-        return AgmOwner.executeProposal.sendTransaction(proposalId, {from: from, gas: gas});
+        return AgmOwner.executeProposal(proposalId, {from: from, gas: gas});
     }).then(function(result) {
         alert('executeProposal TX was successful: ' + result);
-        //return result;
+        return result;
     }).catch(function(error) {
         console.log('Error during executeProposal TX: ' + error);
     })
