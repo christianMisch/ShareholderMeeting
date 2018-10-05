@@ -22,23 +22,23 @@ module.exports = async function(deployer, network, accounts) {
 
     deshash = await IPFSUpload.upload('Who should be the new chairperson for the next year?');
     await AgmOwnerContract.createProposal.sendTransaction('board election', deshash, 'Schmidt, Mueller, Guenther');
-    await FactoryContract.appendVotingOption.sendTransaction(0, 'Schmidt');
-    await FactoryContract.appendVotingOption.sendTransaction(0, 'Mueller');
-    await FactoryContract.appendVotingOption.sendTransaction(0, 'Guenther');
-    await FactoryContract.appendVotingOption.sendTransaction(0, 'abstain');
+    await FactoryContract.appendVotingOptionToProposal.sendTransaction(0, 'Schmidt');
+    await FactoryContract.appendVotingOptionToProposal.sendTransaction(0, 'Mueller');
+    await FactoryContract.appendVotingOptionToProposal.sendTransaction(0, 'Guenther');
+    await FactoryContract.appendVotingOptionToProposal.sendTransaction(0, 'abstain');
     //console.log('3.1 ipfs-content: ' + await IPFSDownload.downloadString(deshash));
     deshash = await IPFSUpload.upload('How much percentage should be increased the dividend for shareholders?');
     await AgmOwnerContract.createProposal.sendTransaction('dividend distribution', deshash, '3%, 4%, 5%');
-    await FactoryContract.appendVotingOption.sendTransaction(1, '3%');
-    await FactoryContract.appendVotingOption.sendTransaction(1, '4%');
-    await FactoryContract.appendVotingOption.sendTransaction(1, '5%');
-    await FactoryContract.appendVotingOption.sendTransaction(1, 'abstain');
+    await FactoryContract.appendVotingOptionToProposal.sendTransaction(1, '3%');
+    await FactoryContract.appendVotingOptionToProposal.sendTransaction(1, '4%');
+    await FactoryContract.appendVotingOptionToProposal.sendTransaction(1, '5%');
+    await FactoryContract.appendVotingOptionToProposal.sendTransaction(1, 'abstain');
     //console.log('3.2 ipfs-content: ' + await IPFSDownload.downloadString(deshash));
     deshash = await IPFSUpload.upload('Should the research into new technologies be more fostered?');
     await AgmOwnerContract.createProposal.sendTransaction('foster research', deshash, 'yes, no');
-    await FactoryContract.appendVotingOption.sendTransaction(2, 'yes');
-    await FactoryContract.appendVotingOption.sendTransaction(2, 'no');
-    await FactoryContract.appendVotingOption.sendTransaction(2, 'abstain');
+    await FactoryContract.appendVotingOptionToProposal.sendTransaction(2, 'yes');
+    await FactoryContract.appendVotingOptionToProposal.sendTransaction(2, 'no');
+    await FactoryContract.appendVotingOptionToProposal.sendTransaction(2, 'abstain');
 
     console.log('deshash: ' + deshash);
     //console.log('3.3 ipfs-content: ' + await IPFSDownload.downloadString(deshash));

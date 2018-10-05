@@ -108,3 +108,28 @@ export function getNumOfVotingShareholders() {
         console.log('Error during getNumOfVotingShareholders call: ' + error.message);
     }); 
 }
+
+export function getTotalVoteCount() {
+    return FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
+        return Factory.countSum.call();
+    }).then(function(result) {
+        //alert('getNumOfProposals call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log('Error during getTotalVoteCount call: ' + error.message);
+    }); 
+}
+
+export function appendVotingOptionToProposal(propId, option, from) {
+    return FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
+        return Factory.appendVotingOptionToProposal.sendTransaction(propId, option, {gas: gas, from: from});
+    }).then(function(result) {
+        //alert('getNumOfProposals call was successful: ' + result);
+    }).catch(function(error) {
+        console.log('Error during appendVotingOptionToProposal TX: ' + error.message);
+    }); 
+}

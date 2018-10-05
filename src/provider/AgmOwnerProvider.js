@@ -181,15 +181,16 @@ export function finishAGM(from) {
     });
 }
 
-export function createProposal(name, hash, from) {   
+export function createProposal(name, hash, options, from) {   
     AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
         AgmOwner.userAddress.call().then(function(result) {
             console.log('userAddress: ' + result); 
         });
-        return AgmOwner.createProposal.sendTransaction(name, hash, {from: from, gas: gas});
+        return AgmOwner.createProposal.sendTransaction(name, hash, options, {from: from, gas: gas});
     }).then(function(result) {
         alert('createProposal TX was successful: ' + result);
+        return result;
     }).catch(function(error) {
         console.log('Error during createProposal TX: ' + error.message);
     });
@@ -211,7 +212,7 @@ export function executeProposal(proposalId, from) {
     AgmOwnerContract.deployed().then(function(instance) {
         AgmOwner = instance;
     }).then(function() {
-        return AgmOwner.executeProposals.sendTransaction(proposalId, {from: from, gas: gas});
+        return AgmOwner.executeProposal.sendTransaction(proposalId, {from: from, gas: gas});
     }).then(function(result) {
         alert('executeProposal TX was successful: ' + result);
         //return result;
