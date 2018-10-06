@@ -14,6 +14,7 @@ import {getShareholderWithOption, getShareholderWithOptionLength} from '../../pr
 // only once executed, show stat link, show voting options of every sh who voted, show winning opt with special color, abstain
 
 var propId = 0;
+var totalVotingCount = 0;
 var votingShareholders = [];
 var shareholdersSortedByWeight = [];
 
@@ -129,6 +130,7 @@ $(document).ready(function() {
 });
 
 function showStatistics() {
+    totalVotingCount = 0;
     setTimeout(async function() {
         for (var n = 0; n < await getNumOfProposals(); n++) {
             var executePropEntry = await executeProposal(n, getActiveUserAddress());
@@ -136,6 +138,7 @@ function showStatistics() {
             console.log(executePropEntry);
             var prop = mapProposal(await getProposal(n));
             console.log(prop);
+            totalVotingCount += prop.proposalCount;
             var data = {};
             $('main #canvas-list').append(
                 `
@@ -145,7 +148,7 @@ function showStatistics() {
                     <div id="myLegend-${n}"></div>
                 </li>
                 `
-            )
+            );
             var voteCountCanvas = $(`main #voteCountCanvas-${n}`)[0];
             console.log('voteCountCanvas: ');
             console.log(voteCountCanvas);
@@ -153,7 +156,7 @@ function showStatistics() {
             var colors = ["#fde23e","#f16e23", "#57d9ff","#937e88", "#5ad75a", "#d75ad7", "#ffffff"];
             var optionParts = prop.options.split(',');
             optionParts.forEach(function(val) {val.trim()});
-            var numOfVotOptPerProposal = optionParts.length;
+            var numOfVotOptPerProposal = optionParts.length + 1;
             console.log('numOfVotOptPerProposal: ' + numOfVotOptPerProposal);
             var usedColors = colors.slice(0, numOfVotOptPerProposal);
             
@@ -168,36 +171,47 @@ function showStatistics() {
             console.log('data: ');
             console.log(data);
             console.log('usedColors: ' + usedColors);
-            createPiechart(voteCountCanvas, data, usedColors, myLegend, executePropEntry.winnOptCount.toNumber());
-            
-            console.log('numOfVotingSh: ' + await getNumOfVotingShareholders());
-            
-            for (var i = 0; i < await getNumOfVotingShareholders(); i++) {
-                var votingSharehEntry = await getWeightOfShareholder(i);
-                if (!votingShareholders.includes(votingSharehEntry[0])) {
-                    shareholdersSortedByWeight.push({adr: votingSharehEntry[0], weight: votingSharehEntry[1].toNumber()})
-                    //console.log(votingSharehEntry);
-                    votingShareholders.push(votingSharehEntry[0]);   
-                }
-            }
-            shareholdersSortedByWeight.sort(function(sh1, sh2) {sh2.weight - sh1.weight});
-            shareholdersSortedByWeight.slice(0, 50);
-            for (var b = 0; b < shareholdersSortedByWeight.length; b++) {
-                var selOpt = '';
-                var currAdr = shareholdersSortedByWeight[b].adr
-                for (var f = 0; f < await getShareholderWithOptionLength(currAdr); f++) {
-                    selOpt += await getShareholderWithOption(currAdr, f) + ', ';
-                }
-                $('main #shareTable').append(
-                    `<tr>
-                        <td>${shareholdersSortedByWeight[b].adr}</td>
-                        <td>${selOpt}</td>
-                        <td>${shareholdersSortedByWeight[b].weight}</td>
-                    </tr>`
-                );
-            } 
+            createPiechart(voteCountCanvas, data, usedColors, myLegend, executePropEntry.winnOptCount.toNumber()); 
         }
-        $('main #total-vote-count').html((await getTotalVoteCount()).toNumber());
+        console.log('numOfVotingSh: ' + await getNumOfVotingShareholders());
+
+        for (var i = 0; i < await getNumOfVotingShareholders(); i++) {
+            var votingSharehEntry = await getWeightOfShareholder(i);
+            if (!votingShareholders.includes(votingSharehEntry[0])) {
+                shareholdersSortedByWeight.push({ adr: votingSharehEntry[0], weight: votingSharehEntry[1].toNumber() })
+                //console.log(votingSharehEntry);
+                votingShareholders.push(votingSharehEntry[0]);
+            }
+        }
+        //console.log(shareholdersSortedByWeight);
+        shareholdersSortedByWeight.sort(function (sh1, sh2) { 
+            if (sh1.weight > sh2.weight) {
+                return -1;
+            }
+            if (sh1.weight < sh2.weight) {
+                return 1;
+            }
+            return 0;
+            //sh2.weight - sh1.weight 
+        });
+        //console.log(shareholdersSortedByWeight);
+        shareholdersSortedByWeight.slice(0, 50);
+        for (var b = 0; b < shareholdersSortedByWeight.length; b++) {
+            var selOpt = '';
+            //var currAdr = shareholdersSortedByWeight[b].adr
+            /*for (var f = 0; f < (await getShareholderWithOptionLength(currAdr)).toNumber(); f++) {
+                selOpt += await getShareholderWithOption(currAdr, f) + ', ';
+            }*/
+            $('main #shareTable').append(
+                `<tr>
+                    <td>${shareholdersSortedByWeight[b].adr}</td>
+                    <!--<td>${selOpt}</td>-->
+                    <td>${shareholdersSortedByWeight[b].weight}</td>
+                </tr>`
+            );
+        }
+        $('main #total-vote-count').html(totalVotingCount);
+        //$('main #total-vote-count').html((await getTotalVoteCount()).toNumber());
     }, 100);
 }
 
@@ -270,7 +284,7 @@ var Piechart = function(options){
             }*/
         
             var labelText = Math.round(100 * val / total_value);
-            this.ctx.fillStyle = "white";
+            this.ctx.fillStyle = "black";
             this.ctx.font = "bold 20px Arial";
             this.ctx.fillText(labelText+"%", labelX,labelY);
             start_angle += slice_angle;

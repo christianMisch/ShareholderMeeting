@@ -6,11 +6,9 @@ import "./Shareholder.sol";
 import "./ProposalData.sol";
 import "./QandA.sol";
 import "./AgmOwner.sol";
-import "../lib/solidity-stringutils/strings.sol";
 
 contract Factory is ProposalData {
 
-    //using strings for *;
     mapping(address => Shareholder) public shareholders;
     mapping(uint => string[]) public propToOptMapping;
     address[] public votingShareholders;
@@ -21,7 +19,7 @@ contract Factory is ProposalData {
     // stores the counter to every voting option
     VotingOption[] public votingOptions;
     uint public minimumVotingQuorum;
-    uint public countSum = 0;
+    //uint public countSum = 0;
 
     struct VotingOption {
         string optionName;
@@ -121,21 +119,15 @@ contract Factory is ProposalData {
             (sh.userAddress(), sh.role(), votingWeights[sh.userAddress()]);
     }
 
-    function getShareholderWithOption(address shAdr, uint optId) public view returns (
-        address _userAddress,
-        uint _role,
-        uint _shares,
-        string _opt
-    ) {
+    /*function getShareholderWithOption(address shAdr, uint optId) public view returns (string _opt) {
         Shareholder sh = shareholders[shAdr];
-        return
-            (sh.userAddress(), sh.role(), votingWeights[sh.userAddress()], sh.selectVotOptions(optId));
+        return sh.selectVotOptions(optId);
     }
 
     function getShareholderWithOptionLength(address shAdr) public view returns (uint length) {
-        Shareholder sh = shareholders[shAdr];
+        var sh = shareholders[shAdr];
         return sh.getNumOfSelectVotOptions();
-    }
+    }*/
 
     function setMinimumVotingQuorum(uint quorum) public {
         minimumVotingQuorum = quorum;
@@ -216,7 +208,7 @@ contract Factory is ProposalData {
         uint winningOptionCount = 0;
 
         for (uint j = 0; j < votingOptions.length; j++) {
-            countSum += votingOptions[j].optionCount;
+            //countSum += votingOptions[j].optionCount;
             if (winningOptionCount < votingOptions[j].optionCount) {
                 winningOptionCount = votingOptions[j].optionCount;
             }

@@ -13,6 +13,8 @@ module.exports = async function(deployer, network, accounts) {
     const sh1 = await Shareholder.new(lowCaseAcc[4], 13, f.address, qa.address);
     const sh2 = await Shareholder.new(lowCaseAcc[5], 16, f.address, qa.address);
     const sh3 = await Shareholder.new(lowCaseAcc[7], 43, f.address, qa.address);
+    //console.log('sh1: ' + await sh1.address);
+    //console.log('sh2: ' + await sh2.address);
 
     sh1.vote.sendTransaction(0, 'Schmidt', {from: lowCaseAcc[4]});
     sh1.vote.sendTransaction(1, '4%', {from: lowCaseAcc[4]});
