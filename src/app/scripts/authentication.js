@@ -1,7 +1,7 @@
 import { getUserList, getNumOfUsers, getUser, getIsAnnounced, getIsFinished, announceAGM } from "../../provider/AgmOwnerProvider";
 import {getQAInterval} from './qAndA';
 import {getVotingInterval} from './voting';
-import {setMinimumVotingQuorum, appendVotingOption} from '../../provider/ProposalProvider'
+import {setMinimumVotingQuorum} from '../../provider/ProposalProvider'
 import ecies from 'eth-ecies';
 import util from 'ethereumjs-util';
 import web3 from '../../provider/web3Provider';
@@ -96,7 +96,7 @@ $(document).ready(async function() {
         console.log(dayDiff);
         console.log(addrDecrPwMapping);
         if (inputAdr === web3.eth.accounts[0] && !timersAreDefined) {
-            await appendVotingOption('abstain', inputAdr);
+            //await appendVotingOption('abstain', inputAdr);
             console.log('test');
             showView('timer-link');
             showLogoutButton();

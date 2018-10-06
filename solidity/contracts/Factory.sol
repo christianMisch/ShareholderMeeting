@@ -19,7 +19,7 @@ contract Factory is ProposalData {
     // stores the counter to every voting option
     VotingOption[] public votingOptions;
     uint public minimumVotingQuorum;
-    //uint public countSum = 0;
+    uint public propId = 0;
 
     struct VotingOption {
         string optionName;
@@ -52,8 +52,6 @@ contract Factory is ProposalData {
         proposal.proposalPassed = false;
         proposal.passedPercent = 0;
         proposal.voteCount = 0;
-
-
     }
 
     function getNumOfProposals() public view returns (uint length) {
@@ -159,6 +157,10 @@ contract Factory is ProposalData {
         return shareholders;
     }*/
 
+    function incrementPropId() public view {
+        propId++;
+    }
+
     function appendVotingOptionToProposal(uint proposalId, string opt) public {
         propToOptMapping[proposalId].push(opt);
     }
@@ -189,13 +191,12 @@ contract Factory is ProposalData {
                 }  
             }
         }*/
-
+        Proposal storage prop = proposals[proposalId];
         for (uint k = 0; k < propToOptMapping[proposalId].length; k++) {
             /*uint id = */
             votingOptions.length++;
             votingOptions[k] = VotingOption({optionName: propToOptMapping[proposalId][k], optionCount: 0});
             // iterate over all votes of all proposals to check which voter voted for option k
-            Proposal storage prop = proposals[proposalId];
             for (uint i = 0; i < prop.votes.length; i++) {
                 Vote storage v = prop.votes[i];
                 if (utilCompareInternal(v.voterDecision, votingOptions[k].optionName)) {
@@ -214,14 +215,13 @@ contract Factory is ProposalData {
             }
         }
     
-        /*if (countSum >= minimumVotingQuorum
-            /*&& (winningOptionCount * 100 / countSum) > marginOfVotesForMajority) {
+        if (prop.voteCount >= minimumVotingQuorum) {
             prop.proposalPassed = true;
+            prop.passedPercent = winningOptionCount / prop.voteCount * 100;
         } else {
             prop.proposalPassed = false;
-        }*/
+        }
 
-        //uint winnOptPerc = winningOptionCount * 100 / countSum;
         return (winningOptionCount);
     }
 

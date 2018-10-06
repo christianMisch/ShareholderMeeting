@@ -1,19 +1,12 @@
-import {finishAGM, createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission, executeProposal, getIsFinished} from '../../provider/AgmOwnerProvider';
+import {finishAGM, createProposal, addUser, removeUser, getNumOfUsers, transferOwnership, getOwners, executeProposal, getIsFinished} from '../../provider/AgmOwnerProvider';
 import {getActiveUserAddress, createAlert, showView} from './authentication';
 import {upload} from '../../provider/IPFSUploadProvider';
-import {getNumOfVotingOptions, getVotingOption, getWeightOfShareholder, getNumOfVotingShareholders, getNumOfProposals, getTotalVoteCount, appendVotingOptionToProposal, getProposal} from '../../provider/ProposalProvider';
+import {getVotingOption, getWeightOfShareholder, getNumOfVotingShareholders, getNumOfProposals, appendVotingOptionToProposal, getProposal, incrementPropId, getPropId} from '../../provider/ProposalProvider';
 import {mapProposal} from './voting';
-import {getShareholderWithOption, getShareholderWithOptionLength} from '../../provider/ShareholderProvider'
 //import {showStatistics} from './statistics';
 //import {Piechart} from './statistics';
-//import {web3} from './index';
-
-//const owner = web3Provider.eth.accounts[0];
-//console.log('owner address: ' + owner);
 
 // only once executed, show stat link, show voting options of every sh who voted, show winning opt with special color, abstain
-
-var propId = 0;
 var totalVotingCount = 0;
 var votingShareholders = [];
 var shareholdersSortedByWeight = [];
@@ -40,16 +33,16 @@ $(document).ready(function() {
             var propHash = await upload(propDescription);
             const propOptions = $('#proposal-options').val();
             const parts = propOptions.split(',');
+            var propId = (await getPropId()).toNumber();
+            console.log('propId: ' + propId);
             for (var i = 0; i < parts.length; i++) {
-                await appendVotingOptionToProposal(propId, parts[i].trim());
+                await appendVotingOptionToProposal(propId, parts[i].trim(), activeUserAddress);
             }
-            //await appendVotingOptionToProposal(propId, 'abstain');
-            var txId = createProposal(propName, propHash, propOptions, activeUserAddress);
-            if (txId.charAt(1) === 'x') {
-                ++propId;
-            }
+            await appendVotingOptionToProposal(propId, 'abstain', activeUserAddress);
+            await createProposal(propName, propHash, propOptions, activeUserAddress);
+            await incrementPropId(activeUserAddress);
+            // store propId in contract if proposal creation is splitted
             //console.log(activeUserAddress, propName, propDescription, propOptions);
-            
         });
 
         $('main').on('click', 'input[id="add-user-button"]', async function() {
@@ -95,11 +88,11 @@ $(document).ready(function() {
         });
 
         $('main').on('click', '#finish-AGM-button', async function() {
-            console.log('before: ' + await getIsFinished());
+            //console.log('before: ' + await getIsFinished());
             if (!(await getIsFinished())) {
                 showView('statistics-link');
                 await finishAGM(getActiveUserAddress());
-                console.log('after: ' + await getIsFinished());
+                //console.log('after: ' + await getIsFinished());
                 createAlert('The AGM was successfully finished');
                 //var proposalNum = await getNumOfProposals();
                 //console.log('proposalNum: ' + proposalNum); 
@@ -171,7 +164,9 @@ function showStatistics() {
             console.log('data: ');
             console.log(data);
             console.log('usedColors: ' + usedColors);
-            createPiechart(voteCountCanvas, data, usedColors, myLegend, executePropEntry.winnOptCount.toNumber()); 
+            if (prop.proposalPassed) {
+                createPiechart(voteCountCanvas, data, usedColors, myLegend, executePropEntry.winnOptCount.toNumber()); 
+            }
         }
         console.log('numOfVotingSh: ' + await getNumOfVotingShareholders());
 
@@ -236,6 +231,7 @@ var Piechart = function(options){
     this.colors = options.colors;
     
     this.draw = function() {
+        var legendHTML = "";
         var total_value = 0;
         var color_index = 0;
         for (var categ in this.options.data) {
@@ -247,6 +243,8 @@ var Piechart = function(options){
         for (categ in this.options.data) {
             val = this.options.data[categ];
             var isWinnOpt = occurenceOfWinnOptCountOnlyOnce(this.options.winnCount, this.options.data) && isWinningOption(val, this.options.data);
+            legendHTML += "<div><span style='display:inline-block;width:20px;background-color:" + (isWinnOpt ? '#ff0000' : this.colors[color_index]) + ";'>&nbsp;</span> " + categ + "</div>";
+
             /*console.log('occ: ' + occurenceOfWinnOptCountOnlyOnce(this.options.winnCount, this.options.data));
             console.log('isWin: ' + isWinningOption(val, this.options.data));
             console.log(this.options.data);
@@ -290,14 +288,11 @@ var Piechart = function(options){
             start_angle += slice_angle;
         }
 
-        if (this.options.legend) {
-            color_index = 0;
-            var legendHTML = "";
-            for (categ in this.options.data) {
-                legendHTML += "<div><span style='display:inline-block;width:20px;background-color:"+this.colors[color_index++]+";'>&nbsp;</span> "+categ+"</div>";
-            }
-            this.options.legend.innerHTML = legendHTML;
-        }
+        /*color_index = 0;
+        
+        for (categ in this.options.data) {
+        }*/
+        this.options.legend.innerHTML = legendHTML;
  
     }
 }

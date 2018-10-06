@@ -182,7 +182,7 @@ export function finishAGM(from) {
 }
 
 export function createProposal(name, hash, options, from) {   
-    AgmOwnerContract.deployed().then(function(deplOwner) {
+    return AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
         AgmOwner.userAddress.call().then(function(result) {
             console.log('userAddress: ' + result); 

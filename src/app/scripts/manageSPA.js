@@ -1,4 +1,4 @@
-import {getActiveUserState, removeSecondAlert, createAlert} from './authentication';
+//import {getActiveUserState, removeSecondAlert, createAlert} from './authentication';
 
 var main;
 

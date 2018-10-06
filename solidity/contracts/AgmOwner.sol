@@ -15,7 +15,7 @@ contract AgmOwner is User {
     // stores user's address with corresponding id
     mapping(address => uint) public userId;
     // owners which have permission to setup the AGM
-    address[] owners;
+    address[] public owners;
 
     bool public isFinished = false;
     bool public isAnnounced = false;

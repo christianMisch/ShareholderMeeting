@@ -45,7 +45,7 @@ export function setMinimumVotingQuorum(quorum, from) {
     }); 
 }
 
-export function appendVotingOption(opt, from) {
+/*export function appendVotingOption(opt, from) {
     return FactoryContract.deployed().then(function(deplFac) {
         Factory = deplFac;
         //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
@@ -55,7 +55,7 @@ export function appendVotingOption(opt, from) {
     }).catch(function(error) {
         console.log('Error during getNumOfProposals call: ' + error.message);
     }); 
-}
+}*/
 
 export function getNumOfVotingOptions() {
     return FactoryContract.deployed().then(function(deplFac) {
@@ -131,5 +131,30 @@ export function appendVotingOptionToProposal(propId, option, from) {
         //alert('getNumOfProposals call was successful: ' + result);
     }).catch(function(error) {
         console.log('Error during appendVotingOptionToProposal TX: ' + error.message);
+    }); 
+}
+
+export function incrementPropId(from) {
+    return FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
+        return Factory.incrementPropId.sendTransaction({gas: gas, from: from});
+    }).then(function(result) {
+        //alert('getNumOfProposals call was successful: ' + result);
+    }).catch(function(error) {
+        console.log('Error during incrementPropId TX: ' + error.message);
+    }); 
+}
+
+export function getPropId() {
+    return FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
+        return Factory.propId.call();
+    }).then(function(result) {
+        //alert('getNumOfProposals call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log('Error during getPropId call: ' + error.message);
     }); 
 }
