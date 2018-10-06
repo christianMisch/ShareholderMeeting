@@ -221,3 +221,127 @@ export function executeProposal(proposalId, from) {
     })
 }
 
+export function setAgenda(agenda, from) {   
+    AgmOwnerContract.deployed().then(function(deplOwner) {
+        AgmOwner = deplOwner;
+        return AgmOwner.setAgenda.sendTransaction(agenda, {from: from, gas: gas});
+    }).then(function(result) {
+        alert('setAgenda TX was successful: ' + result);
+        //return result;
+    }).catch(function(error) {
+        console.log('Error during setAgenda TX: ' + error.message);
+    });
+}
+
+export function setMeetingPlace(place, from) {   
+    AgmOwnerContract.deployed().then(function(deplOwner) {
+        AgmOwner = deplOwner;
+        return AgmOwner.setMeetingPlace.sendTransaction(place, {from: from, gas: gas});
+    }).then(function(result) {
+        alert('setMeetingPlace TX was successful: ' + result);
+        //return result;
+    }).catch(function(error) {
+        console.log('Error during setMeetingPlace TX: ' + error.message);
+    });
+}
+
+export function setMeetingStartTime(start, from) {   
+    AgmOwnerContract.deployed().then(function(deplOwner) {
+        AgmOwner = deplOwner;
+        return AgmOwner.setMeetingStartTime.sendTransaction(start, {from: from, gas: gas});
+    }).then(function(result) {
+        alert('setMeetingStartTime TX was successful: ' + result);
+        //return result;
+    }).catch(function(error) {
+        console.log('Error during setMeetingStartTime TX: ' + error.message);
+    });
+}
+
+export function setMeetingEndTime(end, from) {   
+    AgmOwnerContract.deployed().then(function(deplOwner) {
+        AgmOwner = deplOwner;
+        return AgmOwner.setMeetingEndTime.sendTransaction(end, {from: from, gas: gas});
+    }).then(function(result) {
+        alert('setMeetingEndTime TX was successful: ' + result);
+        //return result;
+    }).catch(function(error) {
+        console.log('Error during setMeetingEndTime TX: ' + error.message);
+    });
+}
+
+export function setMeetingName(name, from) {   
+    AgmOwnerContract.deployed().then(function(deplOwner) {
+        AgmOwner = deplOwner;
+        return AgmOwner.setMeetingName.sendTransaction(name, {from: from, gas: gas});
+    }).then(function(result) {
+        alert('setMeetingName TX was successful: ' + result);
+        //return result;
+    }).catch(function(error) {
+        console.log('Error during setMeetingName TX: ' + error.message);
+    });
+}
+
+export function getAgenda() {
+    return AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+        return AgmOwner.agenda.call();
+    }).then(function(result) {
+        console.log(result);
+        //alert('getAgenda call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log(error);
+    });   
+}
+
+export function getMeetingStartTime() {
+    return AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+        return AgmOwner.getMeetingStartTime.call();
+    }).then(function(result) {
+        console.log(result);
+        //alert('getMeetingStartTime call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log(error);
+    });   
+}
+
+export function getMeetingEndTime() {
+    return AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+        return AgmOwner.meetingEndTime.call();
+    }).then(function(result) {
+        console.log(result);
+        //alert('getMeetingEndTime call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log(error);
+    });   
+}
+
+export function getMeetingPlace() {
+    return AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+        return AgmOwner.meetingPlace.call();
+    }).then(function(result) {
+        console.log(result);
+        //alert('getMeetingPlace call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log(error);
+    });   
+}
+
+export function getMeetingName() {
+    return AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+        return AgmOwner.meetingName.call();
+    }).then(function(result) {
+        console.log(result);
+        //alert('getMeetingName call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log(error);
+    });   
+}

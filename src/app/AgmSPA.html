@@ -67,7 +67,7 @@
                                 <a href="#timer" id="timer-link">Agm Timers</a>
                             </li>
                             <li>
-                                <a href="#material" id="material-link">Material</a>
+                                <a href="#material" id="material-link">Agenda</a>
                             </li>
                             <li>
                                 <a href="#setup" id="setup-link">Setup</a>
@@ -86,7 +86,7 @@
                 </div>
 
                 <div class="col-xl-9">
-                  <h1>Annual General Meeting 2018</h1>
+                  <h1 id="meeting-name"></h1>
 
                     <main class="row">
                         <!--template content is inserted here-->
@@ -151,14 +151,12 @@
         <template id="timer-template">
             <article class="col-xl-12">
                 <form>
+                    <label>Please input the name of the AGM (will be shown as headline) <input type="text" id="agm-name"></label>
                     <label> When shall the AGM start?<input type="datetime-local" id="agm-start"></label>
                     <label> When shall the AGM end?<input type="datetime-local" id="agm-end"></label>
                     <label>Where shall the physical AGM take place?<input type="text" id="place"></label>
-                    <label>Please input the agenda <textarea id="agenda-content"></textarea></label>
-                    <label>Upload annual report <input type="file" id="annual-report"></label>
-                    <label>Upload app guide <input type="file" id="guide"></label>
+                    <label>Please seperate the agenda parts with commas. Enumeration is not required.  <textarea id="agenda-content"></textarea></label>
                     <label>Input the the voting quorum <input type="number" id="voting-quorum"></label>
-                    <label></label>
                     <input type="submit" id="time-submit-button" value="Announce">
                 </form>
             </article>
@@ -211,10 +209,14 @@
             </article>-->
             <article class="col-xl-12">
                 <p>Here you find a list of the AGM material: </p>
+                <p>The material files are sent via a personal<strong>e-mail</strong>to you!</p>
                 <ul>
                     <li>Annual report from 2017</li>
                     <li>AGM agenda</li>
                 </ul>
+                <ol id="agenda-list">
+
+                </ol>
             </article>
         </template>
 

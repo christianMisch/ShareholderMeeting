@@ -7,6 +7,7 @@ import {mapProposal} from './voting';
 //import {Piechart} from './statistics';
 
 // only once executed, show stat link, show voting options of every sh who voted, show winning opt with special color, abstain
+// start, end, place store in contract
 var totalVotingCount = 0;
 var votingShareholders = [];
 var shareholdersSortedByWeight = [];
@@ -131,42 +132,43 @@ function showStatistics() {
             console.log(executePropEntry);
             var prop = mapProposal(await getProposal(n));
             console.log(prop);
-            totalVotingCount += prop.proposalCount;
-            var data = {};
-            $('main #canvas-list').append(
-                `
-                <li>
-                    <h3>${n+1}. Proposal    Proposal name: ${prop.proposalName}   Proposal vote sum: ${prop.proposalCount}</h3>
-                    <canvas id="voteCountCanvas-${n}"></canvas>
-                    <div id="myLegend-${n}"></div>
-                </li>
-                `
-            );
-            var voteCountCanvas = $(`main #voteCountCanvas-${n}`)[0];
-            console.log('voteCountCanvas: ');
-            console.log(voteCountCanvas);
-            //console.log(document.getElementById('voteCountCanvas'));
-            var colors = ["#fde23e","#f16e23", "#57d9ff","#937e88", "#5ad75a", "#d75ad7", "#ffffff"];
-            var optionParts = prop.options.split(',');
-            optionParts.forEach(function(val) {val.trim()});
-            var numOfVotOptPerProposal = optionParts.length + 1;
-            console.log('numOfVotOptPerProposal: ' + numOfVotOptPerProposal);
-            var usedColors = colors.slice(0, numOfVotOptPerProposal);
-            
-            for (var i = 0; i < numOfVotOptPerProposal; i++) {
-                var votingOptionEntry = await getVotingOption(i);
-                console.log(votingOptionEntry);
-                data[votingOptionEntry[0]] = votingOptionEntry[1].toNumber();
-            }
-            
-            var myLegend = $(`#myLegend-${n}`)[0];
-            console.log('myLegend: ' + myLegend);
-            console.log('data: ');
-            console.log(data);
-            console.log('usedColors: ' + usedColors);
             if (prop.proposalPassed) {
-                createPiechart(voteCountCanvas, data, usedColors, myLegend, executePropEntry.winnOptCount.toNumber()); 
+                totalVotingCount += prop.proposalCount;
+                var data = {};
+                $('main #canvas-list').append(
+                    `
+                    <li>
+                        <h3>${n+1}. Proposal    Proposal name: ${prop.proposalName}   Proposal vote sum: ${prop.proposalCount}</h3>
+                        <canvas id="voteCountCanvas-${n}"></canvas>
+                        <div id="myLegend-${n}"></div>
+                    </li>
+                    `
+                );
+                var voteCountCanvas = $(`main #voteCountCanvas-${n}`)[0];
+                console.log('voteCountCanvas: ');
+                console.log(voteCountCanvas);
+                //console.log(document.getElementById('voteCountCanvas'));
+                var colors = ["#fde23e","#f16e23", "#57d9ff","#937e88", "#5ad75a", "#d75ad7", "#ffffff"];
+                var optionParts = prop.options.split(',');
+                optionParts.forEach(function(val) {val.trim()});
+                var numOfVotOptPerProposal = optionParts.length + 1;
+                console.log('numOfVotOptPerProposal: ' + numOfVotOptPerProposal);
+                var usedColors = colors.slice(0, numOfVotOptPerProposal);
+                
+                for (var i = 0; i < numOfVotOptPerProposal; i++) {
+                    var votingOptionEntry = await getVotingOption(i);
+                    console.log(votingOptionEntry);
+                    data[votingOptionEntry[0]] = votingOptionEntry[1].toNumber();
+                }
+                
+                var myLegend = $(`#myLegend-${n}`)[0];
+                console.log('myLegend: ' + myLegend);
+                console.log('data: ');
+                console.log(data);
+                console.log('usedColors: ' + usedColors);
+                createPiechart(voteCountCanvas, data, usedColors, myLegend, executePropEntry.winnOptCount.toNumber());
             }
+             
         }
         console.log('numOfVotingSh: ' + await getNumOfVotingShareholders());
 

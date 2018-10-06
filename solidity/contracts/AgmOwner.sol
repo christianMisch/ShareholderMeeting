@@ -21,12 +21,33 @@ contract AgmOwner is User {
     bool public isAnnounced = false;
 
     //uint public marginOfVotesForMajority;
+    
+    //string public meetingDescription;
     string public meetingName;
-    string public meetingDescription;
-    //string public meetingDate;
-    //string public meetingPlace;
-    //uint public meetingStartTime;
-    //uint public meetingEndTime;
+    string public agenda;
+    string public meetingPlace;
+    string public meetingStartTime;
+    string public meetingEndTime;
+
+    function setAgenda(string _agenda) public onlyOwner {
+        agenda = _agenda;
+    }
+
+    function setMeetingPlace(string _meetingPlace) public onlyOwner {
+        meetingPlace = _meetingPlace;
+    }
+
+    function setMeetingStartTime(string _meetingStartTime) public onlyOwner {
+        meetingStartTime = _meetingStartTime;
+    }
+
+    function setMeetingEndTime(string _meetingEndTime) public onlyOwner {
+        meetingEndTime = _meetingEndTime;
+    }
+
+    function setMeetingName(string _meetingName) public onlyOwner {
+        meetingName = _meetingName;
+    }
 
     modifier onlyOwner {
         bool isOwner;
@@ -54,7 +75,7 @@ contract AgmOwner is User {
         //uint _minimumVotingQuorum,
         //uint _marginOfVotesForMajority,
         string _meetingName,
-        string _meetingDescription,
+        //string _meetingDescription,
         //string _meetingDate,
         //string _meetingPlace,
         //uint _meetingStartTime,
@@ -67,7 +88,7 @@ contract AgmOwner is User {
         //minimumVotingQuorum = _minimumVotingQuorum;
         //marginOfVotesForMajority = _marginOfVotesForMajority;
         meetingName = _meetingName;
-        meetingDescription = _meetingDescription;
+        //meetingDescription = _meetingDescription;
         //meetingDate = _meetingDate;
         //meetingPlace = _meetingPlace;
         //meetingStartTime = _meetingStartTime;

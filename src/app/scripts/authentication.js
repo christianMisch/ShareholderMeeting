@@ -1,4 +1,20 @@
-import { getUserList, getNumOfUsers, getUser, getIsAnnounced, getIsFinished, announceAGM } from "../../provider/AgmOwnerProvider";
+import { 
+    getUserList, 
+    getUser, 
+    getIsAnnounced, 
+    getIsFinished, 
+    announceAGM, 
+    setAgenda, 
+    setMeetingEndTime, 
+    setMeetingName, 
+    setMeetingPlace, 
+    setMeetingStartTime,
+    getMeetingEndTime,
+    getMeetingStartTime,
+    getAgenda,
+    getMeetingName,
+    getMeetingPlace
+} from "../../provider/AgmOwnerProvider";
 import {getQAInterval} from './qAndA';
 import {getVotingInterval} from './voting';
 import {setMinimumVotingQuorum} from '../../provider/ProposalProvider'
@@ -10,15 +26,16 @@ var addrDecrPwMapping = [];
 
 var inputAdr;
 var timersAreDefined = false;
-var place;
+//var place;
 var startDate;
 var endDate;
 var dayDiff = 14;
 var dayDiffInterval;
 var announceInterval;
-var votingQuorum;
-var annReport;
-var guide;
+//var votingQuorum;
+//var annReport;
+//var guide;
+//var agenda;
 
 $(document).ready(async function() {
     
@@ -49,7 +66,9 @@ $(document).ready(async function() {
 
     $('#login-button').click(async function(e) {
         e.preventDefault();
-
+        if (await getIsAnnounced()) {
+            $('#meeting-name').html(await getMeetingName());
+        }
         inputAdr = $('#wallet-address').val().toLowerCase();
         
         $('#timer-link').hide();
@@ -120,8 +139,8 @@ $(document).ready(async function() {
         $('main #auth-modal').css('color', 'white');
         
         showWelcomePage();
-        setTimeout(function() {
-            if ($('#place').html() === '' && $('#start').html() === '' && $('#end').html() === '') {
+        setTimeout(async function() {
+            if (!(await getIsAnnounced())) {
                 $('#announce-wrapper').hide();
                 $('main #auth-modal').css('visibility', 'hidden');
             }
@@ -131,19 +150,15 @@ $(document).ready(async function() {
         showLoginFields();
 
         if (inputAdr === web3.eth.accounts[0]) {
-            setTimeout(async function() {
-                //computeDayDiff();
-                if (dayDiff >= 30 && !(await getIsAnnounced()) )  {
-                    $('main #announce-wrapper').show();
-                    $('main #place').html(place);
-                    $('main #start').html(startDate.replace('T', ' '));
-                    $('main #end').html(endDate.replace('T', ' '));
-                    //console.log(document.body);
-                } else if (!await getIsAnnounced()) {
-                    createAlert('The AGM can only be announced at least 30 days in prior!', 'danger');
-                }
-                
-                
+            setTimeout(async function () {
+
+                $('main #announce-wrapper').show();
+                $('main #place').html(await getMeetingPlace());
+                $('main #start').html((await getMeetingStartTime()).replace('T', ' '));
+                $('main #end').html((await getMeetingEndTime()).replace('T', ' '));
+                //console.log(document.body);
+
+
                 dayDiffInterval = setInterval(function() {
                     computeDayDiff();
                 }, 86400000);
@@ -160,16 +175,20 @@ $(document).ready(async function() {
     });
 
     $('main').on('click', 'input[id = "time-submit-button"]', async function() {
-        place = $('main #place').val();
-        startDate = $('main #agm-start').val();
-        endDate = $('main #agm-end').val();
+        var startDate = $('main #agm-start').val();
+        var endDate = $('main #agm-end').val();
+        await setMeetingStartTime(startDate, getActiveUserAddress());
+        await setMeetingEndTime(endDate, getActiveUserAddress());
         if (!(startDate.substring(0,10) === endDate.substring(0,10)) 
             || startDate.substring(11,13) > endDate.substring(11,13)) {
                createAlert('The AGM should start, end on the same date and the start time should be smaller than the end time!', 'danger');
                showView('timer-link');
         } else {
-            votingQuorum = parseInt($('main #voting-quorum').val());
+            await setMeetingPlace($('main #place').val(), getActiveUserAddress());
+            var votingQuorum = parseInt($('main #voting-quorum').val());
             await setMinimumVotingQuorum(votingQuorum, getActiveUserAddress());
+            await setAgenda($('main #agenda-content').val(), getActiveUserAddress());
+            await setMeetingName($('main #agm-name').val(), getActiveUserAddress())
             /*var f = new File('[example test]', 'example.txt');
             var fileReader = new FileReader();
             var fileWriter = new FileWriter(f);
@@ -185,10 +204,14 @@ $(document).ready(async function() {
             fileReader.readAsText(annReport);*/
             
             timersAreDefined = true;
-            console.log(annReport, guide);
-            await announceAGM(inputAdr);
-            showRoleBasedView();
-
+            //console.log(annReport, guide);
+            computeDayDiff();
+            if (dayDiff >= 30 && !(await getIsAnnounced()) )  {
+                await announceAGM(inputAdr);
+                showRoleBasedView();
+            } else {
+                createAlert('The AGM can only be announced at least 30 days in prior!', 'danger');
+            }
         }
         
     });
@@ -218,7 +241,23 @@ $(document).ready(async function() {
         //console.log($('#decPassword').val());
         addrDecrPwMapping.push(inputAdr);
         showRoleBasedView();
-    })
+    });
+
+    $('a[href="#material"]').click(async function() {
+        if (await getIsAnnounced()) {
+            setTimeout(async function() {
+                var agendaStr = await getAgenda();
+                var agendParts = agendaStr.split(',');
+                for (var i = 0; i < agendParts.length; i++) {
+                    $('main #agenda-list').append(
+                        `
+                        <li>${agendParts[i].trim()}</li>
+                        `
+                    );
+                }
+            }, 100);
+        }
+    });
 
 });
 
