@@ -22,16 +22,11 @@ import ecies from 'eth-ecies';
 import util from 'ethereumjs-util';
 import web3 from '../../provider/web3Provider';
 
-var addrDecrPwMapping = [];
-
 var inputAdr;
-var timersAreDefined = false;
 //var place;
-var startDate;
-var endDate;
-var dayDiff = 14;
-var dayDiffInterval;
-var announceInterval;
+//var startDate;
+//var endDate;
+var dayDiff;
 //var votingQuorum;
 //var annReport;
 //var guide;
@@ -42,7 +37,7 @@ $(document).ready(async function() {
     console.log('isAnnounced: ' + await getIsAnnounced());
     showWelcomePage();
     // hide logout button, welcome link in sidebar and user credentials
-    if (!timersAreDefined) {
+    if (!(await getIsAnnounced())) {
         $('main #announce-wrapper').hide();
     }
     
@@ -66,30 +61,10 @@ $(document).ready(async function() {
 
     $('#login-button').click(async function(e) {
         e.preventDefault();
+        computeDayDiff();
         if (await getIsAnnounced()) {
             $('#meeting-name').html(await getMeetingName());
-        }
-        inputAdr = $('#wallet-address').val().toLowerCase();
-        
-        $('#timer-link').hide();
-        //$('#statistics-link').hide();
-        //const user = mapUser(await getUser(inputAdr));
-        //console.log('activeUser: ');
-        //console.log(user);
-
-        announceInterval = setInterval(function() {
-            // has to be enabled in production
-            //computeDayDiff();
-            if (dayDiff < 6) {
-                setTimeout(async function() {
-                    console.log('dayDiff is lower than 6');
-                    if (mapUser(await getUser(inputAdr)).userAddress === '') {
-                        createAlert('You cannot login into the application anymore.', 'danger');
-                        $('#login-button').attr('class', 'btn btn-danger');
-                        $('#login-button').prop('disabled', true);   
-                    }
-                }, 100);
-            } else if (dayDiff === 14) {
+            if (dayDiff === 14) {
                 //console.log('encrypt data...');
                 var encryptedData = encrypt(inputAdr, generateRandomString());
                 //console.log('encrData: ' + encryptedData);
@@ -110,26 +85,30 @@ $(document).ready(async function() {
                     });*/
                 //console.log('EMAIL WAS SENT!!!');
             }
-        }, 1000);
+        }
+        inputAdr = $('#wallet-address').val().toLowerCase();
+        console.log('inputAdr: ' + inputAdr);
+        //console.log(mapUser(await getUser(inputAdr)));
+        $('#timer-link').hide();
+        //$('#statistics-link').hide();
+        //const user = mapUser(await getUser(inputAdr));
+        //console.log('activeUser: ');
+        //console.log(user);
 
-        console.log(dayDiff);
-        console.log(addrDecrPwMapping);
-        if (inputAdr === web3.eth.accounts[0] && !timersAreDefined) {
-            //await appendVotingOption('abstain', inputAdr);
-            console.log('test');
+        console.log('dayDiff: ' + dayDiff);
+        if (inputAdr === web3.eth.accounts[0] && !(await getIsAnnounced())) {
             showView('timer-link');
             showLogoutButton();
-        } else if (inputAdr === web3.eth.accounts[0] || addrDecrPwMapping.includes(inputAdr)) {
+        } else if (inputAdr === web3.eth.accounts[0] || mapUser(await getUser(inputAdr)).role !== 3) {
             showRoleBasedView();
-        } else if (!addrDecrPwMapping.includes(inputAdr) && dayDiff < 6) {
-            console.log('not allowed to login');
+        } else if (mapUser(await getUser(inputAdr)).role === 3 && dayDiff < 6) {
             createAlert('You cannot login into the application anymore.', 'danger');
-            //$('#login-button').attr('class', 'btn btn-danger');
-            //$('#login-button').prop('disabled', true);
+            $('#login-button').attr('class', 'btn btn-danger');
+            $('#login-button').prop('disabled', true);
         } else {
             $('main #auth-modal').trigger('click');
             $('button[data-step="1"]').prop('disabled', true);
-        } 
+        }
     });
 
     $('#logout-button').click(function() {
@@ -140,35 +119,25 @@ $(document).ready(async function() {
         
         showWelcomePage();
         setTimeout(async function() {
+            $('main #auth-modal').css('visibility', 'hidden');
             if (!(await getIsAnnounced())) {
                 $('#announce-wrapper').hide();
-                $('main #auth-modal').css('visibility', 'hidden');
+            } else {
+                var loc = await getMeetingPlace();
+                var stTime = await getMeetingStartTime();
+                var enTime = await getMeetingEndTime();
+                $('main #announce-wrapper').show();
+                $('main #place').html(loc);
+                $('main #start').html(stTime.replace('T', ' '));
+                $('main #end').html(enTime.replace('T', ' '));
             }
-        },100);
+        }, 100);
         
         hideUserCredentials();
         showLoginFields();
-
-        if (inputAdr === web3.eth.accounts[0]) {
-            setTimeout(async function () {
-
-                $('main #announce-wrapper').show();
-                $('main #place').html(await getMeetingPlace());
-                $('main #start').html((await getMeetingStartTime()).replace('T', ' '));
-                $('main #end').html((await getMeetingEndTime()).replace('T', ' '));
-                //console.log(document.body);
-
-
-                dayDiffInterval = setInterval(function() {
-                    computeDayDiff();
-                }, 86400000);
-                //console.log('day diff interval escaped...');
-                
-            }, 100);
-        }
          
-        clearInterval(dayDiffInterval);
-        clearInterval(announceInterval);
+        //clearInterval(dayDiffInterval);
+        //clearInterval(announceInterval);
         clearInterval(getQAInterval());
         clearInterval(getVotingInterval());
 
@@ -189,22 +158,8 @@ $(document).ready(async function() {
             await setMinimumVotingQuorum(votingQuorum, getActiveUserAddress());
             await setAgenda($('main #agenda-content').val(), getActiveUserAddress());
             await setMeetingName($('main #agm-name').val(), getActiveUserAddress())
-            /*var f = new File('[example test]', 'example.txt');
-            var fileReader = new FileReader();
-            var fileWriter = new FileWriter(f);
             
-            fileReader.onload = function(e) {
-                fileWriter.write(e.target.result);
-            }
-            
-            annReport = $('#annual-report')[0].files[0];
-            guide = $('#guide')[0].files[0];
-            
-
-            fileReader.readAsText(annReport);*/
-            
-            timersAreDefined = true;
-            //console.log(annReport, guide);
+            //timersAreDefined = true;
             computeDayDiff();
             if (dayDiff >= 30 && !(await getIsAnnounced()) )  {
                 await announceAGM(inputAdr);
@@ -239,7 +194,7 @@ $(document).ready(async function() {
     $('main').on('click', '#finish-button', function() {
         //console.log($('#decrPW').html());
         //console.log($('#decPassword').val());
-        addrDecrPwMapping.push(inputAdr);
+        //addrDecrPwMapping.push(inputAdr);
         showRoleBasedView();
     });
 
@@ -355,18 +310,14 @@ function computeDate() {
     return strDate;
 }
 
-function computeDayDiff() {
+async function computeDayDiff() {
     const MS_PER_DAY = 1000 * 60 * 60 * 24;
     var date = new Date();
+    var startDate = await getMeetingStartTime();
     //console.log(startDate.substring(0,4), startDate.substring(5,7), startDate.substring(8,10));
     var utc1 = Date.UTC(startDate.substring(0, 4), startDate.substring(5, 7), startDate.substring(8, 10));
     var utc2 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
     dayDiff = Math.floor((utc1 - utc2) / MS_PER_DAY) - 30;
-    $('main #day-diff').html(dayDiff);
-}
-
-function setDayDiff(diff) {
-    dayDiff = diff;
     $('main #day-diff').html(dayDiff);
 }
 

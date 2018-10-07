@@ -156,7 +156,11 @@ contract AgmOwner is User {
     }
 
     function getUser(address _userAddress) public view returns (address adr, uint role) {
-        User u = users[userId[_userAddress]];
+        uint userID = userId[_userAddress];
+        if (userID == 0 && _userAddress != userAddress) {
+            return (address(0), 3);
+        }
+        User u = users[userID];
         return (u.userAddress(), u.role());
     }
 

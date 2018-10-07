@@ -297,7 +297,7 @@ export function getAgenda() {
 export function getMeetingStartTime() {
     return AgmOwnerContract.deployed().then(function(instance) {
         AgmOwner = instance;
-        return AgmOwner.getMeetingStartTime.call();
+        return AgmOwner.meetingStartTime.call();
     }).then(function(result) {
         console.log(result);
         //alert('getMeetingStartTime call was successful: ' + result);
