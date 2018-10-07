@@ -3,12 +3,13 @@ import web3 from '../../provider/web3Provider';
 import {announceAGM} from '../../provider/AgmOwnerProvider';
 import { upload } from '../../provider/IPFSUploadProvider';
 import {downloadString} from '../../provider/IPFSDownloadProvider';
+//const IPFSDownload = require('../../provider/IPFSDownloadProvider.js');
 import './agmSetup';
 import {getActiveUserAddress} from './authentication';
 import './manageSPA';
 import './qAndA';
 import './voting';
-
+// minimum 14 days before for shareholders to register
 export class App {
 
     constructor(account, network) {
@@ -45,6 +46,10 @@ export class App {
                 console.log('FAILED...', error);
             });
         console.log('EMAIL WAS SENT!!!');*/
+        console.log('upload data');
+        var hash = await upload('example');
+        console.log('downloadString');
+        console.log(await downloadString(hash));
 
     }
 }

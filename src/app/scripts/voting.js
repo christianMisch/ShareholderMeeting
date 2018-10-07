@@ -4,8 +4,8 @@ import {getShareholder, getNumOfShareholders, vote} from '../../provider/Shareho
 import {setUserShares, getActiveUserAddress, createAlert} from './authentication';
 import { getUser } from '../../provider/AgmOwnerProvider';
 import {mapUser} from './authentication';
-//import {downloadString} from '../../provider/IPFSDownloadProvider';
-var  IPFSDownloadProvider = require('../../provider/IPFSDownloadProvider.js'); 
+import {downloadString} from '../../provider/IPFSDownloadProvider';
+//var  IPFSDownloadProvider = require('../../provider/IPFSDownloadProvider.js'); 
 
 var votingInterval;
 var numOfProp = 0;
@@ -78,7 +78,7 @@ $(document).ready(async function() {
             for (var i = 0; i < numOfProp; i++) {
                 var currProp = await getProposal(i);
                 const mappedProp = mapProposal(currProp);
-                console.log(mappedProp.proposalHash);
+                console.log(mappedProp);
                 const splits = mappedProp.options.split(',');
                 var wrapper = $('<div></div>');
                 
@@ -95,10 +95,10 @@ $(document).ready(async function() {
                         <label><input type="radio" id="abstain" name="${radioCount}">abstain</label>
                     </div>`
                 ));
-                console.log('before download');
+                //console.log('before download');
                 console.log('prop hash: ' + mappedProp.proposalHash);
-                var propDescription = await IPFSDownloadProvider.downloadString(mappedProp.proposalHash);
-                console.log('after download');
+                var propDescription = await downloadString(mappedProp.proposalHash);
+                //console.log('after download');
                 console.log('propDescription: ' + propDescription);
                 ++radioCount;
                 $('main table').append(
@@ -170,15 +170,19 @@ $(document).ready(async function() {
             var shareholder = mapShareholder(await getShareholder(getActiveUserAddress()));
             var currShares = shareholder.shares;
             //const blockIndex = parseInt($('#block-index').val());
-            const txId = await delegateToProxy(proxyAdr, false, 0, getActiveUserAddress());
-            if (txId.charAt(1) === 'x') {
-                shareholder = mapShareholder(await getShareholder(getActiveUserAddress()));
-                $('#shares').html(shareholder.shares);
-                //$(`main li[id="${blockIndex}"]`).remove();
-                createAlert(`You succesfully delegated all your shares: ${currShares} to the proxy: ${proxyAdr}`)
-            }
+            var proxyUser = mapUser(await getUser(proxyAdr));
+            if (proxyUser.role === 2 && proxyUser.isReg === true) {
+                const txId = await delegateToProxy(proxyAdr, false, 0, getActiveUserAddress());
+                if (txId.charAt(1) === 'x') {
+                    shareholder = mapShareholder(await getShareholder(getActiveUserAddress()));
+                    $('#shares').html(shareholder.shares);
+                    //$(`main li[id="${blockIndex}"]`).remove();
+                    createAlert(`You succesfully delegated all your shares: ${currShares} to the proxy: ${proxyAdr}`)
+                }
+            } else {
+                createAlert('Proxy is not a shareholder or is not a registered user!', 'danger');
 
-            
+            }
             //console.log(getActiveUserAddress());
             //console.log(typeof(getActiveUserAddress()));
             //const currShares = $('main strong[id="shares"]').html();
@@ -191,6 +195,36 @@ $(document).ready(async function() {
         const denomArr = await getVotingDenominations();
         console.log(denomArr);
     }, 3000)*/
+
+    $('main').on('click', 'input[id="proposal-creator-button"]', async function() {
+        const activeUserAddress = getActiveUserAddress();
+        console.log('activeUserAddress: ' + activeUserAddress);
+        //console.log('ownerAddress: ' + ownerAddress);
+        //console.log('activeUserAdr: ' + activeUserAddress);
+        //console.log('owner: ' + owner.toUpperCase());
+        /*console.log(await getOwners());
+        console.log('hasPermission: ' + (await getOwners()).includes(activeUserAddress.toLowerCase()))*/
+        if (!(await getOwners()).includes(activeUserAddress)) {
+            createAlert('You have currently no permission to setup the AGM', 'danger');
+            return;
+        }
+        
+        const propName = $('#proposal-name').val();
+        const propDescription = $('#proposal-description').val();
+        var propHash = await upload(propDescription);
+        const propOptions = $('#proposal-options').val();
+        const parts = propOptions.split(',');
+        var propId = (await getPropId()).toNumber();
+        console.log('propId: ' + propId);
+        for (var i = 0; i < parts.length; i++) {
+            await appendVotingOptionToProposal(propId, parts[i].trim(), activeUserAddress);
+        }
+        await appendVotingOptionToProposal(propId, 'abstain', activeUserAddress);
+        await createProposal(propName, propHash, propOptions, activeUserAddress);
+        await incrementPropId(activeUserAddress);
+        // store propId in contract if proposal creation is splitted
+        //console.log(activeUserAddress, propName, propDescription, propOptions);
+    });
 
 });
 
