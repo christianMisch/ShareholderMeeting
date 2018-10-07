@@ -345,3 +345,15 @@ export function getMeetingName() {
         console.log(error);
     });   
 }
+
+export function registerUser(from) {   
+    AgmOwnerContract.deployed().then(function(deplOwner) {
+        AgmOwner = deplOwner;
+        return AgmOwner.registerUser.sendTransaction({from: from, gas: gas});
+    }).then(function(result) {
+        alert('registerUser TX was successful: ' + result);
+        //return result;
+    }).catch(function(error) {
+        console.log('Error during registerUser TX: ' + error.message);
+    });
+}

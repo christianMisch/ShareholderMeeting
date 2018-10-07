@@ -2,6 +2,8 @@ import {getProposal, getNumOfProposals} from '../../provider/ProposalProvider';
 import {denominateVotingTokens, delegateToProxy, getVotingDenominations} from '../../provider/ShareholderProvider';
 import {getShareholder, getNumOfShareholders, vote} from '../../provider/ShareholderProvider';
 import {setUserShares, getActiveUserAddress, createAlert} from './authentication';
+import { getUser } from '../../provider/AgmOwnerProvider';
+import {mapUser} from './authentication';
 //import {downloadString} from '../../provider/IPFSDownloadProvider';
 var  IPFSDownloadProvider = require('../../provider/IPFSDownloadProvider.js'); 
 
@@ -21,11 +23,17 @@ $(document).ready(async function() {
         console.log('blockIndex: ' + blockIndex);
         var delegAddr = $(`main input[id="deleg-addr-${blockIndex}"]`).val();
         console.log('delegAddr: ' + delegAddr);
-        var txId = await delegateToProxy(delegAddr, true, blockIndex, getActiveUserAddress());
-        if (txId.charAt(1) === 'x') {
-            $(`main li[id="${blockIndex}"]`).remove();
-            createAlert(`You succesfully delegated ${inpButt[0].parentElement.innerText.substring(16,17).toString()} shares to the proxy address: ${delegAddr}`);
+        var proxyUser = mapUser(await getUser(delegAddr));
+        if (proxyUser.role === 2 && proxyUser.isReg === true) {
+            var txId = await delegateToProxy(delegAddr, true, blockIndex, getActiveUserAddress());
+            if (txId.charAt(1) === 'x') {
+                $(`main li[id="${blockIndex}"]`).remove();
+                createAlert(`You succesfully delegated ${inpButt[0].parentElement.innerText.substring(16,17).toString()} shares to the proxy address: ${delegAddr}`);
+            }
+        } else {
+            createAlert('Proxy is not a shareholder or is not a registered user!', 'danger');
         }
+        
     });
 
     $('a[href="#voting"]').click(async function() {
@@ -43,8 +51,8 @@ $(document).ready(async function() {
             var proposalCount = parseInt(await getNumOfProposals());
     
             if (numOfProp == proposalCount) {
-                console.log('proposal count has not changed.');
-                console.log('numOfProp: ' + numOfProp);
+                //console.log('proposal count has not changed.');
+                //console.log('numOfProp: ' + numOfProp);
                 return;
             }
             numOfProp = proposalCount;
@@ -54,8 +62,8 @@ $(document).ready(async function() {
             //var propRefreshBut = document.getElementById('main input[id="refresh-proposal"]');
             //console.log(propRefreshBut);
             //propRefreshBut.dispatchEvent(e);
-            console.log('proposalCount: ' + proposalCount);
-            console.log('numOfProp: ' + numOfProp);
+            //console.log('proposalCount: ' + proposalCount);
+            //console.log('numOfProp: ' + numOfProp);
           }, 1000);
 
       }, 1000);

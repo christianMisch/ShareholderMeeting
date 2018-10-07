@@ -43,7 +43,13 @@ module.exports = async function(deployer, network, accounts) {
     console.log('deshash: ' + deshash);
     //console.log('3.3 ipfs-content: ' + await IPFSDownload.downloadString(deshash));
 
-    //await AgmOwnerContract.announceAGM.sendTransaction();
+    await AgmOwnerContract.announceAGM.sendTransaction();
+    await AgmOwnerContract.setAgenda.sendTransaction('action1,action2');
+    await AgmOwnerContract.setMeetingPlace.sendTransaction('Köln');
+    await AgmOwnerContract.setMeetingStartTime.sendTransaction('2018-12-20T11:11');
+    await AgmOwnerContract.setMeetingEndTime.sendTransaction('2018-12-20T14:22');
+    await AgmOwnerContract.setMeetingName.sendTransaction('Siemens AGM 2018');
+
 
     //await FactoryContract..sendTransaction('no');
 

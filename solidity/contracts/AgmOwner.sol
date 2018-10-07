@@ -83,7 +83,7 @@ contract AgmOwner is User {
         Factory _fac
     )
 
-            User(_userAddress, Role.AGMOWNER) public {
+            User(_userAddress, Role.AGMOWNER, true) public {
 
         //minimumVotingQuorum = _minimumVotingQuorum;
         //marginOfVotesForMajority = _marginOfVotesForMajority;
@@ -155,17 +155,25 @@ contract AgmOwner is User {
         return users.length;
     }
 
-    function getUser(address _userAddress) public view returns (address adr, uint role) {
+    function getUser(address _userAddress) public view returns (address adr, uint role, bool isReg) {
         uint userID = userId[_userAddress];
         if (userID == 0 && _userAddress != userAddress) {
-            return (address(0), 3);
+            return (address(0), 3, false);
         }
         User u = users[userID];
-        return (u.userAddress(), u.role());
+        return (u.userAddress(), u.role(), u.isRegistered());
     }
 
     function getUserList() public view returns (User[] userList) {
         return users;
+    }
+
+    function registerUser() public {
+        uint usID = userId[msg.sender];
+        if (usID != 0) {
+            User u = users[usID];
+            u.setIsRegistered(true);
+        }
     }
 
     function finishAGM() public /*onlyOwner*/ {

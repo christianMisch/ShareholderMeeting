@@ -156,7 +156,7 @@
                     <label> When shall the AGM end?<input type="datetime-local" id="agm-end"></label>
                     <label>Where shall the physical AGM take place?<input type="text" id="place"></label>
                     <label>Please seperate the agenda parts with commas. Enumeration is not required.  <textarea id="agenda-content"></textarea></label>
-                    <label>Input the the voting quorum <input type="number" id="voting-quorum"></label>
+                    <label>Input the the voting quorum <strong>per</strong> proposal<input type="number" id="voting-quorum"></label>
                     <input type="submit" id="time-submit-button" value="Announce">
                 </form>
             </article>
@@ -208,12 +208,12 @@
                 <label>Please insert the date of the AGM: <input type="datetime" id="date"></label>
             </article>-->
             <article class="col-xl-12">
-                <p>Here you find a list of the AGM material: </p>
-                <p>The material files are sent via a personal<strong>e-mail</strong>to you!</p>
+                <p>The following materials are sent via a personal<strong> e-mail</strong> to you!</p>
                 <ul>
-                    <li>Annual report from 2017</li>
+                    <li>Annual report from last year</li>
                     <li>AGM agenda</li>
                 </ul>
+                <p>Here will be announced the agenda: </p>
                 <ol id="agenda-list">
 
                 </ol>
@@ -235,6 +235,7 @@
                     <label>Number of shares which are contained in one block <input type="number" id="factor"></label>
                     <input type="button" value="denominate" id="denominate-button">
                     <strong id="test">Your current share denomination is shown below:</strong>
+                    <strong>Please start delegation from the last share block</strong>
                     <div id="voting-denomination-list">
                 </form>
 

@@ -38,7 +38,7 @@ contract Shareholder is User, ProposalData {
     event CalculateDivision(uint num, uint copy, uint divider);
 
     constructor(address userAddress, uint _votingWeight, Factory _fac, QandA _qa)
-        User(userAddress, Role.SHAREHOLDER) public {
+        User(userAddress, Role.SHAREHOLDER, false) public {
 
         fac = _fac;
         qa = _qa;
@@ -133,11 +133,11 @@ contract Shareholder is User, ProposalData {
 
             
             // deletes the entry with swapping elements if required
-            for (; voteBlockIndex < votingDenominations.length - 1; voteBlockIndex++) {
+            /*for (; voteBlockIndex < votingDenominations.length - 1; voteBlockIndex++) {
                 votingDenominations[voteBlockIndex] = votingDenominations[voteBlockIndex+1];
             }
 
-            votingDenominations.length--;
+            votingDenominations.length--;*/
 
             uint newWeightWithPartDeleg = fac.votingWeights(proxyAddress) + targetVoteWeight;
             fac.setVotingWeight(proxyAddress, newWeightWithPartDeleg);

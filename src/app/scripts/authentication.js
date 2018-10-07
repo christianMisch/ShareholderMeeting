@@ -13,7 +13,8 @@ import {
     getMeetingStartTime,
     getAgenda,
     getMeetingName,
-    getMeetingPlace
+    getMeetingPlace,
+    registerUser
 } from "../../provider/AgmOwnerProvider";
 import {getQAInterval} from './qAndA';
 import {getVotingInterval} from './voting';
@@ -21,12 +22,12 @@ import {setMinimumVotingQuorum} from '../../provider/ProposalProvider'
 import ecies from 'eth-ecies';
 import util from 'ethereumjs-util';
 import web3 from '../../provider/web3Provider';
-
+// delete all finish buttons
 var inputAdr;
 //var place;
 //var startDate;
 //var endDate;
-var dayDiff;
+var dayDiff = 14;
 //var votingQuorum;
 //var annReport;
 //var guide;
@@ -61,15 +62,38 @@ $(document).ready(async function() {
 
     $('#login-button').click(async function(e) {
         e.preventDefault();
-        computeDayDiff();
+        inputAdr = $('#wallet-address').val().toLowerCase();
+        console.log('inputAdr: ' + inputAdr);
+        // turn on
+        //computeDayDiff();
+        $('#timer-link').hide();
+        const user = mapUser(await getUser(inputAdr));
+        console.log('activeUser: ');
+        console.log(user);
+
+        console.log('dayDiff: ' + dayDiff);
+        if (inputAdr === web3.eth.accounts[0] && !(await getIsAnnounced())) {
+            showView('timer-link');
+            showLogoutButton();
+        } else if (inputAdr === web3.eth.accounts[0] || mapUser(await getUser(inputAdr)).isReg === true) {
+            showRoleBasedView();
+        } else if (mapUser(await getUser(inputAdr)).isReg === false && dayDiff < 6) {
+            createAlert('You cannot login into the application anymore.', 'danger');
+            $('#login-button').attr('class', 'btn btn-danger');
+            $('#login-button').prop('disabled', true);
+        } else {
+            $('main #auth-modal').trigger('click');
+            $('button[data-step="1"]').prop('disabled', true);
+        }
+
         if (await getIsAnnounced()) {
             $('#meeting-name').html(await getMeetingName());
             if (dayDiff === 14) {
                 //console.log('encrypt data...');
                 var encryptedData = encrypt(inputAdr, generateRandomString());
-                //console.log('encrData: ' + encryptedData);
-                /*var decryptedData = decrypt('', encryptedData);
-                console.log('decrData: ' + decryptedData);*/
+                console.log('encrData: ' + encryptedData);
+                //var decryptedData = decrypt('', encryptedData);
+                //console.log('decrData: ' + decryptedData);
                 var templateParams = {
                     from_name: 'AGM administrator',
                     to_name: 'Chris',
@@ -85,29 +109,6 @@ $(document).ready(async function() {
                     });*/
                 //console.log('EMAIL WAS SENT!!!');
             }
-        }
-        inputAdr = $('#wallet-address').val().toLowerCase();
-        console.log('inputAdr: ' + inputAdr);
-        //console.log(mapUser(await getUser(inputAdr)));
-        $('#timer-link').hide();
-        //$('#statistics-link').hide();
-        //const user = mapUser(await getUser(inputAdr));
-        //console.log('activeUser: ');
-        //console.log(user);
-
-        console.log('dayDiff: ' + dayDiff);
-        if (inputAdr === web3.eth.accounts[0] && !(await getIsAnnounced())) {
-            showView('timer-link');
-            showLogoutButton();
-        } else if (inputAdr === web3.eth.accounts[0] || mapUser(await getUser(inputAdr)).role !== 3) {
-            showRoleBasedView();
-        } else if (mapUser(await getUser(inputAdr)).role === 3 && dayDiff < 6) {
-            createAlert('You cannot login into the application anymore.', 'danger');
-            $('#login-button').attr('class', 'btn btn-danger');
-            $('#login-button').prop('disabled', true);
-        } else {
-            $('main #auth-modal').trigger('click');
-            $('button[data-step="1"]').prop('disabled', true);
         }
     });
 
@@ -160,6 +161,7 @@ $(document).ready(async function() {
             await setMeetingName($('main #agm-name').val(), getActiveUserAddress())
             
             //timersAreDefined = true;
+            // turn on
             computeDayDiff();
             if (dayDiff >= 30 && !(await getIsAnnounced()) )  {
                 await announceAGM(inputAdr);
@@ -191,10 +193,11 @@ $(document).ready(async function() {
         }
     })
 
-    $('main').on('click', '#finish-button', function() {
+    $('main').on('click', '#finish-button', async function() {
         //console.log($('#decrPW').html());
         //console.log($('#decPassword').val());
         //addrDecrPwMapping.push(inputAdr);
+        await registerUser(inputAdr);
         showRoleBasedView();
     });
 
@@ -206,7 +209,7 @@ $(document).ready(async function() {
                 for (var i = 0; i < agendParts.length; i++) {
                     $('main #agenda-list').append(
                         `
-                        <li>${agendParts[i].trim()}</li>
+                        <li>${i+1}. ${agendParts[i].trim()}</li>
                         `
                     );
                 }
@@ -369,7 +372,8 @@ export function getActiveUserAddress() {
 export function mapUser(userArr) {
     return {
         userAddress: userArr[0],
-        role: userArr[1].toNumber()
+        role: userArr[1].toNumber(),
+        isReg: userArr[2]
     }
 }
 
@@ -396,7 +400,7 @@ function generateRandomString() {
 function encrypt(data) {
     //var ethAddress = pubToAddress(new Buffer(publicKey));
     //console.log('ethAddress: ' + ethAddress);
-    const msg = new Buffer('msgToRetrieveThePublicKey');
+    const msg = new Buffer(data);
     const sig = web3.eth.sign(getActiveUserAddress(), '0x' + msg.toString('hex'));
     const res = util.fromRpcSig(sig);
 
