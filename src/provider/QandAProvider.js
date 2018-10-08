@@ -17,7 +17,7 @@ const gas = /*'220000'*/ '3000000';
 
 export function createQuestion(ipfs_hash, from) {
     ShareholderContract.deployed().then(function(instance) {
-        return instance.createQuestion.sendTransaction(ipfs_hash, {from: from, gas: gas});
+        return instance.createQuestion.sendTransaction(ipfs_hash, from, {from: from, gas: gas});
     }).then(function(txId) {
         alert('createQuestion TX was successful: ' + txId);
     }).catch(function(error) {
@@ -28,7 +28,7 @@ export function createQuestion(ipfs_hash, from) {
 
 export function createAnswer(questionId, ipfs_hash, from) {
     DirectorContract.deployed().then(function(instance) {
-        return instance.createAnswer.sendTransaction(questionId, ipfs_hash, {from: from, gas: gas});
+        return instance.createAnswer.sendTransaction(questionId, ipfs_hash, from, {from: from, gas: gas});
     }).then(function(txId) {
         alert('createAnswer TX was successful: ' + txId);
     }).catch(function(error) {

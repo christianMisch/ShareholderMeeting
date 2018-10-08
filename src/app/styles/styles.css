@@ -20,6 +20,10 @@ header p {
     text-align: right;
 }
 
+#login-content {
+    margin-bottom: 0 !important;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
 }
@@ -52,8 +56,8 @@ a, a:hover, a:focus {
 }
 
 #sidebar ul.components {
-    /*padding: 20px 0;*/
-    border-bottom: 1px solid #47748b;
+    /*padding: 20px 0;
+    border-bottom: 1px solid #47748b;*/
 }
 
 #sidebar ul li a {
@@ -131,6 +135,14 @@ label {
 main ol li {
     list-style-type: none;
     color:blue;
+}
+
+header {
+    margin-bottom: 0px;
+}
+
+div[class="container-fluid"] {
+    margin-left: 0px;
 }
 
 

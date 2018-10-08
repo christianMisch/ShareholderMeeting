@@ -19,6 +19,7 @@ export class App {
 
     async start() {
         console.log(`Start the app with networkId=${this.network} and owner account =${this.account}`);
+        $('#filler').hide();
         /*var announcement = mappAnnouncement(await announceAGM());
         console.log(announcement);
         place = announcement.place;

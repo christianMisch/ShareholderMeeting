@@ -228,9 +228,10 @@ $(function() {
         const activeUser = mapUser(await getUser(getActiveUserAddress().toLowerCase()));;
         //console.log('pressed a tag');
         if (activeUser.role === 1) {
-            const questContent = e.currentTarget.firstChild.nextSibling.firstChild.data;
+            const questContent = e.currentTarget.firstChild.nextElementSibling.offsetParent.children[2].innerHTML.split('<ol')[0].trim();
             const questId = e.currentTarget.getAttribute('href').substring(10);
             console.log(questContent, questId);
+            console.log(e.currentTarget.firstChild);
             $('main div[id="question-content"]').html(questContent);
 
             $('main').on('click', 'button[id="submit-question-button"]', async function() {
@@ -239,6 +240,7 @@ $(function() {
                 const answContent = $('main textarea[id="answer-content"]').val();
                 var answHash = await upload(answContent)
                 createAnswer(questId-1, answHash, getActiveUserAddress());
+                $('main button[data-dismiss="modal"]').trigger('click');
             });
             return;
         }

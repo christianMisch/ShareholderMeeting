@@ -8,14 +8,14 @@ contract QandA {
     struct Answer {
         uint answerId;
         uint questionId;
-        address answerCreator;
+        string answerCreator;
         //string content;
         uint timestamp;
         string ipfs_hash;
     }
 
     struct Question {
-        address creator;
+        string creator;
         uint questionId;
         string ipfs_hash;
         uint timestamp;
@@ -36,7 +36,7 @@ contract QandA {
     function getAnswer(uint answerId) public view returns (
         uint _answerId,
         uint _questionId,
-        address _answerCreator,
+        string _answerCreator,
         string _ipfs_hash,
         uint _timestamp
     ) {
@@ -50,7 +50,7 @@ contract QandA {
         return answers.length;
     }
 
-    function createNewAnswer(uint _questionId, string _ipfs_hash, address sender) public returns(uint answId) {
+    function createNewAnswer(uint _questionId, string _ipfs_hash, string sender) public returns(uint answId) {
 
         answId = answers.length++;
         Answer storage answer = answers[answId];
@@ -61,7 +61,7 @@ contract QandA {
         answer.timestamp = now;
     }
 
-    function createNewQuestion(string _ipfs_hash, address sender) public returns (uint questId) {
+    function createNewQuestion(string _ipfs_hash, string sender) public returns (uint questId) {
 
         questId = questions.length++;
         Question storage question = questions[questId];
@@ -78,7 +78,7 @@ contract QandA {
     }
 
     function getQuestion(uint questionId) public view returns (
-        address _creator,
+        string _creator,
         uint _questionId,
         string _ipfs_hash,
         uint _timestamp,

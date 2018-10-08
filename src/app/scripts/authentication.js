@@ -62,6 +62,7 @@ $(document).ready(async function() {
 
     $('#login-button').click(async function(e) {
         e.preventDefault();
+        $('#filler').show();
         inputAdr = $('#wallet-address').val().toLowerCase();
         console.log('inputAdr: ' + inputAdr);
         // turn on
@@ -85,7 +86,7 @@ $(document).ready(async function() {
             $('main #auth-modal').trigger('click');
             $('button[data-step="1"]').prop('disabled', true);
         }
-
+        //$('#logout-button').css('margin-left', '160%');
         if (await getIsAnnounced()) {
             $('#meeting-name').html(await getMeetingName());
             if (dayDiff === 14) {
@@ -113,6 +114,7 @@ $(document).ready(async function() {
     });
 
     $('#logout-button').click(function() {
+        $('#filler').hide();
         $('nav').hide();
         $('#logout-button').hide();
         $('#login-button').show();
@@ -239,6 +241,9 @@ async function showRoleBasedView() {
         console.log('user acc:' + inputAdr);
         console.log('set time diff...');*/
         $('nav').show();
+        $('#sidebar-position').css('padding', '0');
+        $('#navbar-header').css('padding', '20px');
+        //$('#login-content').css('margin-bottom', '0');
         $('#setup-link').show();
         $('#welcome-link').hide();
         $('#voting-link').hide();
@@ -254,6 +259,7 @@ async function showRoleBasedView() {
         }, 100);*/
 
         showUserCredentials();
+        $('#login-div p').css('margin', '0 1%');
         $('#userAddress').html('User: ' + inputAdr);
         $('#userRole').html('Role: AgmOwner');
         var strDate = computeDate();
@@ -268,10 +274,13 @@ async function showRoleBasedView() {
     } else if (user && user.role === 2) {
         createAlert('You have successfully logged in as Shareholder!');
         $('nav').show();
+        $('#sidebar-position').css('padding', '0');
+        $('#navbar-header').css('padding', '20px');
         $('#voting-link').show();
         $('#setup-link').hide();
         $('#welcome-link').hide();
         showUserCredentials();
+        $('#login-div p').css('margin', '0 1%');
         $('#userAddress').html('User: ' + inputAdr);
         $('#userRole').html('Role: Shareholder');
         $('#date').html('Date: ' + computeDate());
@@ -286,10 +295,13 @@ async function showRoleBasedView() {
 
         createAlert('You have successfully logged in as Director!');
         $('nav').show();
+        $('#sidebar-position').css('padding', '0');
+        $('#navbar-header').css('padding', '20px');
         $('#setup-link').hide();
         $('#welcome-link').hide();
         $('#voting-link').hide();
         showUserCredentials();
+        $('#login-div p').css('margin', '0 1%');
         $('#userAddress').html('User: ' + inputAdr);
         $('#userRole').html('Role: Director');
         $('#date').html('Date: ' + computeDate());

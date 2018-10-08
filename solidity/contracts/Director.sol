@@ -7,6 +7,7 @@ import "./QandA.sol";
 contract Director is User {
 
     QandA public qa;
+    // delete property
     bool isAdministrator;
 
     event AnswerCreated(uint ansId, address creator);
@@ -25,10 +26,9 @@ contract Director is User {
     }
 
     // only director is allowed to create an answer
-    function createAnswer(uint _questionId, string _ipfs_hash)
-        onlyDirector public returns (uint answerId)  {
+    function createAnswer(uint _questionId, string _ipfs_hash, string sender) public onlyDirector returns (uint answerId)  {
 
-        answerId = qa.createNewAnswer(_questionId, _ipfs_hash, msg.sender);
+        answerId = qa.createNewAnswer(_questionId, _ipfs_hash, sender);
 
         emit AnswerCreated(answerId, msg.sender);
     }

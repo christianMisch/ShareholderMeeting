@@ -19,6 +19,8 @@ module.exports = async function(deployer, network, accounts) {
     await AgmOwnerContract.addUser.sendTransaction('0xc179a95Ac86AAbf6baF4D97BA161152fE0cc0655'.toLowerCase(), 2, 45, QandAContract.address);
     await AgmOwnerContract.addUser.sendTransaction('0xB78E4A88e140b9ceeC48D569d6ae0ED4F419eFb1'.toLowerCase(), 2, 12, QandAContract.address);
     await AgmOwnerContract.addUser.sendTransaction('0x92130D033C5846d2653D088c74D844f61717794d'.toLowerCase(), 1, 0, QandAContract.address);
+    await AgmOwnerContract.addUser.sendTransaction('0x32B6D8932B2c4eE0C0D70044695Af4A036767Df7'.toLowerCase(), 1, 0, QandAContract.address);
+
 
     //deshash = await IPFSUpload.upload('Who should be the new chairperson for the next year?');
     await AgmOwnerContract.createProposal.sendTransaction('board election', 'Who should be the new chairperson for the next year?', 'Schmidt, Mueller, Guenther');

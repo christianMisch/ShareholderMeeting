@@ -23,14 +23,18 @@
                         <form id="login-form">
                             <div class="form-group row" id="login-div">
                                 
-                                <label class="col-0 col-form-label" id="address-label">Wallet address: </label>
+                                <label class="col-form-label" id="address-label">Wallet address: </label>
                                 <div class="col-4" id="wallet-div">
                                     <input class="form-control" type="text" placeholder="0x..." id="wallet-address">
                                 </div>
-                                <p id="userAddress">User: </p>
-                                <p id="userRole">Role: </p>
-                                <p id="date">Date: </p>
-                                <div id="header-buttons">
+                                <div class="col-6">
+                                    <p id="userAddress">User: </p>
+                                    <p id="userRole">Role: </p>
+                                    <p id="date">Date: </p>
+                                </div>
+                                <div class="col-5" id="filler"></div>
+                                
+                                <div class="col-1" id="header-buttons">
                                     <input type="button" class="btn btn-success" value="login" id="login-button">
                                     <input type="button" class="btn btn-success" value="logout" id="logout-button">    
                                 </div>
@@ -54,10 +58,10 @@
 
         <div class="container-fluid">
             <div class="row">
-                <div class="col-xl-3">
+                <div class="col-3" id="sidebar-position">
                     <nav id="sidebar">
                         <div class="sidebar-header">
-                            <h3>AGM features</h3>
+                            <h3 id="navbar-header">AGM features</h3>
                         </div>
 
                         <ul class="list-unstyled components">
@@ -86,7 +90,7 @@
                     </nav>
                 </div>
 
-                <div class="col-xl-9">
+                <div class="col-9">
                   <h1 id="meeting-name"></h1>
 
                     <main class="row">
