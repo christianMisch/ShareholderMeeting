@@ -17,9 +17,9 @@ module.exports = async function(deployer, network, accounts) {
     const lowCaseAcc = accounts.map(acc => acc.toLowerCase());
     var hash;
 
-    const sh1 = await Shareholder.new(lowCaseAcc[2], 13, f.address, qa.address);
-    const sh2 = await Shareholder.new(lowCaseAcc[3], 16, f.address, qa.address);
-    const sh3 = await Shareholder.new(lowCaseAcc[4], 43, f.address, qa.address);
+    //const sh1 = await Shareholder.new(lowCaseAcc[7], 13, f.address, qa.address);
+    //const sh2 = await Shareholder.new(lowCaseAcc[8], 16, f.address, qa.address);
+    //const sh3 = await Shareholder.new(lowCaseAcc[9], 43, f.address, qa.address);
 
     hash = await IPFSUpload.upload('On which financial sector will the company focus in the next year?');
     await ShareholderContract.createQuestion.sendTransaction(hash);

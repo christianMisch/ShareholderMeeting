@@ -18,7 +18,7 @@ export class App {
     }
 
     async start() {
-        console.log(`Start the app with networkId=${this.network} and default account =${this.account}`);
+        console.log(`Start the app with networkId=${this.network} and owner account =${this.account}`);
         /*var announcement = mappAnnouncement(await announceAGM());
         console.log(announcement);
         place = announcement.place;
@@ -49,7 +49,8 @@ export class App {
         console.log('upload data');
         var hash = await upload('example');
         console.log('downloadString');
-        console.log(await downloadString(hash));
+        //console.log(await downloadString(hash));
+        //console.log(await callIPFSHash(hash));
 
     }
 }

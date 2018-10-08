@@ -91,7 +91,7 @@ contract QandA {
     }
 
     function setRating(uint questionId, uint ratingOpt) public {
-
+        // cant rate again
         Question storage question = questions[questionId];
         if (ratingOpt == 1) {
             question.upvotes++;

@@ -95,12 +95,14 @@ export function getNumOfShareholders() {
 }
 
 export function vote(propId, votOpt, from) {
-  ShareholderContract.deployed().then(function (deplShareh) {
+  return ShareholderContract.deployed().then(function (deplShareh) {
     Shareholder = deplShareh;
     return Shareholder.vote.sendTransaction(propId, votOpt, {from: from, gas: gas});
   }).then(function (result) {
     console.log('vote TX was successful: ' + result);
+    return result;
   }).catch(function (error) {
+    return error.message;
     console.log('error during vote TX: ' + error.message);
   });
 }

@@ -1,4 +1,4 @@
-import {getProposal, getNumOfProposals} from '../../provider/ProposalProvider';
+import {getProposal, getNumOfProposals, hasVoted} from '../../provider/ProposalProvider';
 import {denominateVotingTokens, delegateToProxy, getVotingDenominations} from '../../provider/ShareholderProvider';
 import {getShareholder, getNumOfShareholders, vote} from '../../provider/ShareholderProvider';
 import {setUserShares, getActiveUserAddress, createAlert} from './authentication';
@@ -96,10 +96,11 @@ $(document).ready(async function() {
                     </div>`
                 ));
                 //console.log('before download');
-                console.log('prop hash: ' + mappedProp.proposalHash);
-                var propDescription = await downloadString(mappedProp.proposalHash);
+                console.log('prop hash: ' + mappedProp.proposalDescription);
+                //var propDescription = await downloadString(mappedProp.proposalHash);
+                var propDescription = mappedProp.proposalDescription;
                 //console.log('after download');
-                console.log('propDescription: ' + propDescription);
+                //console.log('propDescription: ' + propDescription);
                 ++radioCount;
                 $('main table').append(
                     `<tr class="list-group-item-info">
@@ -122,12 +123,21 @@ $(document).ready(async function() {
                 console.log('no options selected')
                 return;
             }
-            
+            //var hasVoted;
+            var txId;
             for (var l = 0; l < selectedOptions.length; l++) {
                 /*console.log(selectedOptions[l]);
                 console.log(parseInt(selectedOptions[l].name));
                 console.log(selectedOptions[l].nextSibling.data.trim());*/
-                await vote(parseInt(selectedOptions[l].name), selectedOptions[l].nextSibling.data.trim(), activeUserAdr);
+                //hasVoted = await hasVoted(parseInt(selectedOptions[l].name));
+                txId = await vote(parseInt(selectedOptions[l].name), selectedOptions[l].nextSibling.data.trim(), activeUserAdr);
+                console.log(txId);
+                console.log(typeof(txId));
+            }
+            if (txId.charAt(1) === 'x') {
+                createAlert('You successfully casted your votes!');
+            } else {
+                createAlert('You have already voted!', 'danger');
             }
         });
 
@@ -232,7 +242,7 @@ export function mapProposal(propArr) {
     return {
         proposalId: propArr[0].toNumber(),
         proposalName: propArr[1],
-        proposalHash: propArr[2],
+        proposalDescription: propArr[2],
         options: propArr[3],
         proposalPassed: propArr[4],
         proposalPercent: propArr[5].toNumber(),

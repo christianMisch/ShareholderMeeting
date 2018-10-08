@@ -42,12 +42,13 @@ contract Factory is ProposalData {
         
     }
 
-    function createNewProposal(string _name, string _ipfs_hash, string _options) public returns (uint propId) {
+    function createNewProposal(string _name, string _description, string _options) public returns (uint propId) {
         propId = proposals.length++;
         Proposal storage proposal = proposals[propId];
         proposal.proposalId = propId;
         proposal.name = _name;
-        proposal.ipfs_hash = _ipfs_hash;
+        //proposal.ipfs_hash = _ipfs_hash;
+        proposal.description = _description;
         proposal.options = _options;
         proposal.proposalPassed = false;
         proposal.passedPercent = 0;
@@ -61,7 +62,8 @@ contract Factory is ProposalData {
     function getProposal(uint proposalId) public view returns (
         uint _proposalId,
         string _name,
-        string _ipfs_hash,
+        //string _ipfs_hash,
+        string description,
         string _options,
         bool _proposalPassed,
         uint _passedPercent,
@@ -69,14 +71,14 @@ contract Factory is ProposalData {
     ) {
         Proposal storage proposal = proposals[proposalId];
         return
-        (proposal.proposalId, proposal.name, proposal.ipfs_hash, proposal.options, proposal.proposalPassed, proposal.passedPercent, proposal.voteCount);
+        (proposal.proposalId, proposal.name, proposal.description, proposal.options, proposal.proposalPassed, proposal.passedPercent, proposal.voteCount);
     }
 
     function setVote(uint proposalId, string votingOption, address sender) public {
         Proposal storage prop = proposals[proposalId];
         //bool isContained = false;
-        /*require(!prop.votedOnProposal[msg.sender], "The shareholder already voted");
-        require(delegate == address(0), "Proxy is not allowed to vote");*/
+        require(!prop.votedOnProposal[sender], "The shareholder already voted");
+        /*require(delegate == address(0), "Proxy is not allowed to vote");*/
 
         uint voteId = prop.votes.length++;
         prop.votes[voteId] = Vote({

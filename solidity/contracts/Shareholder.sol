@@ -13,6 +13,7 @@ contract Shareholder is User, ProposalData {
     //address public delegate;
     uint[] public votingDenominations;
     Delegate[] public delegations;
+    //bool public hasVoted;
     //string[] public selectVotOptions;
     mapping (uint => address) public ratings;
 
