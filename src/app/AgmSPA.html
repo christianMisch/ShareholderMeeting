@@ -23,21 +23,21 @@
                         <form id="login-form">
                             <div class="form-group row" id="login-div">
                                 
-                                <label class="col-form-label" id="address-label">Wallet address: </label>
-                                <div class="col-4" id="wallet-div">
-                                    <input class="form-control" type="text" placeholder="0x..." id="wallet-address">
-                                </div>
-                                <div class="col-6">
+                                <!--<label class="col-form-label" id="address-label"></label>-->
+                                <!--<div class="col-4" id="wallet-div">-->
+                                <input class="col-4 form-control" type="text" placeholder="Wallet address: 0x0..." id="wallet-address">
+                                <input id="secret-PW" class="col-2 form-control" type="text" placeholder="Type in your password">
+                                <span class="col-6" id="user-data">
                                     <p id="userAddress">User: </p>
                                     <p id="userRole">Role: </p>
                                     <p id="date">Date: </p>
-                                </div>
-                                <div class="col-5" id="filler"></div>
+                                </span>
+                                <span class="col-7" id="filler"></span>
                                 
-                                <div class="col-1" id="header-buttons">
+                                <span class="col-1" id="header-buttons">
                                     <input type="button" class="btn btn-success" value="login" id="login-button">
                                     <input type="button" class="btn btn-success" value="logout" id="logout-button">    
-                                </div>
+                                </span>
                                 
                             </div>
                             

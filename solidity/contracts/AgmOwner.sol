@@ -14,6 +14,8 @@ contract AgmOwner is User {
     User[] public users;
     // stores user's address with corresponding id
     mapping(address => uint) public userId;
+    // stores the password for any user
+    mapping(address => string) public secretPWs;
     // owners which have permission to setup the AGM
     address[] public owners;
 
@@ -168,11 +170,12 @@ contract AgmOwner is User {
         return users;
     }
 
-    function registerUser() public {
+    function registerUser(string decrPW) public {
         uint usID = userId[msg.sender];
         if (usID != 0) {
             User u = users[usID];
             u.setIsRegistered(true);
+            secretPWs[msg.sender] = decrPW;
         }
     }
 

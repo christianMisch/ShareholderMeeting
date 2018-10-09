@@ -14,7 +14,9 @@ import {
     getAgenda,
     getMeetingName,
     getMeetingPlace,
-    registerUser
+    registerUser,
+    getUserId,
+    getUserPW
 } from "../../provider/AgmOwnerProvider";
 import {getQAInterval} from './qAndA';
 import {getVotingInterval} from './voting';
@@ -41,9 +43,19 @@ $(document).ready(async function() {
     if (!(await getIsAnnounced())) {
         $('main #announce-wrapper').hide();
     }
-    
+    //console.log('locStor' + localStorage.getItem('address'));
+    if (localStorage.getItem('address') && mapUser(await getUser(localStorage.getItem('address'))).isReg === true) {
+        $('#secret-PW').show();
+        //$('#wallet-address').css('margin-right', '20px');
+        $('#filler').show();
+        $('#filler').attr('class', 'col-5');
+    } else {
+        $('#secret-PW').hide();
+        $('#filler').show();
+
+    }
     $('#logout-button').hide();
-    $('#date').hide();
+    //$('#date').hide();
     $('nav').hide();
     setTimeout(function() {
         $('main #auth-modal').css('visibility', 'hidden');
@@ -63,7 +75,10 @@ $(document).ready(async function() {
     $('#login-button').click(async function(e) {
         e.preventDefault();
         $('#filler').show();
+        $('#filler').attr('class', 'col-5');
         inputAdr = $('#wallet-address').val().toLowerCase();
+        localStorage.setItem('address', inputAdr);
+        var secrPassword = $('#secret-PW').val();
         console.log('inputAdr: ' + inputAdr);
         // turn on
         //computeDayDiff();
@@ -76,8 +91,10 @@ $(document).ready(async function() {
         if (inputAdr === web3.eth.accounts[0] && !(await getIsAnnounced())) {
             showView('timer-link');
             showLogoutButton();
-        } else if (inputAdr === web3.eth.accounts[0] || mapUser(await getUser(inputAdr)).isReg === true) {
+        } else if (inputAdr === web3.eth.accounts[0] || (mapUser(await getUser(inputAdr)).isReg === true && await getUserPW(inputAdr) === secrPassword && secrPassword !== '0')) {
             showRoleBasedView();
+        } else if ( (mapUser(await getUser(inputAdr))).isReg === true && await getUserPW(inputAdr) !== secrPassword ) {
+            createAlert('Please type in also your password to authenticate yourself!', 'danger');
         } else if (mapUser(await getUser(inputAdr)).isReg === false && dayDiff < 6) {
             createAlert('You cannot login into the application anymore.', 'danger');
             $('#login-button').attr('class', 'btn btn-danger');
@@ -91,8 +108,9 @@ $(document).ready(async function() {
             $('#meeting-name').html(await getMeetingName());
             if (dayDiff === 14) {
                 //console.log('encrypt data...');
-                var encryptedData = encrypt(inputAdr, generateRandomString());
+                var encryptedData = encrypt(await generateRandomString());
                 console.log('encrData: ' + encryptedData);
+                console.log('randStr: ' + await generateRandomString());
                 //var decryptedData = decrypt('', encryptedData);
                 //console.log('decrData: ' + decryptedData);
                 var templateParams = {
@@ -114,11 +132,14 @@ $(document).ready(async function() {
     });
 
     $('#logout-button').click(function() {
-        $('#filler').hide();
+        $('#filler').attr('class', 'col-5');
+        //$('#filler').hide();
         $('nav').hide();
         $('#logout-button').hide();
         $('#login-button').show();
         $('main #auth-modal').css('color', 'white');
+        $('#secret-PW').show();
+        //$('#wallet-address').css('margin-right', '2px');
         
         showWelcomePage();
         setTimeout(async function() {
@@ -199,7 +220,9 @@ $(document).ready(async function() {
         //console.log($('#decrPW').html());
         //console.log($('#decPassword').val());
         //addrDecrPwMapping.push(inputAdr);
-        await registerUser(inputAdr);
+        var secPW = $('#decrPW').html();
+        console.log('secPW: ' + secPW);
+        await registerUser(secPW, inputAdr);
         showRoleBasedView();
     });
 
@@ -337,19 +360,22 @@ async function computeDayDiff() {
 }
 
 function showUserCredentials() {
-    $('#userAddress').show();
+    $('#user-data').show();
+    /*$('#userAddress').show();
     $('#userRole').show();
-    $('#date').show();
+    $('#date').show();*/
 }
 
 function hideUserCredentials() {
-    $('#userAddress').hide();
-    $('#userRole').hide();
+    $('#user-data').hide();
+    /*$('#userAddress').hide();
+    $('#userRole').hide();*/
 }
 
 function hideLoginFields() {
     $('#wallet-div').hide();
     $('#wallet-address').hide();
+    $('#secret-PW').hide();
     $('#address-label').hide();
 
 }
@@ -357,6 +383,7 @@ function hideLoginFields() {
 function showLoginFields() {
     $('#wallet-div').show();
     $('#wallet-address').show();
+    $('#secret-PW').show();
     $('#address-label').show();
 }
 
@@ -401,18 +428,20 @@ async function isAuthenticated(address) {
     return false;
 }
 
-function setDayDiff(newDiff) {
+/*function setDayDiff(newDiff) {
     dayDiff = newDiff;
-}
+}*/
 
-function generateRandomString() {
-    return Math.random().toString(36).slice(-10);
+async function generateRandomString() {
+    var str = Math.random().toString(36).slice(-10) + `${(await getUserId(getActiveUserAddress())).toNumber()}`;
+    console.log('str: ' + str);
+    return str;
 }
 
 function encrypt(data) {
     //var ethAddress = pubToAddress(new Buffer(publicKey));
     //console.log('ethAddress: ' + ethAddress);
-    const msg = new Buffer(data);
+    const msg = new Buffer('publicKeyToRetrieve');
     const sig = web3.eth.sign(getActiveUserAddress(), '0x' + msg.toString('hex'));
     const res = util.fromRpcSig(sig);
 
@@ -424,7 +453,7 @@ function encrypt(data) {
     const pubKey  = util.ecrecover(prefixedMsg, res.v, res.r, res.s);
     //console.log('pubKey: ' + pubKey);
     let userPublicKey = new Buffer(pubKey, 'hex');
-    let bufferData = new Buffer('c361a95Ac86AAbf6baF4D97BA161132f456c08g4');
+    let bufferData = new Buffer(data);
 
     let encryptedData = ecies.encrypt(userPublicKey, bufferData);
 
@@ -437,6 +466,6 @@ function decrypt(privateKey, encryptedData) {
 
     let decryptedData = ecies.decrypt(userPrivateKey, bufferEncryptedData);
     
-    return decryptedData.toString('utf8');
+    return decryptedData.toString('utf-8');
 }
 

@@ -6,7 +6,7 @@ import {default as contract} from 'truffle-contract';
 
 //const ownerAccount = web3Provider.eth.accounts[0];
 
-console.log(web3);
+//console.log(web3);
 const AgmOwnerContract = contract(AgmOwnerJson);
 AgmOwnerContract.setProvider(web3.currentProvider);
 var AgmOwner;
@@ -346,14 +346,40 @@ export function getMeetingName() {
     });   
 }
 
-export function registerUser(from) {   
+export function registerUser(secretPW, from) {   
     AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
-        return AgmOwner.registerUser.sendTransaction({from: from, gas: gas});
+        return AgmOwner.registerUser.sendTransaction(secretPW, {from: from, gas: gas});
     }).then(function(result) {
         alert('registerUser TX was successful: ' + result);
         //return result;
     }).catch(function(error) {
         console.log('Error during registerUser TX: ' + error.message);
     });
+}
+
+export function getUserId(address) {
+    return AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+        return AgmOwner.userId.call(address);
+    }).then(function(result) {
+        console.log(result);
+        //alert('getUserId call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log(error);
+    });   
+}
+
+export function getUserPW(address) {
+    return AgmOwnerContract.deployed().then(function(instance) {
+        AgmOwner = instance;
+        return AgmOwner.secretPWs.call(address);
+    }).then(function(result) {
+        console.log(result);
+        //alert('getUserPW call was successful: ' + result);
+        return result;
+    }).catch(function(error) {
+        console.log(error);
+    });   
 }
