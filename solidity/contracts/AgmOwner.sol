@@ -76,7 +76,7 @@ contract AgmOwner is User {
         address _userAddress,
         //uint _minimumVotingQuorum,
         //uint _marginOfVotesForMajority,
-        string _meetingName,
+        //string _meetingName,
         //string _meetingDescription,
         //string _meetingDate,
         //string _meetingPlace,
@@ -89,7 +89,7 @@ contract AgmOwner is User {
 
         //minimumVotingQuorum = _minimumVotingQuorum;
         //marginOfVotesForMajority = _marginOfVotesForMajority;
-        meetingName = _meetingName;
+        //meetingName = _meetingName;
         //meetingDescription = _meetingDescription;
         //meetingDate = _meetingDate;
         //meetingPlace = _meetingPlace;

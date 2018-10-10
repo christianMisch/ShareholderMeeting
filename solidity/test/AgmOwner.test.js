@@ -9,6 +9,7 @@ const should = require('should');
 const expect = require('expect');
 
 contract('AgmOwner', async (accounts) => {
+    let lowCaseAcc = accounts.map(acc => acc.toLowerCase());
     let contract;
     let helper;
     let shareholder;
@@ -18,40 +19,43 @@ contract('AgmOwner', async (accounts) => {
     beforeEach(async () => {
         factory = await Factory.deployed();
         qa = await QandA.deployed();
-        contract = await AgmOwnerDeployer(accounts[0], factory.address);
+        contract =  await AgmOwnerDeployer(accounts[0], factory.address);
         shareholder = await Shareholder.deployed();
         helper = await require('./utils/HelperFunctions.js')(factory,_);
-        //expect(+await factory.getNumOfProposals.call()).toBe(0);
-    })
+        //expect(+await contract.getNumOfUsers.call()).toBe(0);
+    });
 
     it('should transfer ownership to another director only if the sender is the deployer of the contract', async function() {
-        await contract.transferOwnership.sendTransaction(accounts[1], {from: accounts[0]});
-        expect(await contract.userAddress()).toBe(accounts[1]);
-    })
+        await contract.transferOwnership.sendTransaction(lowCaseAcc[1], {from: lowCaseAcc[0]});
+        expect(await contract.userAddress()).toBe(lowCaseAcc[0]);
+        expect(await contract.getOwners.call()).toContain(lowCaseAcc[1]);
+    });
 
     it('should not transfer ownership if the sender is not the deployer', async () => {
         try {
-            should.fail(await contract.transferOwnership.sendTransaction(accounts[1], {from: accounts[3]}))
+            await contract.transferOwnership.sendTransaction(lowCaseAcc[1], {from: lowCaseAcc[3]});
+            should.fail("This TX raised an error");
         } catch (error) {
-            expect(error.message).toBe('VM Exception while processing transaction: revert');
+            expect(error.message).toContain('This TX raised an error');
         }
-    })
+    });
 
     it('should create a new shareholder and add him to the AGM list', async () => {
-        await contract.addUser.sendTransaction(accounts[1], false, 10000, qa.address);
-        await contract.addUser.sendTransaction(accounts[1], false, 20, qa.address);
-        await contract.addUser.sendTransaction(accounts[2], false, 30, qa.address);
+        await contract.addUser.sendTransaction(lowCaseAcc[1], 0, 10000, qa.address);
+        await contract.addUser.sendTransaction(lowCaseAcc[2], 1, 20, qa.address);
+        await contract.addUser.sendTransaction(lowCaseAcc[3], 2, 30, qa.address);
         expect(+await contract.getNumOfUsers.call()).toBe(3);
-        expect(+await contract.numberOfUsers()).toBe(3);
-        //shareholder and owner have same number of users
-        //console.log(+await shareholder.getNumOfUsers.call());
-        //await sh.getShareholderList.sendTransaction();
-        //console.log(+await sh.getNumOfShareholders.call());
-    })
+        //expect(+await contract.numberOfUsers()).toBe(3);
+        const sh = await helper.getFormattedObj(lowCaseAcc[1], 'user', contract);
+        console.log(sh);
+        expect(sh.userAddress).toBe(lowCaseAcc[1]);
+        expect(+sh.role).toBe(2);
+        expect(sh.isRegistered).toBe(false);
+    });
 
-    it('should create shareholders and directors and remove users', async () => {
-        await contract.addUser.sendTransaction(accounts[2], true, 0, qa.address);
-        await contract.addUser.sendTransaction(accounts[3], false, 1000, qa.address);
+    it('should create shareholder and director and remove users', async () => {
+        await contract.addUser.sendTransaction(accounts[2], 1, 0, qa.address);
+        await contract.addUser.sendTransaction(accounts[3], 2, 1000, qa.address);
         expect(+await contract.numberOfUsers()).toBe(2);
         expect(+await contract.userId.call(accounts[2])).toBe(0);
         expect(+await contract.userId.call(accounts[3])).toBe(1);
@@ -61,7 +65,7 @@ contract('AgmOwner', async (accounts) => {
         expect(+await contract.numberOfUsers()).toBe(0);
     })
 
-    /*it('should create a proposal', async () => {
+    it('should create a proposal', async () => {
         await contract.createProposal.sendTransaction("election", "new board shall be elected", "A,B,C");
         expect(+await factory.getNumOfProposals.call()).toBe(1);
         let propObj = await helper.getFormattedObj(0, 'proposal');
@@ -72,29 +76,34 @@ contract('AgmOwner', async (accounts) => {
         expect(propObj.proposalPassed).toBe(false);
         expect(+propObj.passedPercent).toBe(0);
         expect(+propObj.voteCount).toBe(0);
-    })*/
+    });
 
     it('should ensure that only the owner can create a proposal', async () => {
         try {
-            should.fail(await contract.createProposal.
-                sendTransaction("election", "new board shall be elected", "A,B,C", {from: accounts[5]}));
+            await contract.createProposal.sendTransaction("election", "new board shall be elected", "A,B,C", {from: accounts[5]});
+            should.fail('This TX should raise an error');
         } catch (error) {
-            expect(error.message).toBe('VM Exception while processing transaction: revert')
+            expect(error.message).toContain('This TX should raise an error')
         }
-    })
+    });
 
     it('should finish the AGM', async () => {
         expect(+await contract.numberOfUsers()).toBe(0);
         expect(await contract.isFinished()).toBe(false);
         await contract.finishAGM.sendTransaction({from: accounts[0]});
         expect(await contract.isFinished()).toBe(true);
-    })
+    });
 
     it('should announce the AGM', async () => {
-        let announceObj = await contract.announceAGM.call({from: accounts[0]});
-        expect(announceObj[0]).toBe('01.01.2018');
-        expect(announceObj[1]).toBe('ICC Berlin');
-    })
+        await contract.announceAGM.call({from: accounts[0]});
+        await contract.setMeetingStartTime.sendTransaction('25-09-10T11:00');
+        await contract.setMeetingEndTime.sendTransaction('25-09-10T15:00');
+        await contract.setMeetingPlace.sendTransaction('Koeln');
+        await contract.setMeetingName.sendTransaction('Siemens AGM');
+        expect(await contract.getIsAnnounced.call()).toBe(true);
+        expect(await contract.meetingEndTime.call()).toBe('25-09-10T15:00');
+        expect(await contract.meetingStartTime.call()).toBe('25-09-10T11:00');
+    });
 
     it('should ensure that AgmOwner and shareholders interact with the same proposals', async () => {
         await contract.createProposal.sendTransaction("election1", "new board shall be elected", "A,B,C");
@@ -106,7 +115,7 @@ contract('AgmOwner', async (accounts) => {
         
         expect(numOfProposalsInAgmOwner).toBe(numOfProposalsInShareholder);
         expect(+await factory.getNumOfProposals.call()).toBe(2);
-    })
+    });
 
     it('number of proposals is not set to 0 because the preceding proposals are stored in Factory', async () => {
         expect(+await factory.getNumOfProposals.call()).toBe(2);
@@ -114,7 +123,7 @@ contract('AgmOwner', async (accounts) => {
         let numOfProposalsInShareholder = +await Factory.at(await shareholder.fac()).getNumOfProposals.call();
         expect(numOfProposalsInAgmOwner).toBe(2);
         expect(numOfProposalsInShareholder).toBe(2);
-    })
+    });
 
     it('should ensure that number of proposals for a new deployed Factory is 0', async () => {
         // new factory with new address -> previous created proposals are not stored
@@ -124,5 +133,5 @@ contract('AgmOwner', async (accounts) => {
         let numOfProposalsInAgmOwner = +await newOwnerFac.getNumOfProposals.call();
         expect(+await factory.getNumOfProposals.call()).toBe(2);
         expect(numOfProposalsInAgmOwner).toBe(0);
-    })
+    });
 });

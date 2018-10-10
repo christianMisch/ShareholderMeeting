@@ -10,7 +10,7 @@ module.exports = function(deployer, network, accounts) {
 
     const uppCaseAcc = accounts.map(acc => acc.toLowerCase());
     deployer.deploy(ProposalData);
-    console.log('acc[0]: ' + uppCaseAcc[0]);
+    //console.log('acc[0]: ' + uppCaseAcc[0]);
     //deployer.deploy(User, accounts[1], false);
     /*console.log('web3 accounts');
     console.log(web3.eth.accounts);
@@ -35,7 +35,7 @@ module.exports = function(deployer, network, accounts) {
             uppCaseAcc[0],
             //3,
             //50,
-            'Siemens AGM 2018',
+            //'Siemens AGM 2018',
             //'Annual General Meeting 2018',
             //'01.01.2018, 3pm',
             //'ICC Berlin',
@@ -44,13 +44,11 @@ module.exports = function(deployer, network, accounts) {
             f.address
         );
     }).then(async function(agmOwner) {
-        console.log('factory address:      ' + f.address);
+        /*console.log('factory address:      ' + f.address);
         console.log('QandA   address:      ' + qa.address);
         console.log('AgmOwner user address: ' + await agmOwner.userAddress());
-        console.log(uppCaseAcc[0]);
+        console.log(uppCaseAcc[0]);*/
         //console.log(agmOwner.then(function(deplOwner){console.log(deplOwner.userAddress)}));
         //accounts.forEach(acc => console.log(acc));
     });
-
-
 }

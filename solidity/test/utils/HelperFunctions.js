@@ -1,11 +1,12 @@
 const Factory = artifacts.require("./Factory.sol");
 const QandA = artifacts.require('./QandA.sol');
+const AgmOwner = artifacts.require('./AgmOwner.sol');
 
 const answerFields = [
     'answerId',
     'questionId',
     'answerCreator',
-    'content',
+    'ipfs_hash',
     'timestamp' 
 ]
 
@@ -22,7 +23,7 @@ const proposalFields = [
 const questionFields = [
     'creator',
     'questionId',
-    'content',
+    'ipfs_hash',
     'timestamp',
     'upvotes',
     'downvotes'
@@ -33,12 +34,30 @@ const delegateFields = [
     'votingWeight'
 ];
 
+const userFields = [
+    'userAddress',
+    'role',
+    'isRegistered'
+];
+
 module.exports = (factory, qa) => {
 
     async function getFormattedObj(id, type, currContract) {
         let rawData;
 
         switch (type) {
+            case 'user':
+                rawData = await currContract.getUser.call(id);
+                    
+                if (rawData.length != userFields.length) {
+                    throw new Error("The proposal doesn't have the correct format. Please check the properties");
+                }
+                const userFormatted = {};
+                for (let i = 0; i < userFields.length; i++) {
+                    userFormatted[userFields[i]] = rawData[i];
+                }
+                return userFormatted;
+
             case 'answer':
                 rawData = await qa.getAnswer.call(id);
                 

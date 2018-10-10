@@ -8,9 +8,9 @@ contract Director is User {
 
     QandA public qa;
     // delete property
-    bool isAdministrator;
+    bool public isAdministrator;
 
-    event AnswerCreated(uint ansId, address creator);
+    event AnswerCreated(uint ansId, string creator);
 
     modifier onlyDirector {
         require(this.role() == 1, "the user is not a director");
@@ -30,6 +30,6 @@ contract Director is User {
 
         answerId = qa.createNewAnswer(_questionId, _ipfs_hash, sender);
 
-        emit AnswerCreated(answerId, msg.sender);
+        emit AnswerCreated(answerId, sender);
     }
 }

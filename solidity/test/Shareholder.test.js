@@ -3,6 +3,8 @@ const Shareholder = artifacts.require('./Shareholder.sol');
 const AgmOwner = artifacts.require('./AgmOwner.sol');
 const Factory = artifacts.require('./Factory.sol');
 const QandA = artifacts.require('./QandA.sol');
+const IPFSUpload = require('../../src/provider/IPFSUploadProvider.js');
+const IPFSDownload = require('../../src/provider/IPFSDownloadProvider.js');
 //const AgmOwnerDeployer = require('./utils/AgmOwnerDeployer.js')(AgmOwner);
 
 const should = require('should');
@@ -20,13 +22,15 @@ contract('Shareholder', async (accounts) => {
         contract = await Shareholder.deployed();
         agmOwner = await AgmOwner.deployed();
         helper = await require('./utils/HelperFunctions.js')(factory, qa);
-    });
+    })
 
     it('should create a new shareholder instance', async () => {
-        let instance = await Shareholder.new(accounts[0], 20000, factory.address, qa.address);
-        expect(await instance.delegate()).toContain('0x0');
-        expect(await instance.userAddress()).toBe(accounts[0]);
-        expect(await instance.isDirector()).toBe(false);
+        let instance = await Shareholder.new(accounts[5], 20000, factory.address, qa.address);
+        //expect(await instance.delegate()).toContain('0x0');
+        expect(await instance.userAddress()).toBe(accounts[5]);
+        //expect(await instance.isDirector()).toBe(false);
+        expect(+await instance.getNumOfDelegations.call()).toBe(0);
+        expect(+await instance.getNumOfVotingDenominations.call()).toBe(0);
         let fac = await helper.getFactory(instance);
         expect(+await fac.votingWeights(await instance.userAddress())).toBe(20000);
         
@@ -65,14 +69,15 @@ contract('Shareholder', async (accounts) => {
     it('should be possible to create a question for a shareholder', async () => {
         // use same contract because it invokes contract.getQuestion(id)
         let sh = await Shareholder.new(accounts[1], 1000, factory.address, qa.address);
-        await sh.createQuestion.sendTransaction("question1", {from: accounts[1]});
+        var hash = await IPFSUpload.upload('question1')
+        await sh.createQuestion.sendTransaction(hash, accounts[1]);
         let contrQA = await helper.getQandA(sh);
         expect(+await contrQA.getNumOfQuestions.call()).toBe(1);
         let questionObj = await helper.getFormattedObj(0, 'question');
        
         expect(questionObj.creator).toBe(await sh.userAddress());
         expect(+questionObj.questionId).toBe(0);
-        expect(questionObj.content).toBe('question1');
+        expect(await IPFSDownload.downloadString(questionObj.content)).toBe('question1');
         expect(+questionObj.timestamp).toBeGreaterThan(1000000);
         expect(+questionObj.upvotes).toBe(0);
         expect(+questionObj.downvotes).toBe(0);
@@ -96,9 +101,10 @@ contract('Shareholder', async (accounts) => {
     })
 
     it('should be possible to rate a question', async () => {
-        await contract.createQuestion.sendTransaction("question1", {from: accounts[0]});
-        expect(await contract.userAddress()).toBe(accounts[0]);
-        await contract.rateQuestion.sendTransaction(0, 0, {from: accounts[0]});
+        var hash = await IPFSUpload.upload('question1')
+        await contract.createQuestion.sendTransaction(hash, accounts[6]);
+        expect(await contract.userAddress()).toBe(accounts[6]);
+        await contract.rateQuestion.sendTransaction(0, 0, {from: accounts[6]});
         
         let qa = await helper.getQandA(contract);
         expect(+await qa.getNumOfQuestions.call()).toBe(2);
@@ -108,7 +114,7 @@ contract('Shareholder', async (accounts) => {
         
         //expect(questObj.creator).toBe(accounts[0]);
         expect(+questObj.questionId).toBe(0);
-        expect(questObj.content).toBe('question1');
+        expect(await IPFSDownload.downloadString(questObj.content)).toBe('question1');
         expect(+questObj.timestamp).toBeGreaterThan(0);
         expect(+questObj.upvotes).toBe(0);
         expect(+questObj.downvotes).toBe(1);
@@ -153,24 +159,25 @@ contract('Shareholder', async (accounts) => {
         expect(+await sender.getNumOfDelegations.call()).toBe(1);
     })
 
-    it('should be possible for a shareholder to denominate his voting weigth into smaller blocks', async () => {
+    it('should be possible for a shareholder to denominate his voting weight into smaller blocks', async () => {
         let sh = await Shareholder.new(accounts[1], 4500, factory.address, qa.address);
-        await sh.denominateVotingTokens.sendTransaction(4, 0, 0);
+        await sh.denominateVotingTokens.sendTransaction(4, 0);
 
         expect(+await sh.getNumOfVotingDenominations.call()).toBe(4);
-        expect(+await sh.votingDenominations(0)).toBe(1000);
-        expect(+await sh.votingDenominations(1)).toBe(1000);
-        expect(+await sh.votingDenominations(2)).toBe(1000);
-        expect(+await sh.votingDenominations(3)).toBe(1000);
+        expect(+await sh.votingDenominations(0)).toBe(1);
+        expect(+await sh.votingDenominations(1)).toBe(1);
+        expect(+await sh.votingDenominations(2)).toBe(1);
+        expect(+await sh.votingDenominations(3)).toBe(1);
     })
 
     it('is not possible to denominate more voting weight than he owns', async () => {
         let sh = await Shareholder.new(accounts[1], 4500, factory.address, qa.address);
         try {
             // 6 * 1000 voting weight blocks
-            should.fail(await sh.denominateVotingTokens.sendTransaction(6, 0, 0));
+            await sh.denominateVotingTokens.sendTransaction(6, 0);
+            should.fail('This TX raised an error');
         } catch (error) {
-            expect(error.message).toContain('undefined');
+            expect(error.message).toContain('VM Exception while processing transaction: revert');
         }
     })
 
@@ -185,19 +192,19 @@ contract('Shareholder', async (accounts) => {
         let facProxy2 = await helper.getFactory(proxy2);
         let facProxy3 = await helper.getFactory(proxy3);
         
-        // denominateVotingTokens(numOfBlockWeights, equallyDistribution, factorizedBlockWeights)
-        await sender.denominateVotingTokens.sendTransaction(3, 0, 0, {from: accounts[3]});
+        // denominateVotingTokens(numOfBlockWeights, factorizedBlockWeights)
+        await sender.denominateVotingTokens.sendTransaction(3, 0, {from: accounts[3]});
         expect(+await sender.getNumOfVotingDenominations.call()).toBe(3);
-        expect(+await facSender.votingWeights(accounts[3])).toBe(2432);
+        expect(+await facSender.votingWeights(accounts[3])).toBe(5429);
         // delegateToProxy(proxyAddress, enablePartialDelegation, votingBlockIndex)
         await sender.delegateToProxy(accounts[4], true, 0, {from: accounts[3]});
-        expect(+await facProxy1.votingWeights(accounts[4])).toBe(2234);
+        expect(+await facProxy1.votingWeights(accounts[4])).toBe(1238);
         
         await sender.delegateToProxy(accounts[5], true, 1, {from: accounts[3]});
-        expect(+await facProxy2.votingWeights(accounts[5])).toBe(57777);
+        expect(+await facProxy2.votingWeights(accounts[5])).toBe(56780);
         
         await sender.delegateToProxy(accounts[6], true, 2, {from: accounts[3]});
-        expect(+await facProxy3.votingWeights(accounts[6])).toBe(755432);    
+        expect(+await facProxy3.votingWeights(accounts[6])).toBe(754435);    
     })
 
     /*it('should be possible to divide voting weight into equally distributed blocks', async () => {
@@ -216,42 +223,34 @@ contract('Shareholder', async (accounts) => {
 
     })*/
 
-    it('should perform an approximate division', async () => {
-        let sender = await Shareholder.new(accounts[8], 16789, factory.address, qa.address);
-        //expect(+await sender.safeDivision(10, 2)).toBe(5);
-    })
-
     it('should support complex weight denomination and delegation', async () => {
-        let sender = await Shareholder.new(accounts[8], 16789, factory.address, qa.address);
-        let proxy1 = await Shareholder.new(accounts[4], 1234, factory.address, qa.address);
-        let proxy2 = await Shareholder.new(accounts[5], 56777, factory.address, qa.address);
+        let sender = await Shareholder.new(accounts[8], 43, factory.address, qa.address);
+        let proxy1 = await Shareholder.new(accounts[4], 11, factory.address, qa.address);
+        let proxy2 = await Shareholder.new(accounts[5], 63, factory.address, qa.address);
         let facSender = await helper.getFactory(sender);
-        await sender.denominateVotingTokens.sendTransaction(2, 0, 4, {from: accounts[8]});
-        await sender.denominateVotingTokens.sendTransaction(5, 0, 0, {from: accounts[8]});
-        await proxy2.denominateVotingTokens.sendTransaction(3, 0, 7, {from: accounts[5]});
+        await sender.denominateVotingTokens.sendTransaction(2, 4, {from: accounts[8]});
+        await sender.denominateVotingTokens.sendTransaction(5, 0, {from: accounts[8]});
+        await proxy2.denominateVotingTokens.sendTransaction(3, 7, {from: accounts[5]});
 
-        expect(+await facSender.votingWeights(accounts[8])).toBe(3789);
-        expect(+await facSender.votingWeights(accounts[5])).toBe(35777);
-        expect(+await sender.getNumOfVotingDenominations.call()).toBe(7);
+        expect(+await facSender.votingWeights(accounts[8])).toBe(30);
+        expect(+await facSender.votingWeights(accounts[5])).toBe(42);
+        expect(+await sender.getNumOfVotingDenominations.call()).toBe(9);
         expect(+await proxy2.getNumOfVotingDenominations.call()).toBe(3);
-        expect(+await sender.votingDenominations(0)).toBe(4000);
-        expect(+await sender.votingDenominations(0)).toBe(4000);
-        for (i = 2; i < 7; i++) {
-            expect(+await sender.votingDenominations(i)).toBe(1000);
+        expect(+await sender.votingDenominations(0)).toBe(2);
+        expect(+await sender.votingDenominations(0)).toBe(2);
+        for (i = 4; i < 9; i++) {
+            expect(+await sender.votingDenominations(i)).toBe(1);
         }
 
         await sender.delegateToProxy(accounts[4], true, 0, {from: accounts[8]});
         await sender.delegateToProxy(accounts[5], true, 2, {from: accounts[8]});
-        await proxy1.delegateToProxy(accounts[5], false, 0, {from: accounts[4]});
+        //await proxy1.delegateToProxy(accounts[5], false, 0, {from: accounts[4]});
         await proxy2.delegateToProxy(accounts[8], true, 1, {from: accounts[8]});
 
         
-        expect(+await facSender.votingWeights(accounts[4])).toBe(0);
-        expect(+await facSender.votingWeights(accounts[5])).toBe(42011);
-        expect(+await facSender.votingWeights(accounts[8])).toBe(10789);
-
-
-
+        expect(+await facSender.votingWeights(accounts[4])).toBe(15);
+        expect(+await facSender.votingWeights(accounts[5])).toBe(44);
+        expect(+await facSender.votingWeights(accounts[8])).toBe(32);
     }) 
 
     it('should ensure that a shareholder can only rate at most once on a question', async () => {
@@ -261,8 +260,8 @@ contract('Shareholder', async (accounts) => {
 
         let qaRater = await helper.getQandA(rater);
         let qaOthRat = await helper.getQandA(otherRater);
-
-        await rater.createQuestion.sendTransaction('how many vacation days can we claim?');
+        var hash = IPFSUpload.upload('how many vacation days can we claim?');
+        await rater.createQuestion.sendTransaction(hash, accounts[4]);
         let numOfQuestionsInRater = await qaRater.getNumOfQuestions.call();
         let numOfQuestionsInOtherRat = await qaOthRat.getNumOfQuestions.call();
         
@@ -277,6 +276,5 @@ contract('Shareholder', async (accounts) => {
         } catch (error) {
             expect(error.message).toContain('revert');
         }
-        
     })
 })
