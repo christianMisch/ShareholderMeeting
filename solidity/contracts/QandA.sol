@@ -88,17 +88,17 @@ contract QandA {
             (question.creator, question.questionId, question.ipfs_hash, question.timestamp, question.upvotes, question.downvotes);
     }
 
-    function setRating(uint questionId, uint ratingOpt) public {
+    function setRating(uint questionId, uint ratingOpt, address sender) public {
         // cant rate again
         Question storage question = questions[questionId];
         if (ratingOpt == 1) {
             question.upvotes++;
-            emit QuestionUpvote(msg.sender, question.upvotes);
+            emit QuestionUpvote(sender, question.upvotes);
         } else if (ratingOpt == 0) {
             question.downvotes++;
-            emit QuestionDownvote(msg.sender, question.downvotes);
+            emit QuestionDownvote(sender, question.downvotes);
         } else {
-            emit InvalidRatingOption(msg.sender);
+            emit InvalidRatingOption(sender);
         }
     }
 

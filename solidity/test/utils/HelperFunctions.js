@@ -112,7 +112,7 @@ module.exports = (factory, qa) => {
                 }
                 return questionFormatted;
             case 'delegate':
-                rawData = await currContract.getDelegate.call(id);
+                rawData = await currContract.delegations.call(id);
 
                 if (rawData.length != delegateFields.length) {
                     throw new Error("The proposal doesn't have the correct format. Please check the properties");

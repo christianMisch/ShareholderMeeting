@@ -348,3 +348,20 @@ console.log(web3Provider.eth.accounts);*/
 // </td>
 // */
 
+
+/*function getDelegate(uint delegateId) public view returns (address _proxyAddress, uint _votingWeight) {
+        Delegate storage deleg = delegations[delegateId];
+        return (deleg.proxy, deleg.votingWeight);
+    }*/
+
+    /*function getNumOfDelegations() public view returns (uint length) {
+        return delegations.length;
+    }*/
+
+    /*function getNumOfVotingDenominations() public view returns (uint length) {
+        return votingDenominations.length;
+    }*/
+
+    /*function getVotingDenominations() public view returns (uint[] denominations) {
+        return votingDenominations;
+    }*/

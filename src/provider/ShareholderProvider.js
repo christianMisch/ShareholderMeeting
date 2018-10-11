@@ -39,7 +39,7 @@ export function delegateToProxy(proxyAddress, partialDelegation, voteBlockIndex,
   });
 }
 
-export function getVotingDenominations() {
+/*export function getVotingDenominations() {
   return ShareholderContract.deployed().then(function (deplShareh) {
     Shareholder = deplShareh;
     return Shareholder.getVotingDenominations.call();
@@ -49,7 +49,7 @@ export function getVotingDenominations() {
   }).catch(function (error) {
     console.log('error during getVotingDenominations TX: ' + error.message);
   });
-}
+}*/
 
 export async function rateQuestion(questId, ratOpt, from) {
   /*return ShareholderContract.deployed().then(function (deplShareh) {

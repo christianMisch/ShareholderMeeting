@@ -12,8 +12,6 @@ contract Shareholder is User, ProposalData {
 
     uint[] public votingDenominations;
     Delegate[] public delegations;
-    //bool public hasVoted;
-    //string[] public selectVotOptions;
     mapping (uint => address) public ratings;
 
     enum RatingOption {DOWNVOTE, UPVOTE}
@@ -24,7 +22,7 @@ contract Shareholder is User, ProposalData {
     }
 
     modifier onlyShareholder {
-        require((this.role() == 2) && (fac.votingWeights(msg.sender) > 0), "User is not a shareholder");
+        require((this.role() == 2), "User is not a shareholder");
         _;
     }
 
@@ -48,26 +46,24 @@ contract Shareholder is User, ProposalData {
     }
 
     function vote(uint proposalId, string votingOption) public onlyShareholder {
-        //selectVotOptions.push(votingOption);
         fac.setVote(proposalId, votingOption, msg.sender);
 
         emit Voted(userAddress, proposalId, votingOption);
     }
 
-    function createQuestion(string _ipfs_hash, string creator) public returns (uint questId) {
-
+    function createQuestion(string _ipfs_hash, string creator) public onlyShareholder returns (uint questId) {
         questId = qa.createNewQuestion(_ipfs_hash, creator);
 
         emit QuestionCreated(questId, creator);
     }
 
-    function rateQuestion(uint questionId, RatingOption ratingOpt) public {
-        //require(ratings[questionId] != msg.sender, "sender has already rated this question");
-        qa.setRating(questionId, uint(ratingOpt));
+    function rateQuestion(uint questionId, RatingOption ratingOpt) public onlyShareholder {
+        require(ratings[questionId] == address(0), "The shareholder has already rated this question");
+        qa.setRating(questionId, uint(ratingOpt), msg.sender);
         ratings[questionId] = msg.sender;
     }
 
-    function denominateVotingTokens(uint numOfBlockWeights, uint factor) public {
+    function denominateVotingTokens(uint numOfBlockWeights, uint factor) public onlyShareholder {
 
         uint voterWeight = fac.votingWeights(msg.sender);
         uint subtractedVoteWeight;
@@ -93,25 +89,8 @@ contract Shareholder is User, ProposalData {
         }
     }
 
-    /*function getVoterWeight(address _userAddress) public returns (uint weight) {
-        weight = 0;
-        for (uint i = 0; i < fac.getNumOfShareholders(); i++) {
-
-            (address currAddress,,address _delegate) = fac.getShareholder(i);
-            if (_delegate == _userAddress) {
-                weight += fac.votingWeights(currAddress);
-            }
-
-            if (currAddress == _userAddress && _delegate == address(0)) {
-                weight += fac.votingWeights(currAddress);
-            }
-        }
-
-        emit VoterWeight(_userAddress, weight);
-    }*/
-
     // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
-    function delegateToProxy(address proxyAddress, bool partialDelegation, uint voteBlockIndex) public {
+    function delegateToProxy(address proxyAddress, bool partialDelegation, uint voteBlockIndex) public onlyShareholder {
         require(fac.votingWeights(msg.sender) >= 0, "Sender does not own enough voting tokens");
         //require(proxyAddress != msg.sender, "Self-delegation is not allowed");
         //require(userExists(proxyAddress), "Proxy is not a registered user");
@@ -131,7 +110,6 @@ contract Shareholder is User, ProposalData {
             /*for (; voteBlockIndex < votingDenominations.length - 1; voteBlockIndex++) {
                 votingDenominations[voteBlockIndex] = votingDenominations[voteBlockIndex+1];
             }
-
             votingDenominations.length--;*/
 
             uint newWeightWithPartDeleg = fac.votingWeights(proxyAddress) + targetVoteWeight;
@@ -153,20 +131,20 @@ contract Shareholder is User, ProposalData {
         }
     }
 
-    function getDelegate(uint delegateId) public view returns (address _proxyAddress, uint _votingWeight) {
+    /*function getDelegate(uint delegateId) public view returns (address _proxyAddress, uint _votingWeight) {
         Delegate storage deleg = delegations[delegateId];
         return (deleg.proxy, deleg.votingWeight);
-    }
+    }*/
 
-    function getNumOfDelegations() public view returns (uint length) {
+    /*function getNumOfDelegations() public view returns (uint length) {
         return delegations.length;
-    }
+    }*/
 
-    function getNumOfVotingDenominations() public view returns (uint length) {
+    /*function getNumOfVotingDenominations() public view returns (uint length) {
         return votingDenominations.length;
-    }
+    }*/
 
-    function getVotingDenominations() public view returns (uint[] denominations) {
+    /*function getVotingDenominations() public view returns (uint[] denominations) {
         return votingDenominations;
-    }
+    }*/
 }

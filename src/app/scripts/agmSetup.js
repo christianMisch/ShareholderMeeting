@@ -27,7 +27,11 @@ $(document).ready(function() {
             const newUserAddress = $('#new-user-address').val().toLowerCase();
             const role = parseInt($('#director-flag').val());
             //console.log('role: ' + typeof(role));
-            const numOfShares = $('#num-of-shares').val();
+            const numOfShares = parseInt($('#num-of-shares').val());
+            if (role !== 2 && numOfShares > 1) {
+                createAlert('Only a shareholder can own shares. Please set a 0 if the user is not a shareholder!', 'danger');
+                return;
+            }
             addUser(newUserAddress, role, numOfShares, activeUserAddress);
             getNumOfUsers();
             const mapRole = role === 0 ? 'AgmOwner': (role === 1 ? 'Director': 'Shareholder');
