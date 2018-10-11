@@ -40,12 +40,30 @@ const userFields = [
     'isRegistered'
 ];
 
+const voteFields = [
+    'userAddress',
+    'option',
+    'weight'
+];
+
 module.exports = (factory, qa) => {
 
-    async function getFormattedObj(id, type, currContract) {
+    async function getFormattedObj(id, type, currContract, voteId) {
         let rawData;
 
         switch (type) {
+            case 'vote':
+                rawData = await factory.getVote.call(id, voteId);
+                        
+                if (rawData.length != voteFields.length) {
+                    throw new Error("The proposal doesn't have the correct format. Please check the properties");
+                }
+                const voteFormatted = {};
+                for (let i = 0; i < voteFields.length; i++) {
+                    voteFormatted[voteFields[i]] = rawData[i];
+                }
+                return voteFormatted;
+                
             case 'user':
                 rawData = await currContract.getUser.call(id);
                     

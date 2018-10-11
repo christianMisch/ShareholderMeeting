@@ -10,7 +10,6 @@ contract Shareholder is User, ProposalData {
     Factory public fac;
     QandA public qa;
 
-    //address public delegate;
     uint[] public votingDenominations;
     Delegate[] public delegations;
     //bool public hasVoted;
@@ -25,7 +24,7 @@ contract Shareholder is User, ProposalData {
     }
 
     modifier onlyShareholder {
-        require((this.role() == 2) && (fac.votingWeights(msg.sender) > 0), "user is not a shareholder");
+        require((this.role() == 2) && (fac.votingWeights(msg.sender) > 0), "User is not a shareholder");
         _;
     }
 
@@ -44,21 +43,16 @@ contract Shareholder is User, ProposalData {
         fac = _fac;
         qa = _qa;
         fac.setVotingWeight(userAddress, _votingWeight);
-        //fac.createNewShareholder(userAddress, _votingWeight, _qa);
 
         emit ShareholderCreated(userAddress, fac.votingWeights(userAddress));
     }
 
-    function vote(uint proposalId, string votingOption) public {
+    function vote(uint proposalId, string votingOption) public onlyShareholder {
         //selectVotOptions.push(votingOption);
         fac.setVote(proposalId, votingOption, msg.sender);
 
         emit Voted(userAddress, proposalId, votingOption);
     }
-
-    /*function getNumOfSelectVotOptions() public view returns (uint length) {
-        return selectVotOptions.length;
-    }*/
 
     function createQuestion(string _ipfs_hash, string creator) public returns (uint questId) {
 
@@ -176,26 +170,3 @@ contract Shareholder is User, ProposalData {
         return votingDenominations;
     }
 }
-
-/*
-} else if (numOfBlockWeights == 0 && factor == 0 && dividedWeight != 0 && divider != 0) {
-            for (uint j = 0; j < divider; j++) {
-                votingDenominations.push(dividedWeight);
-            }
-            fac.setVotingWeight(msg.sender, 0);
-            emit WeightDivision(dividedWeight);
-
-    function safeDivision(uint number, uint divider) public returns (uint result) {
-        uint copy = number;
-        emit CalculateDivision(number, copy, divider);
-        uint currVal;
-        result = 0;
-        for (; copy == 0; result++) {
-            currVal = copy - divider;
-            copy = currVal;
-        }
-
-        return result;
-    }
-
-*/

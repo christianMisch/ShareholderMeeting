@@ -76,9 +76,7 @@ contract Factory is ProposalData {
 
     function setVote(uint proposalId, string votingOption, address sender) public {
         Proposal storage prop = proposals[proposalId];
-        //bool isContained = false;
-        //require(prop.votedOnProposal[sender] != true, "The shareholder already voted");
-        /*require(delegate == address(0), "Proxy is not allowed to vote");*/
+        require(prop.votedOnProposal[sender] != true, "The shareholder already voted");
 
         uint voteId = prop.votes.length++;
         prop.votes[voteId] = Vote({

@@ -26,7 +26,7 @@ contract Director is User {
     }
 
     // only director is allowed to create an answer
-    function createAnswer(uint _questionId, string _ipfs_hash, string sender) public /*onlyDirector*/ returns (uint answerId)  {
+    function createAnswer(uint _questionId, string _ipfs_hash, string sender) public onlyDirector returns (uint answerId)  {
 
         answerId = qa.createNewAnswer(_questionId, _ipfs_hash, sender);
 

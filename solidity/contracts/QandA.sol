@@ -51,7 +51,6 @@ contract QandA {
     }
 
     function createNewAnswer(uint _questionId, string _ipfs_hash, string sender) public returns(uint answId) {
-
         answId = answers.length++;
         Answer storage answer = answers[answId];
         answer.answerId = answId;
@@ -62,7 +61,6 @@ contract QandA {
     }
 
     function createNewQuestion(string _ipfs_hash, string sender) public returns (uint questId) {
-
         questId = questions.length++;
         Question storage question = questions[questId];
         question.questionId = questId;

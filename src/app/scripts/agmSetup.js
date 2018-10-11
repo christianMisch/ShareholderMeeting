@@ -47,7 +47,7 @@ $(document).ready(function() {
             removeUser(adrOfRemovedUser, activeUserAddress);
             getNumOfUsers();
         });
-
+        
         $('main').on('click', 'input[id="transfer-ownership-button"]', async function() {
             const activeUserAddress = getActiveUserAddress();
             if (!(await getOwners()).includes(activeUserAddress)) {

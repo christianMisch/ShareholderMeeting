@@ -2,7 +2,7 @@ const Director = artifacts.require('./Director.sol');
 const Shareholder = artifacts.require('./Shareholder.sol');  
 const QandA = artifacts.require('QandA.sol');
 const IPFSUpload = require('../../src/provider/IPFSUploadProvider.js');
-const IPFSDownload = require('../../src/provider/IPFSDownloadProvider.js') 
+const IPFSDownload = require('../../src/provider/IPFSDownloadProvider.js'); 
 
 const should = require('should');
 const expect = require('expect');
@@ -14,7 +14,7 @@ contract('Director', async (accounts) => {
 
     beforeEach(async () => {
         contract = await Director.deployed();
-        qa = await QandA.new();
+        qa = await QandA.deployed();
         helper = await require('./utils/HelperFunctions.js')(_,qa); 
     });
 
@@ -28,21 +28,24 @@ contract('Director', async (accounts) => {
     it('should create three new answers', async () => {
         var hashA1 = await IPFSUpload.upload('answer1');
         var hashA2 = await IPFSUpload.upload('answer2');
+        
         await contract.createAnswer.sendTransaction(0, hashA1, '0x92130D033C5846d2653D088c74D844f61717794d'.toLowerCase());
         await contract.createAnswer.sendTransaction(0, hashA2, '0x92130D033C5846d2653D088c74D844f61717794d'.toLowerCase());
-        await contract.createAnswer.sendTransaction(0, "answer3", '0x92130D033C5846d2653D088c74D844f61717794d'.toLowerCase());
+        await contract.createAnswer.sendTransaction(0, "someHash", '0x92130D033C5846d2653D088c74D844f61717794d'.toLowerCase());
         expect(+await qa.getNumOfAnswers.call()).toBe(3);
         let answObj = await helper.getFormattedObj(0, 'answer');
         let sndAnsObj = await helper.getFormattedObj(1, 'answer');
         
         expect(+answObj.answerId).toBe(0);
         expect(+answObj.questionId).toBe(0);
-        expect(await IPFSDownload.downloadString(answObj.ipfs_hash)).toBe('answer1');
+        var stringA1 = await IPFSDownload.downloadString(answObj.ipfs_hash);
+        expect(stringA1).toBe('answer1');
         expect(+answObj.timestamp).toBeGreaterThan(0);
         
         expect(+sndAnsObj.answerId).toBe(1);
         expect(+sndAnsObj.questionId).toBe(0);
-        expect(await IPFSDownload.downloadString(sndAnsObj.ifps_hash)).toBe('answer2');
+        var stringA2 = await IPFSDownload.downloadString(sndAnsObj.ipfs_hash);
+        expect(stringA2).toBe('answer2');
         expect(+sndAnsObj.timestamp).toBeGreaterThan(0);
     });
 

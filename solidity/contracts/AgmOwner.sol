@@ -36,15 +36,15 @@ contract AgmOwner is User {
 
     event MsgSender(address sender);
 
-    modifier onlyOwner(address sender) {
+    modifier onlyOwner {
         //emit MsgSender(msg.sender);
-        bool isOwner;
+        bool isOwner = false;
         for (uint i = 0; i < owners.length; i++) {
-            if (owners[i] == sender) {
+            if (owners[i] == msg.sender) {
                 isOwner = true;
             }
         }
-        isOwner = false;
+        //isOwner = false;
         require(isOwner == true, "Only an AGM owner can access this function!");
         _;
     }
@@ -85,52 +85,45 @@ contract AgmOwner is User {
         fac = _fac;
         owners.push(_userAddress);
         users.push(User(address(this)));
+        userId[_userAddress] = 0;
 
         emit AgmOwnerCreated(_userAddress);
     }
 
-    function setAgenda(string _agenda) public onlyOwner(msg.sender) /*isSet(agenda)*/ {
+    function setAgenda(string _agenda) public onlyOwner isSet(agenda) {
         agenda = _agenda;
     }
 
-    function setMeetingPlace(string _meetingPlace) public /*onlyOwner*/ /*isSet(meetingPlace)*/ {
+    function setMeetingPlace(string _meetingPlace) public onlyOwner isSet(meetingPlace) {
         meetingPlace = _meetingPlace;
     }
 
-    function setMeetingStartTime(string _meetingStartTime) public /*onlyOwner*/ /*isSet(meetingStartTime)*/ {
+    function setMeetingStartTime(string _meetingStartTime) public onlyOwner isSet(meetingStartTime) {
         meetingStartTime = _meetingStartTime;
     }
 
-    function setMeetingEndTime(string _meetingEndTime) public /*onlyOwner*/ /*isSet(meetingEndTime)*/ {
+    function setMeetingEndTime(string _meetingEndTime) public onlyOwner isSet(meetingEndTime) {
         meetingEndTime = _meetingEndTime;
     }
 
-    function setMeetingName(string _meetingName) public /*onlyOwner*/ /*isSet(meetingName)*/ {
+    function setMeetingName(string _meetingName) public onlyOwner isSet(meetingName) {
         meetingName = _meetingName;
     }
 
     // transfer contract ownership to another director
-    function transferOwnership(address _owner) public /*onlyOwner*/ {
-        bool isContained = false;
-        for (uint i = 0; i < owners.length; i++) {
-            if (owners[i] == msg.sender) {
-                isContained = true;
-            }
-        }
-        emit OwnershipSharedTo(msg.sender, _owner);
-        //require(isContained, "The caller of the TX is not a AgmOwner");
+    function transferOwnership(address _owner) public onlyOwner {
+        require(userId[_owner] != 0, "The new user does not exist!");
         owners.push(_owner);
 
-        
+        emit OwnershipSharedTo(msg.sender, _owner);
     }
 
-    function addUser(address _userAddress, Role role, uint votingWeight, QandA qa) public /*onlyOwner*/ {
+    function addUser(address _userAddress, Role role, uint votingWeight, QandA qa) public onlyOwner {
         uint id = userId[_userAddress];
-        require(id != 0, "User has already been added to the AGM!");
-        if (id == 0) {
-            id = users.length++;
-            userId[_userAddress] = id;
-        }
+        require(id == 0, "User has already been added to the AGM!");
+        
+        id = users.length++;
+        userId[_userAddress] = id;
         if (uint(role) == 0) {
             Director o = fac.createNewDirector(_userAddress, true, qa);
             users[id] = o;
@@ -152,7 +145,7 @@ contract AgmOwner is User {
         numberOfUsers++;
     }
 
-    function removeUser(address _userAddress) public /*onlyOwner*/ {
+    function removeUser(address _userAddress) public onlyOwner {
         require(userId[_userAddress] != 0, "User does not exist");
         uint i = userId[_userAddress];
         User remUser = users[i];
@@ -188,15 +181,14 @@ contract AgmOwner is User {
 
     function registerUser(string decrPW) public {
         uint usID = userId[msg.sender];
-        if (usID != 0) {
-            User u = users[usID];
-            require(!u.isRegistered(), "The user has already been registered!");
-            u.setIsRegistered(true);
-            secretPWs[msg.sender] = decrPW;
-        }
+        require(usID != 0, "User has not been added to the user list");
+        User u = users[usID];
+        require(!u.isRegistered(), "The user has already been registered!");
+        u.setIsRegistered(true);
+        secretPWs[msg.sender] = decrPW;
     }
 
-    function finishAGM() public /*onlyOwner {
+    function finishAGM() public onlyOwner {
         require(!isFinished, "AGM has already been finished");
         isFinished = true;
 
@@ -204,7 +196,7 @@ contract AgmOwner is User {
 
     }
 
-    function announceAGM() public /*onlyOwner*/ {
+    function announceAGM() public onlyOwner {
         require(!isAnnounced, "AGM has already been announced");
         isAnnounced = true;
 
@@ -212,7 +204,7 @@ contract AgmOwner is User {
     }
 
     function createProposal(string _name, string _ipfs_hash, string _options)
-        public /*onlyOwner*/ returns(uint propId) {
+        public onlyOwner returns(uint propId) {
 
         propId = fac.createNewProposal(_name, _ipfs_hash, _options);
         emit ProposalCreated(propId, msg.sender);
@@ -237,7 +229,7 @@ contract AgmOwner is User {
     }
 
     // executes the pending proposal
-    function executeProposal(uint proposalId) public /*onlyOwner*/ returns (bool isExecuted) {
+    function executeProposal(uint proposalId) public onlyOwner returns (bool isExecuted) {
         require(isFinished, "AGM has to be finished first");
         uint winnOptCount;
         (winnOptCount) = fac.evaluateProposal(proposalId);

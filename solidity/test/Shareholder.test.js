@@ -9,103 +9,110 @@ const AgmOwnerDeployer = require('./utils/AgmOwnerDeployer.js')(AgmOwner);
 
 const should = require('should');
 const expect = require('expect');
-
+// stop IPFS
 contract('Shareholder', async (accounts) => {
     let agmOwner;
     let helper;
     let factory;
     let contract;
 
-    //beforeEach(async () => {
-        // factory = await Factory.new();
-        // qa = await QandA.deployed();
-        // contract = await Shareholder.deployed();
-        // agmOwner = await AgmOwnerDeployer(accounts[0], factory.address);
-        // helper = await require('./utils/HelperFunctions.js')(factory, qa);
-    //})
+    beforeEach(async () => {
+        factory = await Factory.new();
+        qa = await QandA.new();
+        contract = await Shareholder.new(accounts[9], 202, factory.address, qa.address);
+        agmOwner = await AgmOwnerDeployer(accounts[0], factory.address);
+        helper = await require('./utils/HelperFunctions.js')(factory, qa);
+    })
 
-    // it('should ensure that a shareholder can only vote once', async () => {
-    //     //expect(+await factory.getNumOfProposals.call()).toBe(0);
-    //     await agmOwner.createProposal.sendTransaction('board election', 'Who should be the new chairperson for the next year?', 'Schmidt, Mueller, Guenther');
-    //     //expect(+await factory.getNumOfProposals.call()).toBe(1);
-    //     //await contract.vote.sendTransaction(0, 'Schmidt');
-    // })
+    it('should ensure that a shareholder can only vote once on the same proposal', async () => {
+        expect(+await factory.getNumOfProposals.call()).toBe(0);
+        await agmOwner.createProposal.sendTransaction('board election', 'Who should be the new chairperson for the next year?', 'Schmidt, Mueller, Guenther');
+        expect(+await factory.getNumOfProposals.call()).toBe(1);
+        await contract.vote.sendTransaction(0, 'Schmidt', {from: accounts[9]});
+        try {
+            await contract.vote.sendTransaction(0, 'Schmidt', {from: accounts[9]});
+            should.fail('This TX raises an error');
+        } catch (error) {
+            expect(error.message).toContain('VM Exception while processing transaction: revert');
+        }
+    })
 
-    // it('should create a new shareholder instance', async () => {
-    //     let instance = await Shareholder.new(accounts[5], 20000, factory.address, qa.address);
-    //     //expect(await instance.delegate()).toContain('0x0');
-    //     expect(await instance.userAddress()).toBe(accounts[5]);
-    //     //expect(await instance.isDirector()).toBe(false);
-    //     expect(+await instance.getNumOfDelegations.call()).toBe(0);
-    //     expect(+await instance.getNumOfVotingDenominations.call()).toBe(0);
-    //     let fac = await helper.getFactory(instance);
-    //     expect(+await fac.votingWeights(await instance.userAddress())).toBe(20000);
+    it('should create a new shareholder instance', async () => {
+        let instance = await Shareholder.new(accounts[5], 20000, factory.address, qa.address);
+        expect(await instance.userAddress()).toBe(accounts[5]);
+        expect(+await instance.getNumOfDelegations.call()).toBe(0);
+        expect(+await instance.getNumOfVotingDenominations.call()).toBe(0);
+        let fac = await helper.getFactory(instance);
+        expect(+await fac.votingWeights(await instance.userAddress())).toBe(20000); 
+    })
+
+    it('should be allowed for a shareholder to vote on a proposal', async () => {
+        await agmOwner.createProposal.sendTransaction('election', 'elect the chairperson', 'A,B,C');
+        let propObj = await helper.getFormattedObj(0, 'proposal');
+        expect(+propObj.proposalId).toBe(0);
+        expect(propObj.name).toBe('election');
+        expect(propObj.description).toBe('elect the chairperson');
+        expect(propObj.options).toBe('A,B,C');
+        expect(propObj.proposalPassed).toBe(false);
         
-    // })
-
-    // it('should be allowed for a shareholder to vote on a proposal', async () => {
-    //     await agmOwner.createProposal.sendTransaction('election', 'elect the chairperson', 'A,B,C');
-    //     let propObj = await helper.getFormattedObj(0, 'proposal');
-    //     expect(+propObj.proposalId).toBe(0);
-    //     expect(propObj.name).toBe('election');
-    //     expect(propObj.description).toBe('elect the chairperson');
-    //     expect(propObj.options).toBe('A,B,C');
-    //     expect(propObj.proposalPassed).toBe(false);
+        let facOwner = await helper.getFactory(agmOwner);
+        let facShareh = await helper.getFactory(contract);
+        expect(+await facOwner.getNumOfProposals.call()).toBe(1);
+        expect(+await facShareh.getNumOfProposals.call()).toBe(1);
         
-    //     let facOwner = await helper.getFactory(agmOwner);
-    //     let facShareh = await helper.getFactory(contract);
-    //     expect(+await facOwner.getNumOfProposals.call()).toBe(1);
-    //     expect(+await facShareh.getNumOfProposals.call()).toBe(1);
-        
-    //     let sh = await Shareholder.new(accounts[1], 1000, factory.address, qa.address);
-    //     await sh.vote.sendTransaction(0, 'A');
-    //     await sh.vote.sendTransaction(0, 'A');
+        let sh = await Shareholder.new(accounts[1], 10, factory.address, qa.address);
+        let sh2 = await Shareholder.new(accounts[2], 20, factory.address, qa.address);
+        await sh.vote.sendTransaction(0, 'A', {from: accounts[1]});
+        await sh2.vote.sendTransaction(0, 'C', {from: accounts[2]});
+        await contract.vote.sendTransaction(0, 'B', {from: accounts[9]});
 
-    //     let modifPropObj = await helper.getFormattedObj(0, 'proposal');
-    //     expect(+modifPropObj.voteCount).toBe(2);
+        let modifPropObj = await helper.getFormattedObj(0, 'proposal');
+        expect(+modifPropObj.voteCount).toBe(3);
         
-    //     let facSh = await helper.getFactory(sh);
-    //     expect(+await facSh.getNumOfProposals.call()).toBe(1)
-    //     expect(+await facSh.getNumOfVotes.call(0)).toBe(2);
-    //     expect(await sh.userAddress()).toBe(accounts[1]);
-    //     //let voteTuple = await facSh.getVote.call(1, accounts[1]); 
-    //     //console.log(voteTuple);
-    //     //expect(+voteTuple[2]).toBe(1000);
-    // })
+        let facSh = await helper.getFactory(sh);
+        expect(+await facSh.getNumOfProposals.call()).toBe(1)
+        expect(+await facSh.getNumOfVotes.call(0)).toBe(3);
+        expect(await sh.userAddress()).toBe(accounts[1]);
+        let voteObj = await helper.getFormattedObj(0,'vote',_,2); 
+        //console.log(voteObj);
+        expect(voteObj.userAddress).toBe(accounts[9]);
+        expect(voteObj.option).toBe('B');
+        expect(+voteObj.weight).toBe(202);
+    })
 
-    // it('should be possible to create a question for a shareholder', async () => {
-    //     // use same contract because it invokes contract.getQuestion(id)
-    //     let sh = await Shareholder.new(accounts[1], 1000, factory.address, qa.address);
-    //     var hash = await IPFSUpload.upload('question1')
-    //     await sh.createQuestion.sendTransaction(hash, accounts[1]);
-    //     let contrQA = await helper.getQandA(sh);
-    //     expect(+await contrQA.getNumOfQuestions.call()).toBe(1);
-    //     let questionObj = await helper.getFormattedObj(0, 'question');
+    it('should be possible to create a question for a shareholder', async () => {
+        // use same contract because it invokes contract.getQuestion(id)
+        let sh = await Shareholder.new(accounts[1], 1000, factory.address, qa.address);
+        var hash = await IPFSUpload.upload('question1')
+        await sh.createQuestion.sendTransaction(hash, accounts[1]);
+        let contrQA = await helper.getQandA(sh);
+        expect(+await contrQA.getNumOfQuestions.call()).toBe(1);
+        let questionObj = await helper.getFormattedObj(0, 'question');
        
-    //     expect(questionObj.creator).toBe(await sh.userAddress());
-    //     expect(+questionObj.questionId).toBe(0);
-    //     expect(await IPFSDownload.downloadString(questionObj.content)).toBe('question1');
-    //     expect(+questionObj.timestamp).toBeGreaterThan(1000000);
-    //     expect(+questionObj.upvotes).toBe(0);
-    //     expect(+questionObj.downvotes).toBe(0);
-    // })
+        expect(questionObj.creator).toBe(await sh.userAddress());
+        expect(+questionObj.questionId).toBe(0);
+        expect(await IPFSDownload.downloadString(questionObj.ipfs_hash)).toBe('question1');
+        expect(+questionObj.timestamp).toBeGreaterThan(1000000);
+        expect(+questionObj.upvotes).toBe(0);
+        expect(+questionObj.downvotes).toBe(0);
+    })
 
-    // it('should return the right length of questions', async () => {
-    //     let newQandAref = await QandA.new();
-    //     let sh1 = await Shareholder.new(accounts[1], 1000, factory.address, newQandAref.address);
-    //     let sh2 = await Shareholder.new(accounts[2], 2000, factory.address, newQandAref.address);
-    //     await sh1.createQuestion.sendTransaction("question1");
-    //     await sh1.createQuestion.sendTransaction("question2");
-    //     await sh1.createQuestion.sendTransaction("question3");
-    //     await sh2.createQuestion.sendTransaction("question3");
-    //     await sh2.createQuestion.sendTransaction("question3");
-    //     let qaSh1 = await helper.getQandA(sh1);
-    //     let qaSh2 = await helper.getQandA(sh2);
+    it('should return the right length of questions', async () => {
+        let sh1 = await Shareholder.new(accounts[1], 1000, factory.address, qa.address);
+        let sh2 = await Shareholder.new(accounts[2], 2000, factory.address, qa.address);
+        var hash1 = await IPFSUpload.upload('question1');
+        var hash2 = await IPFSUpload.upload('question2');
+        var hash3 = await IPFSUpload.upload('question3');
+        await sh1.createQuestion.sendTransaction(hash1, accounts[1]);
+        await sh1.createQuestion.sendTransaction(hash2, accounts[1]);
+        await sh2.createQuestion.sendTransaction(hash3, accounts[2]);
+        let qaSh1 = await helper.getQandA(sh1);
+        let qaSh2 = await helper.getQandA(sh2);
 
-    //     expect(+await qaSh1.getNumOfQuestions.call()).toBe(5);
-    //     expect(+await qaSh2.getNumOfQuestions.call()).toBe(5);
-    //     expect(+await newQandAref.getNumOfQuestions.call()).toBe(5)
-    // })
+        expect(+await qaSh1.getNumOfQuestions.call()).toBe(3);
+        expect(+await qaSh2.getNumOfQuestions.call()).toBe(3);
+        expect(+await qa.getNumOfQuestions.call()).toBe(3)
+    })
 
     // it('should be possible to rate a question', async () => {
     //     var hash = await IPFSUpload.upload('question1')
