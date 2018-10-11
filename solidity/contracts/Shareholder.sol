@@ -29,7 +29,7 @@ contract Shareholder is User, ProposalData {
         _;
     }
 
-    event QuestionCreated(uint questionId, address creator);
+    event QuestionCreated(uint questionId, string creator);
     event Voted(address invoker, uint proposalId, string votingOption);
     event VoterWeight(address userAddress, uint weight);
     event PartialDelegationFrom(address sender, uint senderWeight, address proxy, uint proxyWeight);
@@ -64,7 +64,7 @@ contract Shareholder is User, ProposalData {
 
         questId = qa.createNewQuestion(_ipfs_hash, creator);
 
-        emit QuestionCreated(questId, msg.sender);
+        emit QuestionCreated(questId, creator);
     }
 
     function rateQuestion(uint questionId, RatingOption ratingOpt) public {

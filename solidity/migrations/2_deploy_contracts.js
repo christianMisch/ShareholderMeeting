@@ -8,7 +8,7 @@ const QandA = artifacts.require("./QandA.sol");
 
 module.exports = function(deployer, network, accounts) {
 
-    const uppCaseAcc = accounts.map(acc => acc.toLowerCase());
+    const lowCaseAcc = accounts.map(acc => acc.toLowerCase());
     deployer.deploy(ProposalData);
     //console.log('acc[0]: ' + uppCaseAcc[0]);
     //deployer.deploy(User, accounts[1], false);
@@ -26,13 +26,13 @@ module.exports = function(deployer, network, accounts) {
     }).then(function(qaInst) {
         qa = qaInst;
         //var random = Math.floor(Math.random() * (12 - 5)) + 5;
-        deployer.deploy(Shareholder, uppCaseAcc[8], 10, f.address, qa.address);
+        deployer.deploy(Shareholder, lowCaseAcc[8], 10, f.address, qa.address);
     }).then(function() {
-        return deployer.deploy(Director, uppCaseAcc[9], false, qa.address, 1);
+        return deployer.deploy(Director, lowCaseAcc[9], false, qa.address, 1);
     }).then(function() {
         return deployer.deploy(
             AgmOwner,
-            uppCaseAcc[0],
+            lowCaseAcc[0],
             //3,
             //50,
             //'Siemens AGM 2018',

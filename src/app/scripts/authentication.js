@@ -39,12 +39,15 @@ $(document).ready(async function() {
     
     console.log('isAnnounced: ' + await getIsAnnounced());
     showWelcomePage();
+    $('#secret-PW').hide();
     // hide logout button, welcome link in sidebar and user credentials
     if (!(await getIsAnnounced())) {
         $('main #announce-wrapper').hide();
     }
-    //console.log('locStor' + localStorage.getItem('address'));
-    if (localStorage.getItem('address') && mapUser(await getUser(localStorage.getItem('address'))).isReg === true) {
+    console.log('locStor' + sessionStorage.getItem('address'));
+    console.log(web3.eth.accounts[0]);
+    if ( (sessionStorage.getItem('address') && mapUser(await getUser(sessionStorage.getItem('address'))).isReg === true) 
+            || sessionStorage.getItem('address') !== web3.eth.accounts[0]) {
         $('#secret-PW').show();
         //$('#wallet-address').css('margin-right', '20px');
         $('#filler').show();
@@ -77,7 +80,7 @@ $(document).ready(async function() {
         $('#filler').show();
         $('#filler').attr('class', 'col-5');
         inputAdr = $('#wallet-address').val().toLowerCase();
-        localStorage.setItem('address', inputAdr);
+        sessionStorage.setItem('address', inputAdr);
         var secrPassword = $('#secret-PW').val();
         console.log('inputAdr: ' + inputAdr);
         // turn on
@@ -186,7 +189,7 @@ $(document).ready(async function() {
             //timersAreDefined = true;
             // turn on
             computeDayDiff();
-            if (dayDiff >= 30 && !(await getIsAnnounced()) )  {
+            if (dayDiff <= 30 && !(await getIsAnnounced()) )  {
                 await announceAGM(inputAdr);
                 showRoleBasedView();
             } else {

@@ -13,7 +13,7 @@ contract Director is User {
     event AnswerCreated(uint ansId, string creator);
 
     modifier onlyDirector {
-        require(this.role() == 1, "the user is not a director");
+        require(this.role() == 1, "The user is not a director");
         _;
 
     }
@@ -26,7 +26,7 @@ contract Director is User {
     }
 
     // only director is allowed to create an answer
-    function createAnswer(uint _questionId, string _ipfs_hash, string sender) public onlyDirector returns (uint answerId)  {
+    function createAnswer(uint _questionId, string _ipfs_hash, string sender) public /*onlyDirector*/ returns (uint answerId)  {
 
         answerId = qa.createNewAnswer(_questionId, _ipfs_hash, sender);
 

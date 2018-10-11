@@ -1,5 +1,5 @@
-import {finishAGM, createProposal, addUser, removeUser, getNumOfUsers, transferOwnership, getOwners, executeProposal, getIsFinished} from '../../provider/AgmOwnerProvider';
-import {getActiveUserAddress, createAlert, showView} from './authentication';
+import {finishAGM, createProposal, addUser, removeUser, getNumOfUsers, transferOwnership, getOwners, executeProposal, getIsFinished, getUser} from '../../provider/AgmOwnerProvider';
+import {getActiveUserAddress, createAlert, showView, mapUser} from './authentication';
 import {upload} from '../../provider/IPFSUploadProvider';
 import {getVotingOption, getWeightOfShareholder, getNumOfVotingShareholders, getNumOfProposals, appendVotingOptionToProposal, getProposal, incrementPropId, getPropId} from '../../provider/ProposalProvider';
 import {mapProposal} from './voting';
@@ -16,35 +16,7 @@ $(document).ready(function() {
 
     $('a[href="#setup"]').click(function() {
 
-        $('main').on('click', 'input[id="proposal-creator-button"]', async function() {
-            const activeUserAddress = getActiveUserAddress();
-            console.log('activeUserAddress: ' + activeUserAddress);
-            //console.log('ownerAddress: ' + ownerAddress);
-            //console.log('activeUserAdr: ' + activeUserAddress);
-            //console.log('owner: ' + owner.toUpperCase());
-            /*console.log(await getOwners());
-            console.log('hasPermission: ' + (await getOwners()).includes(activeUserAddress.toLowerCase()))*/
-            if (!(await getOwners()).includes(activeUserAddress)) {
-                createAlert('You have currently no permission to setup the AGM', 'danger');
-                return;
-            }
-            
-            const propName = $('#proposal-name').val();
-            const propDescription = $('#proposal-description').val();
-            var propHash = await upload(propDescription);
-            const propOptions = $('#proposal-options').val();
-            const parts = propOptions.split(',');
-            var propId = (await getPropId()).toNumber();
-            console.log('propId: ' + propId);
-            for (var i = 0; i < parts.length; i++) {
-                await appendVotingOptionToProposal(propId, parts[i].trim(), activeUserAddress);
-            }
-            await appendVotingOptionToProposal(propId, 'abstain', activeUserAddress);
-            await createProposal(propName, propHash, propOptions, activeUserAddress);
-            await incrementPropId(activeUserAddress);
-            // store propId in contract if proposal creation is splitted
-            //console.log(activeUserAddress, propName, propDescription, propOptions);
-        });
+        
 
         $('main').on('click', 'input[id="add-user-button"]', async function() {
             const activeUserAddress = getActiveUserAddress();
@@ -83,6 +55,11 @@ $(document).ready(function() {
                 return;
             }
             const newOwnerAddress = $('#ownership-address').val().toLowerCase();
+            if ( (mapUser(await getUser(newOwnerAddress))).role === 3 ) {
+                createAlert('Proxy is not a registered user!', 'danger');
+                return;
+            }
+            
             console.log(newOwnerAddress);
             await transferOwnership(newOwnerAddress, activeUserAddress);
         

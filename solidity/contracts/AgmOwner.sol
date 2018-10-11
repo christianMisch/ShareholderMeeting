@@ -21,8 +21,6 @@ contract AgmOwner is User {
 
     bool public isFinished = false;
     bool public isAnnounced = false;
-
-    //uint public marginOfVotesForMajority;
     
     //string public meetingDescription;
     string public meetingName;
@@ -31,35 +29,23 @@ contract AgmOwner is User {
     string public meetingStartTime;
     string public meetingEndTime;
 
-    function setAgenda(string _agenda) public onlyOwner {
-        agenda = _agenda;
+    modifier isSet(string param) {
+        require(bytes(param).length == 0, "The parameter has already been set");
+        _;
     }
 
-    function setMeetingPlace(string _meetingPlace) public onlyOwner {
-        meetingPlace = _meetingPlace;
-    }
+    event MsgSender(address sender);
 
-    function setMeetingStartTime(string _meetingStartTime) public onlyOwner {
-        meetingStartTime = _meetingStartTime;
-    }
-
-    function setMeetingEndTime(string _meetingEndTime) public onlyOwner {
-        meetingEndTime = _meetingEndTime;
-    }
-
-    function setMeetingName(string _meetingName) public onlyOwner {
-        meetingName = _meetingName;
-    }
-
-    modifier onlyOwner {
+    modifier onlyOwner(address sender) {
+        //emit MsgSender(msg.sender);
         bool isOwner;
         for (uint i = 0; i < owners.length; i++) {
-            if (owners[i] == msg.sender) {
+            if (owners[i] == sender) {
                 isOwner = true;
             }
         }
         isOwner = false;
-        //require(isOwner == true, "only an AGM owner can access this function!");
+        require(isOwner == true, "Only an AGM owner can access this function!");
         _;
     }
 
@@ -67,10 +53,11 @@ contract AgmOwner is User {
     event ProposalCreated(uint propId, address creator);
     event Voted(address userAddress, uint proposalId, string votingOption);
     event AgmFinished(bool isFinished);
-    event OwnershipSharedTo(address newOwner);
+    event OwnershipSharedTo(address caller, address newOwner);
     event UserCreated(uint userId, address userAddress, string role);
     event UserRemoved(uint userId, address userAddress, uint role);
     event AgmAnnounced(bool isAnnounced);
+    event AgmOwnerCreated(address adr);
 
     constructor(
         address _userAddress,
@@ -98,18 +85,48 @@ contract AgmOwner is User {
         fac = _fac;
         owners.push(_userAddress);
         users.push(User(address(this)));
+
+        emit AgmOwnerCreated(_userAddress);
+    }
+
+    function setAgenda(string _agenda) public onlyOwner(msg.sender) /*isSet(agenda)*/ {
+        agenda = _agenda;
+    }
+
+    function setMeetingPlace(string _meetingPlace) public /*onlyOwner*/ /*isSet(meetingPlace)*/ {
+        meetingPlace = _meetingPlace;
+    }
+
+    function setMeetingStartTime(string _meetingStartTime) public /*onlyOwner*/ /*isSet(meetingStartTime)*/ {
+        meetingStartTime = _meetingStartTime;
+    }
+
+    function setMeetingEndTime(string _meetingEndTime) public /*onlyOwner*/ /*isSet(meetingEndTime)*/ {
+        meetingEndTime = _meetingEndTime;
+    }
+
+    function setMeetingName(string _meetingName) public /*onlyOwner*/ /*isSet(meetingName)*/ {
+        meetingName = _meetingName;
     }
 
     // transfer contract ownership to another director
-    function transferOwnership(address _owner) public onlyOwner {
-        //userAddress = _owner;
+    function transferOwnership(address _owner) public /*onlyOwner*/ {
+        bool isContained = false;
+        for (uint i = 0; i < owners.length; i++) {
+            if (owners[i] == msg.sender) {
+                isContained = true;
+            }
+        }
+        emit OwnershipSharedTo(msg.sender, _owner);
+        //require(isContained, "The caller of the TX is not a AgmOwner");
         owners.push(_owner);
 
-        emit OwnershipSharedTo(_owner);
+        
     }
 
-    function addUser(address _userAddress, Role role, uint votingWeight, QandA qa) public {
+    function addUser(address _userAddress, Role role, uint votingWeight, QandA qa) public /*onlyOwner*/ {
         uint id = userId[_userAddress];
+        require(id != 0, "User has already been added to the AGM!");
         if (id == 0) {
             id = users.length++;
             userId[_userAddress] = id;
@@ -135,9 +152,8 @@ contract AgmOwner is User {
         numberOfUsers++;
     }
 
-    function removeUser(address _userAddress) public {
-        //require(userId[_userAddress] != 0, "User does not exist");
-
+    function removeUser(address _userAddress) public /*onlyOwner*/ {
+        require(userId[_userAddress] != 0, "User does not exist");
         uint i = userId[_userAddress];
         User remUser = users[i];
         delete users[i];
@@ -174,20 +190,21 @@ contract AgmOwner is User {
         uint usID = userId[msg.sender];
         if (usID != 0) {
             User u = users[usID];
+            require(!u.isRegistered(), "The user has already been registered!");
             u.setIsRegistered(true);
             secretPWs[msg.sender] = decrPW;
         }
     }
 
-    function finishAGM() public /*onlyOwner*/ {
-        //require(!isFinished, "AGM has already been finished");
+    function finishAGM() public /*onlyOwner {
+        require(!isFinished, "AGM has already been finished");
         isFinished = true;
 
         emit AgmFinished(isFinished);
 
     }
 
-    function announceAGM() public onlyOwner {
+    function announceAGM() public /*onlyOwner*/ {
         require(!isAnnounced, "AGM has already been announced");
         isAnnounced = true;
 
@@ -220,7 +237,8 @@ contract AgmOwner is User {
     }
 
     // executes the pending proposal
-    function executeProposal(uint proposalId) public returns (bool isExecuted) {
+    function executeProposal(uint proposalId) public /*onlyOwner*/ returns (bool isExecuted) {
+        require(isFinished, "AGM has to be finished first");
         uint winnOptCount;
         (winnOptCount) = fac.evaluateProposal(proposalId);
         emit ProposalExecuted(true, proposalId, winnOptCount);
