@@ -365,3 +365,121 @@ console.log(web3Provider.eth.accounts);*/
     /*function getVotingDenominations() public view returns (uint[] denominations) {
         return votingDenominations;
     }*/
+
+
+    ///Factory.sol
+
+    /*function getShareholderWithOption(address shAdr, uint optId) public view returns (string _opt) {
+        Shareholder sh = shareholders[shAdr];
+        return sh.selectVotOptions(optId);
+    }
+
+    function getShareholderWithOptionLength(address shAdr) public view returns (uint length) {
+        var sh = shareholders[shAdr];
+        return sh.getNumOfSelectVotOptions();
+    }*/
+
+    /*function getNumOfShareholders() public view returns (uint length) {
+        return shareholders.length;
+    }*/
+
+    /*function getShareholderList() public view returns (Shareholder[]) {
+        return shareholders;
+    }*/
+
+    //require(isFinished, "meeting has not finished yet");
+        // iterate over all options to store default options in the array
+        /*for (uint k = 0; k < propOptions.length; k++) {
+            uint id = votingOptions.length++;
+            votingOptions[id] = VotingOption({optionName: propOptions[k], optionCount: 0});
+            // iterate over all votes of all proposals to check which voter voted for option k
+            for (uint l = 0; l < proposals.length; l++) {
+                Proposal storage prop = proposals[l];
+                for (uint i = 0; i < prop.votes.length; i++) {
+                    Vote storage v = prop.votes[i];
+                    if (utilCompareInternal(v.voterDecision, propOptions[k])) {
+                        votingOptions[k].optionCount++;
+                    }
+                }  
+            }
+        }*/
+
+// Shareholder.sol
+
+        // if shareholder voted on any proposal he cannot delegate his VP to a proxy anymore
+        // delegation
+        //require(proxyAddress != msg.sender, "Self-delegation is not allowed");
+        //require(userExists(proxyAddress), "Proxy is not a registered user");
+        //require(userExists(msg.sender), "the user account is not registered");
+        //require(delegate == address(0), "user already has delegated to another proxy");
+
+        // deletes the entry with swapping elements if required
+            /*for (; voteBlockIndex < votingDenominations.length - 1; voteBlockIndex++) {
+                votingDenominations[voteBlockIndex] = votingDenominations[voteBlockIndex+1];
+            }
+            votingDenominations.length--;*/
+
+
+// User.sol
+
+/*function userExists(address _userAddress) public returns (bool exists) {
+        exists = userId[_userAddress] != 0;
+
+        emit UserExists(exists);
+        return exists;
+    }*/
+
+
+
+// Statistics.sol
+
+/*pragma solidity ^0.4.23;
+
+import "./Shareholder.sol";
+
+contract VotingStatistic {
+
+    // sum of the weights or voting power of all users
+    uint private totalVotingPower;
+    // how much voting power each uses owns
+    mapping(address => uint) private votingPower;
+    // which proposal is passed
+    mapping(uint => bool) private passedProposal;
+    // with how much persentage each proposal is passed or not
+    mapping(uint => uint) private proposalPercentage;
+
+    function updateVotingPower(address userAddress, uint weight) public {
+        votingPower[userAddress] = weight;
+    }
+
+    function updatePassedProposal(uint proposalId, bool proposalPassed) public {
+        passedProposal[proposalId] = proposalPassed;
+    }
+
+    function updateProposalPercentage(uint proposalId, uint passedPercentage) public {
+        proposalPercentage[proposalId] = passedPercentage;
+    }
+
+    function setTotalVotingPower(uint newTotalVP) public {
+        totalVotingPower = newTotalVP;
+    }
+
+    function getTotalVotingPower() public view returns (uint totalVP) {
+        return totalVotingPower;
+    }*/
+
+    /*
+    function calculateVotingStatistic(uint proposalId) public {
+        VotingStatistic statistic = new VotingStatistic();
+
+        for (uint j = 0; j < users.length; j++) {
+            statistic.updateVotingPower(users[j].userAddress(), votingTokens[users[j].userAddress()]);
+            uint totalVotPow = statistic.getTotalVotingPower();
+            statistic.setTotalVotingPower(totalVotPow + votingTokens[users[j].userAddress()]);
+        }
+        for (uint i = 0; i < proposals.length; i++) {
+            statistic.updatePassedProposal(proposals[i].proposalId, proposals[i].proposalPassed);
+            statistic.updateProposalPercentage(proposalId, proposals[i].passedPercent);
+        }
+    } 
+}*/

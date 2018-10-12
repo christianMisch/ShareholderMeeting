@@ -158,16 +158,3 @@ export function getPropId() {
         console.log('Error during getPropId call: ' + error.message);
     }); 
 }
-
-export function hasVoted(propId, from) {
-    return FactoryContract.deployed().then(function(deplFac) {
-        Factory = deplFac;
-        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
-        return Factory.hasVoted.call(propId, {from: from});
-    }).then(function(result) {
-        //alert('hasVoted call was successful: ' + result);
-        return result;
-    }).catch(function(error) {
-        console.log('Error during hasVoted call: ' + error.message);
-    }); 
-}

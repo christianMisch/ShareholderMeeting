@@ -7,18 +7,27 @@ import "./ProposalData.sol";
 import "./QandA.sol";
 import "./AgmOwner.sol";
 
+/**
+*   @title factory for creating different users according to their role
+*          stores also the proposals and voting weights which can be accessed by other user contracts
+*/
 contract Factory is ProposalData {
 
+    // stores a shareholder object to a specific user address
     mapping(address => Shareholder) public shareholders;
+    // stores all available voting options for a specific proposal
     mapping(uint => string[]) public propToOptMapping;
+    // stores all shareholders who casted their vote
     address[] public votingShareholders;
+    // stores all proposals
     Proposal[] public proposals;
+    // stores the voting weight of every user
     mapping(address => uint) public votingWeights;
-    // stores all option names
-    //string[] public propOptions;
-    // stores the counter to every voting option
+    // stores the number of votes for a specific voting option
     VotingOption[] public votingOptions;
+    // determines the minimum number of votes per proposal which is required to compute the tally and statistic
     uint public minimumVotingQuorum;
+    // for incrementing the proposal id to assign the options the right proposal
     uint public propId = 0;
 
     struct VotingOption {
@@ -26,33 +35,33 @@ contract Factory is ProposalData {
         uint optionCount;
     }
 
-    function createNewShareholder(address _userAddress, uint weight, QandA qa) public returns (Shareholder) {
-        Shareholder sh = new Shareholder(_userAddress, weight, this, qa);
-        shareholders[_userAddress] = sh;
-        //votingWeights[_userAddress] = weight;
-        return sh;
+    /**
+    *   @dev getters and setters
+    */
+
+    function setVote(uint proposalId, string votingOption, address sender) public {
+        Proposal storage prop = proposals[proposalId];
+        require(prop.votedOnProposal[sender] != true, "The shareholder already voted");
+        uint voteId = prop.votes.length++;
+        // the shareholder weight is stored within the vote
+        prop.votes[voteId] = Vote({
+            voterAddress: sender,
+            voterDecision: votingOption,
+            voterWeight: votingWeights[sender]}
+        );
+        // the shareholder is marked that he voted on this proposal
+        prop.votedOnProposal[sender] = true;
+        prop.voteCount++;
+        // the shareholder is appended to the list of voters
+        votingShareholders.push(sender);
     }
 
-    function createNewDirector(address _userAddress, bool isAdministrator, QandA qa) public returns (Director) {
-        if (isAdministrator) {
-            return new Director(_userAddress, isAdministrator, qa, 0);
-        } else {
-            return new Director(_userAddress, isAdministrator, qa, 1);
-        }
-        
+    function setVotingWeight(address userAddress, uint weight) public {
+        votingWeights[userAddress] = weight;
     }
 
-    function createNewProposal(string _name, string _description, string _options) public returns (uint propId) {
-        propId = proposals.length++;
-        Proposal storage proposal = proposals[propId];
-        proposal.proposalId = propId;
-        proposal.name = _name;
-        //proposal.ipfs_hash = _ipfs_hash;
-        proposal.description = _description;
-        proposal.options = _options;
-        proposal.proposalPassed = false;
-        proposal.passedPercent = 0;
-        proposal.voteCount = 0;
+    function setMinimumVotingQuorum(uint quorum) public {
+        minimumVotingQuorum = quorum;
     }
 
     function getNumOfProposals() public view returns (uint length) {
@@ -62,7 +71,6 @@ contract Factory is ProposalData {
     function getProposal(uint proposalId) public view returns (
         uint _proposalId,
         string _name,
-        //string _ipfs_hash,
         string description,
         string _options,
         bool _proposalPassed,
@@ -72,21 +80,6 @@ contract Factory is ProposalData {
         Proposal storage proposal = proposals[proposalId];
         return
         (proposal.proposalId, proposal.name, proposal.description, proposal.options, proposal.proposalPassed, proposal.passedPercent, proposal.voteCount);
-    }
-
-    function setVote(uint proposalId, string votingOption, address sender) public {
-        Proposal storage prop = proposals[proposalId];
-        require(prop.votedOnProposal[sender] != true, "The shareholder already voted");
-
-        uint voteId = prop.votes.length++;
-        prop.votes[voteId] = Vote({
-            voterAddress: sender,
-            voterDecision: votingOption,
-            voterWeight: votingWeights[sender]}
-        );
-        prop.votedOnProposal[sender] = true;
-        prop.voteCount++;
-        votingShareholders.push(sender);
     }
 
     function getVote(uint proposalID, uint voteId) public view returns (address user, string option, uint weight) {
@@ -103,10 +96,6 @@ contract Factory is ProposalData {
         return proposal.votes.length;
     }
 
-    function setVotingWeight(address userAddress, uint weight) public {
-        votingWeights[userAddress] = weight;
-    }
-
     function getShareholder(address shAdr) public view returns (
         address _userAddress,
         uint _role,
@@ -115,20 +104,6 @@ contract Factory is ProposalData {
         Shareholder sh = shareholders[shAdr];
         return
             (sh.userAddress(), sh.role(), votingWeights[sh.userAddress()]);
-    }
-
-    /*function getShareholderWithOption(address shAdr, uint optId) public view returns (string _opt) {
-        Shareholder sh = shareholders[shAdr];
-        return sh.selectVotOptions(optId);
-    }
-
-    function getShareholderWithOptionLength(address shAdr) public view returns (uint length) {
-        var sh = shareholders[shAdr];
-        return sh.getNumOfSelectVotOptions();
-    }*/
-
-    function setMinimumVotingQuorum(uint quorum) public {
-        minimumVotingQuorum = quorum;
     }
 
     function getVotingOption(uint optionId) public view returns (string votingOption, uint votingCount) {
@@ -149,22 +124,6 @@ contract Factory is ProposalData {
         return votingShareholders.length;
     }
 
-    /*function getNumOfShareholders() public view returns (uint length) {
-        return shareholders.length;
-    }*/
-
-    /*function getShareholderList() public view returns (Shareholder[]) {
-        return shareholders;
-    }*/
-
-    function incrementPropId() public view {
-        propId++;
-    }
-
-    function appendVotingOptionToProposal(uint proposalId, string opt) public {
-        propToOptMapping[proposalId].push(opt);
-    }
-
     function getOptionsLengthForProposal(uint proposalId) public view returns (uint length) {
         return propToOptMapping[proposalId].length;
     }
@@ -173,27 +132,80 @@ contract Factory is ProposalData {
         return propToOptMapping[proposalId][optId];
     }
 
-    function evaluateProposal(uint proposalId) public returns (uint winnCount) {
+    /**
+    *   @dev factory method to create a new shareholder
+    *   @param _userAddress address of the user
+    *   @param weight voting weight = number of shares of the user
+    *   @param qa reference to access the Q&A lists
+    *   @return sh a new Shareholder object 
+    */
+    function createNewShareholder(address _userAddress, uint weight, QandA qa) public returns (Shareholder) {
+        Shareholder sh = new Shareholder(_userAddress, weight, this, qa);
+        shareholders[_userAddress] = sh;
+        return sh;
+    }
 
-        //require(isFinished, "meeting has not finished yet");
-        // iterate over all options to store default options in the array
-        /*for (uint k = 0; k < propOptions.length; k++) {
-            uint id = votingOptions.length++;
-            votingOptions[id] = VotingOption({optionName: propOptions[k], optionCount: 0});
-            // iterate over all votes of all proposals to check which voter voted for option k
-            for (uint l = 0; l < proposals.length; l++) {
-                Proposal storage prop = proposals[l];
-                for (uint i = 0; i < prop.votes.length; i++) {
-                    Vote storage v = prop.votes[i];
-                    if (utilCompareInternal(v.voterDecision, propOptions[k])) {
-                        votingOptions[k].optionCount++;
-                    }
-                }  
-            }
-        }*/
+    /**
+    *   @dev factory method to create a new director
+    *   @param _userAddress address of the user
+    *   @param isAdministrator indicated whether the director has admin rights
+    *   @param qa reference to access the Q&A lists
+    *   @return d a new Director object
+    */
+    function createNewDirector(address _userAddress, bool isAdministrator, QandA qa) public returns (Director) {
+        if (isAdministrator) {
+            return new Director(_userAddress, isAdministrator, qa, 0);
+        } else {
+            return new Director(_userAddress, isAdministrator, qa, 1);
+        }
+        
+    }
+
+    /**
+    *   @dev factory method to create a new proposal
+    *   @param _name name of the proposal
+    *   @param _description description of the proposal
+    *   @param _options voting options of the proposal
+    *   @return proposalId the id of the new created proposal
+    */
+    function createNewProposal(string _name, string _description, string _options) public returns (uint proposalId) {
+        proposalId = proposals.length++;
+        Proposal storage proposal = proposals[propId];
+        proposal.proposalId = propId;
+        proposal.name = _name;
+        //proposal.ipfs_hash = _ipfs_hash;
+        proposal.description = _description;
+        proposal.options = _options;
+        proposal.proposalPassed = false;
+        proposal.passedPercent = 0;
+        proposal.voteCount = 0;
+    }
+
+    /**
+    *   @dev increment the proposal id 
+    */
+    function incrementPropId() public view {
+        propId++;
+    }
+
+    /**
+    *   @dev push a voting option to the proposal - voting option mapping
+    *   @param proposalId the id of the proposal
+    *   @param opt the voting options which shall be added
+    */
+    function appendVotingOptionToProposal(uint proposalId, string opt) public {
+        propToOptMapping[proposalId].push(opt);
+    }
+
+    /**
+    *   @dev complete the execution of the proposal and compute the vote tally for every voting option
+    *         and checks whether the voting quorum is satisfied
+    *   @param proposalId the id of the proposal which shall be evaluated
+    *   @return winnCount the voting option's vote number for which most of the shareholder voted
+    */
+    function evaluateProposal(uint proposalId) public returns (uint winnCount) {
         Proposal storage prop = proposals[proposalId];
         for (uint k = 0; k < propToOptMapping[proposalId].length; k++) {
-            /*uint id = */
             votingOptions.length++;
             votingOptions[k] = VotingOption({optionName: propToOptMapping[proposalId][k], optionCount: 0});
             // iterate over all votes of all proposals to check which voter voted for option k
@@ -204,28 +216,28 @@ contract Factory is ProposalData {
                 }
             }  
         }
-
-
         uint winningOptionCount = 0;
-
         for (uint j = 0; j < votingOptions.length; j++) {
-            //countSum += votingOptions[j].optionCount;
             if (winningOptionCount < votingOptions[j].optionCount) {
                 winningOptionCount = votingOptions[j].optionCount;
             }
         }
-    
         if (prop.voteCount >= minimumVotingQuorum) {
             prop.proposalPassed = true;
             prop.passedPercent = winningOptionCount / prop.voteCount * 100;
         } else {
             prop.proposalPassed = false;
         }
-
         return (winningOptionCount);
     }
 
-    function utilCompareInternal(string a, string b) public pure returns (bool) {
+    /**
+    *   @dev utility function for comparing strings
+    *   @param a fist string
+    *   @param b second string
+    *   @return isEqual indicates whether the two input strings are equal
+    */
+    function utilCompareInternal(string a, string b) public pure returns (bool isEqual) {
         if (bytes(a).length != bytes(b).length) {
             return false;
         }
@@ -236,5 +248,4 @@ contract Factory is ProposalData {
         }
         return true;
     }
-
 }
