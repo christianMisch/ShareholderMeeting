@@ -1,22 +1,6 @@
-import { 
-    getUserList, 
-    getUser, 
-    getIsAnnounced, 
-    getIsFinished, 
-    announceAGM, 
-    setAgenda, 
-    setMeetingEndTime, 
-    setMeetingName, 
-    setMeetingPlace, 
-    setMeetingStartTime,
-    getMeetingEndTime,
-    getMeetingStartTime,
-    getAgenda,
-    getMeetingName,
-    getMeetingPlace,
-    registerUser,
-    getUserId,
-    getUserPW
+import {
+    getUser, getIsAnnounced, announceAGM, setAgenda, setMeetingEndTime, setMeetingName, setMeetingPlace, getUserPW,
+    setMeetingStartTime, getMeetingEndTime, getMeetingStartTime, getAgenda, getMeetingName, getMeetingPlace, registerUser, getUserId
 } from "../../provider/AgmOwnerProvider";
 import {getQAInterval} from './qAndA';
 import {getVotingInterval} from './voting';
@@ -24,98 +8,76 @@ import {setMinimumVotingQuorum} from '../../provider/ProposalProvider'
 import ecies from 'eth-ecies';
 import util from 'ethereumjs-util';
 import web3 from '../../provider/web3Provider';
-// delete all finish buttons
+
+// the Ethereum address (!= public key) of the user who logged in 
 var inputAdr;
-//var place;
-//var startDate;
-//var endDate;
-var dayDiff = 14;
-//var votingQuorum;
-//var annReport;
-//var guide;
-//var agenda;
+// store the difference of days between the AGM and the announce date
+var dayDiff;
 
 $(document).ready(async function() {
-    
-    console.log('isAnnounced: ' + await getIsAnnounced());
+    // show the login info page
     showWelcomePage();
     $('#secret-PW').hide();
-    // hide logout button, welcome link in sidebar and user credentials
     if (!(await getIsAnnounced())) {
+        // announce-wrapper contains the place, start and end time of the AGM
         $('main #announce-wrapper').hide();
     }
-    console.log('locStor' + sessionStorage.getItem('address'));
-    console.log(web3.eth.accounts[0]);
+    // retrieve the input address of the user who logged in => is stored for the whole browser session
     if ( (sessionStorage.getItem('address') && mapUser(await getUser(sessionStorage.getItem('address'))).isReg === true) 
             || sessionStorage.getItem('address') !== web3.eth.accounts[0]) {
+        // only registered users can enter their password for login
         $('#secret-PW').show();
-        //$('#wallet-address').css('margin-right', '20px');
         $('#filler').show();
         $('#filler').attr('class', 'col-5');
     } else {
         $('#secret-PW').hide();
         $('#filler').show();
-
     }
     $('#logout-button').hide();
-    //$('#date').hide();
     $('nav').hide();
     setTimeout(function() {
         $('main #auth-modal').css('visibility', 'hidden');
         $('main #auth-modal').css('color', 'white');
     },100);
-    
     hideUserCredentials();
-
-    /*const links = $('ul[class="list-unstyled components"] a');
-    console.log(links);
-    $.each(links, function(index, val) {
-        console.log(index, val);
-        //val.hide();
-        //$(`#${val.attr('id')}`).hide();
-    })*/
 
     $('#login-button').click(async function(e) {
         e.preventDefault();
         $('#filler').show();
         $('#filler').attr('class', 'col-5');
         inputAdr = $('#wallet-address').val().toLowerCase();
+        // store the input address of the user in the browser
         sessionStorage.setItem('address', inputAdr);
         var secrPassword = $('#secret-PW').val();
-        console.log('inputAdr: ' + inputAdr);
-        // turn on
-        //computeDayDiff();
+        computeDayDiff();
         $('#timer-link').hide();
         const user = mapUser(await getUser(inputAdr));
-        console.log('activeUser: ');
-        console.log(user);
-
-        console.log('dayDiff: ' + dayDiff);
+        // forward the main administrator to the AGM setup page to set the params of the AGM
         if (inputAdr === web3.eth.accounts[0] && !(await getIsAnnounced())) {
             showView('timer-link');
             showLogoutButton();
+        // a registered user and the main administrator can always login
         } else if (inputAdr === web3.eth.accounts[0] || (mapUser(await getUser(inputAdr)).isReg === true && await getUserPW(inputAdr) === secrPassword && secrPassword !== '0')) {
             showRoleBasedView();
+        // a wrong entered password fails the login process
         } else if ( (mapUser(await getUser(inputAdr))).isReg === true && await getUserPW(inputAdr) !== secrPassword ) {
             createAlert('Please type in also your password to authenticate yourself!', 'danger');
+        // users cannot register in the app if the day difference is smaller than a week till the AGM
         } else if (mapUser(await getUser(inputAdr)).isReg === false && dayDiff < 6) {
             createAlert('You cannot login into the application anymore.', 'danger');
             $('#login-button').attr('class', 'btn btn-danger');
             $('#login-button').prop('disabled', true);
         } else {
+            // trigger the registration modal
             $('main #auth-modal').trigger('click');
             $('button[data-step="1"]').prop('disabled', true);
         }
-        //$('#logout-button').css('margin-left', '160%');
         if (await getIsAnnounced()) {
             $('#meeting-name').html(await getMeetingName());
+            // sends an e-mail including the encrypted password to a user who shall participate in the AGM
             if (dayDiff === 14) {
-                //console.log('encrypt data...');
                 var encryptedData = encrypt(await generateRandomString());
-                console.log('encrData: ' + encryptedData);
-                console.log('randStr: ' + await generateRandomString());
-                //var decryptedData = decrypt('', encryptedData);
-                //console.log('decrData: ' + decryptedData);
+                //console.log('encrData: ' + encryptedData);
                 var templateParams = {
                     from_name: 'AGM administrator',
                     to_name: 'Chris',
@@ -123,12 +85,12 @@ $(document).ready(async function() {
                     to_mail: 'mischok.christian@web.de',
                     message: encryptedData
                 };
-                /*emailjs.send('gmail', 'authentication_template', templateParams)
+                emailjs.send('gmail', 'authentication_template', templateParams)
                     .then(function(response) {
                         console.log('SUCCESS!', response.status, response.text);
                     }, function(error) {
                         console.log('FAILED...', error);
-                    });*/
+                    });
                 //console.log('EMAIL WAS SENT!!!');
             }
         }
@@ -136,20 +98,18 @@ $(document).ready(async function() {
 
     $('#logout-button').click(function() {
         $('#filler').attr('class', 'col-5');
-        //$('#filler').hide();
         $('nav').hide();
         $('#logout-button').hide();
         $('#login-button').show();
         $('main #auth-modal').css('color', 'white');
         $('#secret-PW').show();
-        //$('#wallet-address').css('margin-right', '2px');
-        
         showWelcomePage();
         setTimeout(async function() {
             $('main #auth-modal').css('visibility', 'hidden');
             if (!(await getIsAnnounced())) {
                 $('#announce-wrapper').hide();
             } else {
+                // after announcement the params are shown in the welcome page
                 var loc = await getMeetingPlace();
                 var stTime = await getMeetingStartTime();
                 var enTime = await getMeetingEndTime();
@@ -159,22 +119,19 @@ $(document).ready(async function() {
                 $('main #end').html(enTime.replace('T', ' '));
             }
         }, 100);
-        
         hideUserCredentials();
         showLoginFields();
-         
-        //clearInterval(dayDiffInterval);
-        //clearInterval(announceInterval);
         clearInterval(getQAInterval());
         clearInterval(getVotingInterval());
-
     });
 
+    // params of the AGM were set and submitted by the main admin
     $('main').on('click', 'input[id = "time-submit-button"]', async function() {
         var startDate = $('main #agm-start').val();
         var endDate = $('main #agm-end').val();
         await setMeetingStartTime(startDate, getActiveUserAddress());
         await setMeetingEndTime(endDate, getActiveUserAddress());
+        // validate the start and end date
         if (!(startDate.substring(0,10) === endDate.substring(0,10)) 
             || startDate.substring(11,13) > endDate.substring(11,13)) {
                createAlert('The AGM should start, end on the same date and the start time should be smaller than the end time!', 'danger');
@@ -185,30 +142,24 @@ $(document).ready(async function() {
             await setMinimumVotingQuorum(votingQuorum, getActiveUserAddress());
             await setAgenda($('main #agenda-content').val(), getActiveUserAddress());
             await setMeetingName($('main #agm-name').val(), getActiveUserAddress())
-            
-            //timersAreDefined = true;
-            // turn on
             computeDayDiff();
             if (dayDiff <= 30 && !(await getIsAnnounced()) )  {
+                // can only be announced 30 or more days in prior of the AGM
                 await announceAGM(inputAdr);
                 showRoleBasedView();
             } else {
                 createAlert('The AGM can only be announced at least 30 days in prior!', 'danger');
             }
         }
-        
     });
 
+    // during the registration process the user decrypts the encrypted pw with his private key
     $('main').on('click', '#decr-button', function() {
         var privateKey = $('#privateKey').val();
-        console.log('privateKey: ' + privateKey);
         var encrData = $('#encrPW').val();
-        console.log('encrData: ' + encrData);
         var decrData = decrypt(privateKey, encrData);
         $('#decrPW').html(decrData);
-        $('button[data-step="1"]').prop('disabled', false);
-
-        
+        $('button[data-step="1"]').prop('disabled', false); 
     });
 
     $('main').on('input', '#decPassword', function() {
@@ -219,16 +170,15 @@ $(document).ready(async function() {
         }
     })
 
+    // finish the registration process
     $('main').on('click', '#finish-button', async function() {
-        //console.log($('#decrPW').html());
-        //console.log($('#decPassword').val());
-        //addrDecrPwMapping.push(inputAdr);
         var secPW = $('#decrPW').html();
-        console.log('secPW: ' + secPW);
+        // the decrypted pw is stored in the user => pw mapping in the contract
         await registerUser(secPW, inputAdr);
         showRoleBasedView();
     });
 
+    // shows the agenda of the AGM if was announced
     $('a[href="#material"]').click(async function() {
         if (await getIsAnnounced()) {
             setTimeout(async function() {
@@ -244,46 +194,39 @@ $(document).ready(async function() {
             }, 100);
         }
     });
-
 });
 
+/**
+ * @function createAlert creates an alert message
+ * @param {string} message - the message content 
+ * @param {string} alertType - to modify the alert color
+ * @param {string} place - where the alert message should be appended in the dom 
+ */
 export function createAlert(message, alertType = 'success', place = 'footer') {
     $(place).append(`<div role="alert">${message}</div>`)
         .addClass(`alert alert-${alertType}`);
-    //console.log(document.body);
     setTimeout(function () {
         $('footer').empty();
         $('footer').removeAttr('class');
-        //$('.alert').alert('close');
     }, 3000);
 }
 
+/**
+ * @function showRoleBasedView show the correct view depending on the user (role) who logged in
+ */
 async function showRoleBasedView() {
-    //$('#statistics-link').hide();
     const user = mapUser(await getUser(inputAdr));
+    // is an admin
     if (user && user.role === 0) {
         createAlert('You have successfully logged in as AgmOwner!');
-        /*console.log('web3 acc: ' + web3Provider.eth.accounts[0]);
-        console.log('user acc:' + inputAdr);
-        console.log('set time diff...');*/
         $('nav').show();
         $('#sidebar-position').css('padding', '0');
         $('#navbar-header').css('padding', '20px');
-        //$('#login-content').css('margin-bottom', '0');
         $('#setup-link').show();
         $('#welcome-link').hide();
         $('#voting-link').hide();
         $('#qa-link').hide();
-
         showView('setup-link');
-
-        /*setDayDiff(14);
-
-        setTimeout(function () {
-            setDayDiff(5);
-            console.log('dayDiff: ' + dayDiff);
-        }, 100);*/
-
         showUserCredentials();
         $('#login-div p').css('margin', '0 1%');
         $('#userAddress').html('User: ' + inputAdr);
@@ -292,11 +235,9 @@ async function showRoleBasedView() {
         $('#date').html('Date: ' + strDate);
         showLogoutButton();
         hideLoginFields();
-
         console.log(inputAdr);
-        console.log('loggedIn as Owner');
-        console.log('dayDiff: ' + dayDiff);
-
+        //console.log('dayDiff: ' + dayDiff);
+    // is a shareholder
     } else if (user && user.role === 2) {
         createAlert('You have successfully logged in as Shareholder!');
         $('nav').show();
@@ -313,12 +254,9 @@ async function showRoleBasedView() {
         showLogoutButton();
         showView('material-link');
         hideLoginFields();
-
         console.log(inputAdr);
-        console.log('loggedIn as Shareholder');
-
+    // is a director
     } else if (user && user.role === 1) {
-
         createAlert('You have successfully logged in as Director!');
         $('nav').show();
         $('#sidebar-position').css('padding', '0');
@@ -334,16 +272,17 @@ async function showRoleBasedView() {
         showLogoutButton();
         showView('material-link');
         hideLoginFields();
-
         console.log(inputAdr);
-        console.log('loggedIn as Director');
-
     } else {
         $('footer').append(`<div role="alert">Login failed!</div>`)
             .addClass('alert alert-danger');
     }
 }
 
+/**
+ * @function computeDate compute the current date
+ * @returns the current date encoded as YYYY-MM-DD
+ */
 function computeDate() {
     var date = new Date();
     var strDate = date.getFullYear() + "-" + ("0" + date.getMonth()).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
@@ -351,6 +290,9 @@ function computeDate() {
     return strDate;
 }
 
+/**
+ * @function computeDayDiff computes the day difference between the current date and the start date of the AGM
+ */
 async function computeDayDiff() {
     const MS_PER_DAY = 1000 * 60 * 60 * 24;
     var date = new Date();
@@ -364,15 +306,10 @@ async function computeDayDiff() {
 
 function showUserCredentials() {
     $('#user-data').show();
-    /*$('#userAddress').show();
-    $('#userRole').show();
-    $('#date').show();*/
 }
 
 function hideUserCredentials() {
     $('#user-data').hide();
-    /*$('#userAddress').hide();
-    $('#userRole').hide();*/
 }
 
 function hideLoginFields() {
@@ -391,6 +328,7 @@ function showLoginFields() {
 }
 
 export function showView(viewName) {
+    // trigger the welcome page link
     const event = new Event('click');
     const homeLink = document.getElementById(viewName);
     homeLink.dispatchEvent(event);
@@ -419,56 +357,45 @@ export function mapUser(userArr) {
     }
 }
 
-async function isAuthenticated(address) {
-    const userList = await getUserList();
-    console.log('userList: ');
-    console.log(userList);
-    for (var i = 0; i < userList; i++) {
-        if (userList[i].userAddress === address) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/*function setDayDiff(newDiff) {
-    dayDiff = newDiff;
-}*/
-
+/**
+ * @function generateRandomString generates a random string which shall be encrypted and is sent via e-mail
+ * @returns a random string concatenating the attached user id of the logged in user
+ */
 async function generateRandomString() {
     var str = Math.random().toString(36).slice(-10) + `${(await getUserId(getActiveUserAddress())).toNumber()}`;
     console.log('str: ' + str);
     return str;
 }
 
+/**
+ * @function encrypt derives the Ethereum public key from the Ethereum address to use the public key for encryption
+ * @param {string} data - which shall be encrypted 
+ * @returns the encrypted data as a 64bit hash
+ */
 function encrypt(data) {
-    //var ethAddress = pubToAddress(new Buffer(publicKey));
-    //console.log('ethAddress: ' + ethAddress);
     const msg = new Buffer('publicKeyToRetrieve');
     const sig = web3.eth.sign(getActiveUserAddress(), '0x' + msg.toString('hex'));
     const res = util.fromRpcSig(sig);
-
     const prefix = new Buffer("\x19Ethereum Signed Message:\n");
     const prefixedMsg = util.sha3(
         Buffer.concat([prefix, new Buffer(String(msg.length)), msg])
     );
-
     const pubKey  = util.ecrecover(prefixedMsg, res.v, res.r, res.s);
-    //console.log('pubKey: ' + pubKey);
     let userPublicKey = new Buffer(pubKey, 'hex');
     let bufferData = new Buffer(data);
-
     let encryptedData = ecies.encrypt(userPublicKey, bufferData);
-
     return encryptedData.toString('base64')
 }
 
+/**
+ * @function decrypt based on the private key of the user the encrypted password is decrypted
+ * @param {string} privateKey - the private key of the user who wants to register in the app
+ * @param {string} encryptedData - the encrypted data which was sent via e-mail
+ * @returns the decrypted randomly generated string
+ */
 function decrypt(privateKey, encryptedData) {
     let userPrivateKey = new Buffer(privateKey, 'hex');
     let bufferEncryptedData = new Buffer(encryptedData, 'base64');
-
     let decryptedData = ecies.decrypt(userPrivateKey, bufferEncryptedData);
-    
     return decryptedData.toString('utf-8');
 }
-
