@@ -1,9 +1,5 @@
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
 
-/*header {
-    border: 1px solid black;
-}*/
-
 h1 {
     text-align: center;
 }
@@ -42,12 +38,9 @@ a, a:hover, a:focus {
 }
 
 #sidebar {
-    /* don't forget to add all the previously mentioned styles here too */
     background: #7386D5;
     color: #fff;
     transition: all 0.3s;
-    /*min-height: 100vh;*/
-
 }
 
 #sidebar .sidebar-header {
@@ -74,10 +67,6 @@ a, a:hover, a:focus {
     color: white;
     background: orange;
 }
-
-/*article, div {
-    border: 1px solid black;
-}*/
 
 textarea {
     display: block;
@@ -144,5 +133,3 @@ header {
 div[class="container-fluid"] {
     margin-left: 0px;
 }
-
-

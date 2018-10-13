@@ -173,7 +173,6 @@ contract Factory is ProposalData {
         Proposal storage proposal = proposals[propId];
         proposal.proposalId = propId;
         proposal.name = _name;
-        //proposal.ipfs_hash = _ipfs_hash;
         proposal.description = _description;
         proposal.options = _options;
         proposal.proposalPassed = false;

@@ -9,15 +9,21 @@ import ecies from 'eth-ecies';
 import util from 'ethereumjs-util';
 import web3 from '../../provider/web3Provider';
 
+/**
+ * @summary contains the logic for a role-based access to the AGM app using an authentication mechanism
+ */
+
 // the Ethereum address (!= public key) of the user who logged in 
 var inputAdr;
 // store the difference of days between the AGM and the announce date
 var dayDiff;
+// style all sections
+var sectionStyleInterv;
 
 $(document).ready(async function() {
     // show the login info page
     showWelcomePage();
-    $('#secret-PW').hide();
+    sectionStyleInterv = setInterval(function(){$('section').css('border', '1px dotted purple')}, 500);
     if (!(await getIsAnnounced())) {
         // announce-wrapper contains the place, start and end time of the AGM
         $('main #announce-wrapper').hide();
@@ -36,6 +42,7 @@ $(document).ready(async function() {
     $('#logout-button').hide();
     $('nav').hide();
     setTimeout(function() {
+        $('#secret-PW').hide();
         $('main #auth-modal').css('visibility', 'hidden');
         $('main #auth-modal').css('color', 'white');
     },100);
@@ -51,17 +58,19 @@ $(document).ready(async function() {
         var secrPassword = $('#secret-PW').val();
         computeDayDiff();
         $('#timer-link').hide();
-        const user = mapUser(await getUser(inputAdr));
         // forward the main administrator to the AGM setup page to set the params of the AGM
         if (inputAdr === web3.eth.accounts[0] && !(await getIsAnnounced())) {
             showView('timer-link');
             showLogoutButton();
         // a registered user and the main administrator can always login
-        } else if (inputAdr === web3.eth.accounts[0] || (mapUser(await getUser(inputAdr)).isReg === true && await getUserPW(inputAdr) === secrPassword && secrPassword !== '0')) {
-            showRoleBasedView();
+        } else if (inputAdr === web3.eth.accounts[0] || 
+            (mapUser(await getUser(inputAdr)).isReg === true 
+            && await getUserPW(inputAdr) === secrPassword && secrPassword !== '0')) {
+                showRoleBasedView();
         // a wrong entered password fails the login process
-        } else if ( (mapUser(await getUser(inputAdr))).isReg === true && await getUserPW(inputAdr) !== secrPassword ) {
-            createAlert('Please type in also your password to authenticate yourself!', 'danger');
+        } else if ( (mapUser(await getUser(inputAdr))).isReg === true 
+            && await getUserPW(inputAdr) !== secrPassword ) {
+                createAlert('Please type in also your password to authenticate yourself!', 'danger');
         // users cannot register in the app if the day difference is smaller than a week till the AGM
         } else if (mapUser(await getUser(inputAdr)).isReg === false && dayDiff < 6) {
             createAlert('You cannot login into the application anymore.', 'danger');
@@ -77,7 +86,8 @@ $(document).ready(async function() {
             // sends an e-mail including the encrypted password to a user who shall participate in the AGM
             if (dayDiff === 14) {
                 var encryptedData = encrypt(await generateRandomString());
-                //console.log('encrData: ' + encryptedData);
+                // if the e-mail was not received then use the encrData from the console for registration
+                console.log('encrData: ' + encryptedData);
                 var templateParams = {
                     from_name: 'AGM administrator',
                     to_name: 'Chris',
@@ -91,7 +101,7 @@ $(document).ready(async function() {
                     }, function(error) {
                         console.log('FAILED...', error);
                     });
-                //console.log('EMAIL WAS SENT!!!');
+                console.log('EMAIL WAS SENT!!!');
             }
         }
     });
@@ -102,7 +112,9 @@ $(document).ready(async function() {
         $('#logout-button').hide();
         $('#login-button').show();
         $('main #auth-modal').css('color', 'white');
-        $('#secret-PW').show();
+        if (inputAdr !== web3.eth.accounts[0]) {
+            $('#secret-PW').show();
+        }
         showWelcomePage();
         setTimeout(async function() {
             $('main #auth-modal').css('visibility', 'hidden');
@@ -121,6 +133,7 @@ $(document).ready(async function() {
         }, 100);
         hideUserCredentials();
         showLoginFields();
+        clearInterval(sectionStyleInterv);
         clearInterval(getQAInterval());
         clearInterval(getVotingInterval());
     });
@@ -143,7 +156,7 @@ $(document).ready(async function() {
             await setAgenda($('main #agenda-content').val(), getActiveUserAddress());
             await setMeetingName($('main #agm-name').val(), getActiveUserAddress())
             computeDayDiff();
-            if (dayDiff <= 30 && !(await getIsAnnounced()) )  {
+            if (dayDiff >= 30 && !(await getIsAnnounced()) )  {
                 // can only be announced 30 or more days in prior of the AGM
                 await announceAGM(inputAdr);
                 showRoleBasedView();

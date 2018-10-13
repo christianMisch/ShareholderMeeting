@@ -1,28 +1,28 @@
-import {getActiveUserAddress, getActiveUserState, createAlert, mapUser} from './authentication';
+import {getActiveUserAddress, createAlert, mapUser} from './authentication';
 import {createQuestion, createAnswer, getNumOfAnswers, getNumOfQuestions, getAnswer, getQuestion} from '../../provider/QandAProvider';
 import {rateQuestion} from '../../provider/ShareholderProvider';
 import {getUser} from '../../provider/AgmOwnerProvider';
 import {downloadString} from '../../provider/IPFSDownloadProvider';
 import {upload} from '../../provider/IPFSUploadProvider';
 
+/**
+ * @summary contains the logic for displaying the Q&A list in the UI and shareholder rating 
+ */
+
+// stores the total number of questions created by shareholders
 var numOfQuest = 0;
-var numOfAnsw= 0;
+// stores the total number of answers created by directors
+var numOfAnsw = 0;
+// qa metric computed as follows: upvotes - downvotes; used as sort criterion
 var totalUpDownVoteCount = 0;
+// to reload the page if new questons are answers are created
 var qaInterval;
 
 $(function() {
 
-    /*$('a[href="#Q&A"]').click(function() {
-
-
-    });*/
-
     $('a[href="#list"]').click(async function() {
-
-
+        // show questions creation form only for shareholders
         const activeUser = mapUser(await getUser(getActiveUserAddress().toLowerCase()));
-        console.log(activeUser);
-        console.log($('main textarea[id="qa-placeholder"]'));
         if (activeUser.role === 2) {
             setTimeout(function() {
                 $('main #quest-id-label').hide();
@@ -41,7 +41,7 @@ $(function() {
                 $('#rating-info').hide();
               }, 100);
         }
-
+        // creates either a question (shareholder) or an answer (director)
         $('main').on('click', 'input[id="qa-submit-button"]', async function(e) {
             e.preventDefault();
             const activeUser = mapUser(await getUser(getActiveUserAddress().toLowerCase()));
@@ -49,8 +49,6 @@ $(function() {
             var qaHash = await upload(textareaContent);
             const questId = $('main input[id="question-id"]').val();
             const activeUserAdr = getActiveUserAddress();
-            console.log(activeUserAdr);
-            console.log(textareaContent);
             if (activeUser.role === 2) {
                 createQuestion(qaHash, activeUserAdr);
                 getNumOfQuestions();
@@ -59,27 +57,28 @@ $(function() {
                 getNumOfAnswers();
             }
         });
-
+        // counters are used to compare the current number with the number of q/a which is stored in the QandA contract
         numOfAnsw = 0;
         numOfQuest = 0;
         setTimeout(function() {
             $('main form[id="select-question-form"]').hide();
         }, 500);
         qaInterval = setInterval(async function() {
-
             const questNum = await getNumOfQuestions();
             const answNum = await getNumOfAnswers();
+            // current qa metric
             var currUpDownVoteCount = 0;
             $('main #num-of-quest').html(`Number of questions: ${questNum}`);
             $('main #num-of-answ').html(`Number of answers: ${answNum}`);
-            // rating also not changing because if it changes then it should load again
-
+            // to remember which question has not been appended to the DOM, yet (= not visited)  
             var visitedArr = [];
+            // indicate which question has the highest qa metric = should be shown as first item in the list (descending order)
             var priorityMetric = 0;
+            // iterate over all questions which are stored in the QandA contract
             for (var k = 0; k < questNum.toNumber(); k++) {
                 var currQuestArr = await getQuestion(k);
-                //console.log(currQuestArr);
                 var mappQuest = mapQuestion(currQuestArr);
+                // initialize the visited array with all questions
                 visitedArr.push({questId: mappQuest.questionId, visited: false});
                 var questPriority = mappQuest.upvotes - mappQuest.downvotes;
                 currUpDownVoteCount += questPriority;
@@ -87,68 +86,52 @@ $(function() {
                     priorityMetric = questPriority;
                 }
             }
-            //console.log('globalSum: ' + typeof(totalUpDownVoteCount));
-            //console.log('currSum: ' + typeof(currUpDownVoteCount));
-
+            // if the number of questions/answers or rating has not changed then do not refresh the page
             if (numOfQuest === questNum.toNumber()
                 && numOfAnsw === answNum.toNumber()
                 && totalUpDownVoteCount === currUpDownVoteCount) {
-                console.log('no change');
                 return;
-
             }
-
+            // else it should store the updated values for the q/a count and the updated qa metric
             totalUpDownVoteCount = currUpDownVoteCount;
             numOfQuest = questNum.toNumber();
             numOfAnsw = answNum.toNumber();
+            // delete all q/a in the list
             clearQandAList();
-
             var questCount = 1;
             var allVisited = false;
-
-            //console.log(visitedArr);
-
+            // outer loop to guarentee that all question has been added to the Q&A list
             for (;!allVisited;
                 allVisited = visitedArr.filter(q => q.visited === true).length === questNum.toNumber()
             ) {
-                //priorityMetric = 0;
-                /*console.log(questNum);
-                console.log(visitedArr.filter(q => q.visited === true).length);
-                console.log(allVisited);
-                console.log(visitedArr);*/
-
+                // iterate over all questions
                 for (var i = 0; i < questNum; i++) {
-
                     var currQuestArr = await getQuestion(i);
-                    //console.log(currQuestArr);
                     var mappQuest = mapQuestion(currQuestArr);
+                    // compute the qa metric of a specific question
                     var questPriority = mappQuest.upvotes - mappQuest.downvotes;
-                    console.log(mappQuest.questionId, questPriority);
-                    //console.log(mappQuest.questionId + ': ' + questPriority);
-
+                    // the question should have the best qa metric and has not been appended, yet
                     if (questPriority >= priorityMetric
                         && (visitedArr[i].visited === false) ) {
-                        //console.log('inner if');
-                        //priorityMetric = questPriority;
                         visitedArr[i].visited = true;
-
+                        // compute the current date
                         var date = new Date();
                         var dd = date.getDate();
-                        var mm = date.getMonth()+1; //January is 0!
+                        // January is 0
+                        var mm = date.getMonth()+1;
                         var yyyy = date.getFullYear();
-
                         if(dd<10) {
                             dd = '0'+dd
                         }
-
                         if(mm<10) {
                             mm = '0'+mm
                         }
-
                         date = mm + '.' + dd + '.' + yyyy;
+                        // download question content from IPFS
                         var questContent = await downloadString(mappQuest.ipfs_hash);
+                        // provide some additional information about the question => date, up-/downvotes etc.
                         var qaWrapper = $(
-                            // question-i is the real question id
+                            // questions in the UI start from 1
                             `<div>
                                     <a href="#question-${i + 1}" class="list-group-item list-group-item-action flex-column align-items-start list-group-item-danger">
                                         <small class="left-small">user: ${mappQuest.creator}</small>
@@ -159,84 +142,58 @@ $(function() {
                                     </a>
                             </div>`
                         );
-
-                        //console.log(qaWrapper.html());
                         $('main #quest-answ-list').append(qaWrapper.html());
                         var divWrapper = $('<div></div>');
                         var ansWrapper = $('<ol class="list-group"></ol>');
                         var count = 0;
+                        // iterate also over all answers to the corresponding question
                         for (var j = 0; j < answNum; j++) {
-                            //console.log(j);
                             var currAnswArr = await getAnswer(j);
-                            //console.log(currAnswArr);
                             var mappAnsw = mapAnswer(currAnswArr);
                             var answerContent = await downloadString(mappAnsw.ipfs_hash)
+                            // check that the answer belongs to this question
                             if (mappAnsw.questionId === i) {
                                 ansWrapper.append(`<li class="list-group-item list-group-item-action flex-column align-items-start list-group-item-success">Answer ${count + 1}: ${answerContent}</li>`);
                                 count++;
                             }
                         }
                         divWrapper.append(ansWrapper);
-                        //console.log(divWrapper.html());
+                        // append the question with all answers to the list
                         $(`main div[id="${i + 1}"]`).append(divWrapper.html());
-
-
                     }
-
-
                 }
+                // decrement the qa metric to find the next question with 2nd best metric and so on...
                 priorityMetric--;
             }
+            // clear the array
             visitedArr = [];
-            console.log('escaped for loop');
-            //console.log($('main small.left-small'));
-            //console.log($('main small.right-small'));
             $('main small').css('display', 'block');
             $('main small.left-small').css('float', 'left');
             $('main small.right-small').css('float', 'right');
             $('main .clear-fix').css('clear', 'both');
-            //$('main small').css('display', 'inline-block');
-            // enable modal function to questions
+            // if the director clicks on the question the answer modal will be triggered
             if (activeUser.role === 1) {
                 $('main a[href^="#question-"]').attr({
                     'data-toggle': "modal",
                     'data-target': "#answerModal"
                 });
             }
-
-        //console.log(document.body);
-
         }, 1000);
-
-        /*
-        <div>
-            <a>
-                <div>question
-                    <ol>
-                        <li>Answer 1 </li>
-                        <li>Answer 2 </li>
-                    </ol>
-                </div>
-            </a>
-        </div>
-        */
-
     });
 
+    // toggles role bahavior between rating for shareholders and creating answers for directors
     $('main').on('click', 'a[href^="#question-"]', async function(e) {
         e.preventDefault();
         const activeUser = mapUser(await getUser(getActiveUserAddress().toLowerCase()));;
-        //console.log('pressed a tag');
+        // if the user is a director he can create an answer by clicking on the question
         if (activeUser.role === 1) {
+            // the text content of the clicked question
             const questContent = e.currentTarget.firstChild.nextElementSibling.offsetParent.children[2].innerHTML.split('<ol')[0].trim();
+            // id of the clicked question
             const questId = e.currentTarget.getAttribute('href').substring(10);
-            console.log(questContent, questId);
-            console.log(e.currentTarget.firstChild);
             $('main div[id="question-content"]').html(questContent);
-
+            // submit the answer
             $('main').on('click', 'button[id="submit-question-button"]', async function() {
-                //alert('hey');
-                // console.log($('main textarea[id="answer-content"]').val());
                 const answContent = $('main textarea[id="answer-content"]').val();
                 var answHash = await upload(answContent)
                 createAnswer(questId-1, answHash, getActiveUserAddress());
@@ -244,25 +201,23 @@ $(function() {
             });
             return;
         }
+        // delete the previous selected question
         $('#selected-question').empty();
-        console.log(document.body);
         $('main form[id="select-question-form"]').show();
         var questId = e.currentTarget.getAttribute('href').substring(10);
         var from = getActiveUserAddress();
-        //console.log(e.currentTarget.getAttribute('href').substring(10));
-
+        // show the clicked question in the UI
         $('#selected-question').append($(`main div[id="${questId}"]`).clone());
-        //$(`main div[id="${questId}"]`).clone().appendTo('#selected-question');
-
+        // upvote counter of a specific question gets incremented by clicking on upvote
         $('main div').on('click', 'input[id="upvote-button"]', async function() {
             var txId = await rateQuestion(questId-1 , 1, from);
             $('#selected-question ol:last').remove();
+            // to check whether the rate TX was successfull
             if (txId.charAt(1) === 'x') {
                 createAlert('You successfully upvoted this question');
-                //console.log(await getQuestion(questId-1));
             }
         });
-
+        // downvote counter of a specific question gets incremented by clicking on downvote
         $('main').on('click', 'input[id="downvote-button"]', async function() {
             var txId = await rateQuestion(questId-1, 0, from);
             $('#selected-question ol:last').remove();
@@ -301,102 +256,3 @@ function clearQandAList() {
 export function getQAInterval() {
     return qaInterval;
 }
-
-
-/*
-
-for (var i = 0; i < questNum; i++) {
-                var currQuestArr = await getQuestion(i);
-                console.log(currQuestArr);
-                var mappQuest = mapQuestion(currQuestArr);
-                var qaWrapper = $(
-                    `<div>
-                            <a href="#question-${i+1}" class="list-group-item list-group-item-action flex-column align-items-start list-group-item-danger">
-                                <div id="${i + 1}"> Question ${i + 1}: ${mappQuest.content} </div>
-                            </a>
-                    </div>`
-                );
-
-                console.log(qaWrapper.html());
-                $('main #quest-answ-list').append(qaWrapper.html());
-                var divWrapper = $('<div></div>');
-                var ansWrapper = $('<ol class="list-group"></ol>');
-                var count = 0;
-                for (var j = 0; j < answNum; j++) {
-                    console.log(j);
-                    var currAnswArr = await getAnswer(j);
-                    console.log(currAnswArr);
-                    var mappAnsw = mapAnswer(currAnswArr);
-                    if (mappAnsw.questionId === i) {
-                        ansWrapper.append(`<li class="list-group-item list-group-item-action flex-column align-items-start list-group-item-success">Answer ${count + 1}: ${mappAnsw.content}</li>`);
-                        count++;
-                    }
-                }
-                divWrapper.append(ansWrapper);
-                console.log(divWrapper.html());
-                $(`main div[id="${i + 1}"]`).append(divWrapper.html());
-            }
-
-        //console.log(document.body);
-
-        }, 1000);
-
-*/
-
-
-/*
-for (;!allVisited; allVisited = visitedArr.filter(q => q.visited === true).length === questNum.toNumber()) {
-                priorityMetric = 0;
-                console.log(questNum);
-                console.log(visitedArr.filter(q => q.visited === true).length);
-                console.log(allVisited);
-                console.log(visitedArr);
-
-                for (var i = 0; i < questNum; i++) {
-
-                    var currQuestArr = await getQuestion(i);
-                    //console.log(currQuestArr);
-                    var mappQuest = mapQuestion(currQuestArr);
-                    var questPriority = mappQuest.upvotes - mappQuest.downvotes;
-                    console.log(mappQuest.questionId, questPriority);
-                    //console.log(mappQuest.questionId + ': ' + questPriority);
-
-                    if (questPriority >= priorityMetric
-                        && !(visitedArr.map(q => q.questId).includes(mappQuest.questionId)) ) {
-                        //console.log('inner if');
-                        priorityMetric = questPriority;
-                        visitedArr.push({questId: mappQuest.questionId, visited: true});
-                        var qaWrapper = $(
-                            `<div>
-                                    <a href="#question-${i+1}" class="list-group-item list-group-item-action flex-column align-items-start list-group-item-danger">
-                                        <div id="${i + 1}"> Question ${questCount++}: ${mappQuest.content} </div>
-                                    </a>
-                            </div>`
-                        );
-
-                        //console.log(qaWrapper.html());
-                        $('main #quest-answ-list').append(qaWrapper.html());
-                        var divWrapper = $('<div></div>');
-                        var ansWrapper = $('<ol class="list-group"></ol>');
-                        var count = 0;
-                        for (var j = 0; j < answNum; j++) {
-                            //console.log(j);
-                            var currAnswArr = await getAnswer(j);
-                            //console.log(currAnswArr);
-                            var mappAnsw = mapAnswer(currAnswArr);
-                            if (mappAnsw.questionId === i) {
-                                ansWrapper.append(`<li class="list-group-item list-group-item-action flex-column align-items-start list-group-item-success">Answer ${count + 1}: ${mappAnsw.content}</li>`);
-                                count++;
-                            }
-                        }
-                        divWrapper.append(ansWrapper);
-                        //console.log(divWrapper.html());
-                        $(`main div[id="${i + 1}"]`).append(divWrapper.html());
-                    }
-
-
-                }
-            }
-            visitedArr = [];
-            console.log('escaped for loop');
-*/

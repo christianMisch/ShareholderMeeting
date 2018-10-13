@@ -2,60 +2,46 @@
 
 <html lang="en">
     <head>
-        <meta http-equiv="Access-Control-Allow-Origin" content="*">
         <meta charset="utf-8">
         <title>AGM</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
         <link rel="stylesheet" href="./styles/styles.css">
         <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.2.4/email.min.js"></script>
         <script type="text/javascript">
+            // initialize the emailjs service
             (function(){
                 emailjs.init("user_C8orQh3VVC8LorCBAAdSK");
             })();
         </script>
     </head>
     <body>
+        <!-- header of the app whose structure is static -->
         <header>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12 p-3 mb-2 bg-primary text-white" id="login-content">
-                        
                         <form id="login-form">
                             <div class="form-group row" id="login-div">
-                                
-                                <!--<label class="col-form-label" id="address-label"></label>-->
-                                <!--<div class="col-4" id="wallet-div">-->
                                 <input class="col-4 form-control" type="text" placeholder="Wallet address: 0x0..." id="wallet-address">
                                 <input id="secret-PW" class="col-2 form-control" type="text" placeholder="Type in your password">
+                                <!-- user data of a specific user -->
                                 <span class="col-6" id="user-data">
                                     <p id="userAddress">User: </p>
                                     <p id="userRole">Role: </p>
                                     <p id="date">Date: </p>
                                 </span>
                                 <span class="col-7" id="filler"></span>
-                                
                                 <span class="col-1" id="header-buttons">
                                     <input type="button" class="btn btn-success" value="login" id="login-button">
                                     <input type="button" class="btn btn-success" value="logout" id="logout-button">    
                                 </span>
-                                
                             </div>
-                            
-                            
-                            <!--<label id="password-label">
-                                Enter your password:
-                                <input type="password" id="password">
-                            </label>-->
-                           
                         </form>
                     </div>
-
                 </div>
             </div>
-
         </header>
-
-
+        <!-- main content of the app -->
         <div class="container-fluid">
             <div class="row">
                 <div class="col-3" id="sidebar-position">
@@ -63,7 +49,7 @@
                         <div class="sidebar-header">
                             <h3 id="navbar-header">AGM features</h3>
                         </div>
-
+                        <!-- list of all sidebar links -->
                         <ul class="list-unstyled components">
                             <li class="active">
                                 <a href="#welcome" id="welcome-link">Welcome</a>
@@ -92,16 +78,16 @@
 
                 <div class="col-9">
                   <h1 id="meeting-name"></h1>
-
                     <main class="row">
-                        <!--template content is inserted here-->
+                        <!-- template content is inserted here -->
                     </main>
                 </div>
             </div>
         </div>
-
+        <!-- templates are not shown in the UI unless they got instantiated -->
         <template id="welcome-template">
             <article class="col-xl-12">
+                <!-- is only shown after announcement through the main admin -->
                 <div id="announce-wrapper">
                     <p>The 1st Annual General Meeting takes place in <strong id="place"></strong>. It will start on <strong id="start"></strong>
                         and end on <strong id="end"></strong>!</p>
@@ -111,11 +97,10 @@
                     </p>
                     <p>Remaining days to the AGM: <strong id="day-diff"></strong></p>
                 </div>
-                
                 <strong>Please sign in with your Ethereum wallet address and your password</strong>
                 <p>If you are a <strong>shareholder</strong> then you receive your password via mail</p>
             </article>
-
+            <!-- registration modal -->
             <form class="modal multi-step" id="demo-modal">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -124,14 +109,12 @@
                             <h4 class="modal-title step-2" data-step="2">Step 2</h4>
                         </div>
                         <div class="modal-body step step-1" id="step-1">
-                            
                             <label>Please input your private key 
                                 <div><input type="text" id="privateKey" weight="48"></div>
                             </label>
                             <label>Please input the encrypted password 
                                 <div><input type="text" id="encrPW" weight="48"></div>
                             </label>
-                                
                             <div>
                                 <input type="submit" value="Decrypt" id="decr-button">
                                 <div>
@@ -144,17 +127,16 @@
                         </div>                        
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary step step-1" data-step="1">Continue</button>
-
                         </div>
                     </div>
                 </div>
             </form>
-            <button class="btn btn-default" data-toggle="modal" data-target="#demo-modal" id="auth-modal">Show</button>
-            
+            <button class="btn btn-default" data-toggle="modal" data-target="#demo-modal" id="auth-modal">Show</button> 
         </template>
-
+        
         <template id="timer-template">
             <article class="col-xl-12">
+                <!-- AGM parameters -->
                 <form>
                     <label>Please input the name of the AGM (will be shown as headline) <input type="text" id="agm-name"></label>
                     <label> When shall the AGM start?<input type="datetime-local" id="agm-start"></label>
@@ -173,7 +155,6 @@
                 <input type="text" placeholder="0x..." id="ownership-address">
                 <input type="submit" value="Transfer" id="transfer-ownership-button">
             </section>
-            
             <section class="col-6">
                 <article>
                     <p>Here you can create proposals</p>
@@ -196,7 +177,6 @@
                     <input type="button" value="remove User" id="remove-user-button">
                 </article>
             </section>
-
             <section class="col-12">
                 <label>Press this button <strong>ONLY</strong> if the AGM shall be finished. Also, the calculation of the voting stastics will be triggered. 
                     <div>
@@ -206,12 +186,7 @@
             </section>
         </template>
 
-
         <template id="material-template">
-            <!--<article id="announcement" class="col-12">
-                <label>Please insert the place of the AGM: <input type="text" id="place"></label>
-                <label>Please insert the date of the AGM: <input type="datetime" id="date"></label>
-            </article>-->
             <article class="col-xl-12">
                 <p>The following materials are sent via a personal<strong> e-mail</strong> to you!</p>
                 <ul>
@@ -219,8 +194,8 @@
                     <li>AGM agenda</li>
                 </ul>
                 <p>Here will be announced the agenda: </p>
+                <!-- the agenda content is shown here -->
                 <ol id="agenda-list">
-
                 </ol>
             </article>
         </template>
@@ -231,8 +206,8 @@
                   Number of shares you own:
                 </strong>
                 <strong id="shares">
-
                 </strong>
+                <!-- partial voting parameters -->
                 <form>
                     <h3>For partial delegation only</h3>
                     <strong>Please type in your preferred denomination of your shares for delegation!</strong>
@@ -242,47 +217,35 @@
                     <strong id="test">Your current share denomination is shown below:</strong>
                     <strong>Please start delegation from the last share block</strong>
                     <div id="voting-denomination-list">
+                        <!--
+                            <ol>
+                                <li id="1">1. share block:  5 <input id="deleg-butt-1"></input></li>
+                                <li id="2">2. share block:  5 <input id="deleg-butt-2"></input></li>
+                                <li id="3">3. share block:  5 <input id="deleg-butt-3"></input></li>
+                            <ol>
+                        -->
+                    </div>
                 </form>
-
-
-                </div>
             </section>
             <section class="col-6">
-              <!--<label>Which type of delegation do you want (simple=true/partial=false): <input type="text" id="delegation-style"></label>-->
-              <h3>For simple delegation only: ALL your shares will be delegated to the proxy.</h3>
-              <label>Please insert the proxy address: <input type="text" id="proxy-address"></label>
-              <!--<label>Choose the position of the share block <input type="number" id="block-index"></label>-->
-              <input type="button" value="delegate" id="delegate-button">
+              <!-- simple delegation -->
+              <form>
+                <h3>For simple delegation only: ALL your shares will be delegated to the proxy.</h3>
+                <label>Please insert the proxy address: <input type="text" id="proxy-address"></label>
+                <input type="button" value="delegate" id="delegate-button">
+              </form>
             </section>
-
             <article class="col-xl-12" id="refresh-section">
                 <input type="button" value="refresh list" id="refresh-proposal">
                 <table class="list-group">
                     <tr id="table-header" class="list-group-item-info">
                         <th>Description</th>
                         <th>Options</th>
-                        <!--<th>Delegation style</th>
-                        <th>Proxy address</th>-->
                     </tr>
                 </table>
             </article>
             <input type="button" id="vote-button" value="vote">
-
         </template>
-
-        <!--<template id="QandA-template">
-            <h2 class="col-xl-12">Q&A</h2>
-            <div class="col-xl-6">
-                <form id="Q&A-form">
-                    <textarea row="30" cols="50" id="qa-placeholder"></textarea>
-                    <label id="quest-id-label">Please insert the question id: <input type="number" id="question-id"></label>
-                    <input type="reset" value="reset">
-                    <input type="submit" value="submit" id="qa-submit-button">
-                </form>
-            </div>
-            <div id="Q&A-feed" class="col-xl-6">
-            </div>
-        </template>-->
 
         <template id="QandA-list-template">
             <article class="col-xl-12">
@@ -294,31 +257,38 @@
                 </div>
                 <div id="question-form-wrapper">
                     <form id="Q&A-form">
-                        <!--<label>Please insert the question headline: <textarea row="30" cols="50" id="question-headline"></textarea></label>-->
                         <textarea row="30" cols="50" id="qa-placeholder"></textarea>
                         <label id="quest-id-label">Please insert the question id: <input type="number" id="question-id"></label>
                         <input type="reset" value="reset">
                         <input type="submit" value="submit" id="qa-submit-button">
                     </form>
                 </div>
-
             </article>
-            <div class="col-6 list-group" id="quest-answ-list">
-                
+            <div class="col-6 list-group" id="quest-answ-list">   
+                <!--
+                    <div>
+                        <a>
+                            <div>question content
+                                <ol>
+                                    <li>Answer 1 </li>
+                                    <li>Answer 2 </li>
+                                </ol>
+                            </div>
+                        </a>
+                    </div>
+                -->
             </div>
-
             <div class="col-6">
                 <article id="rate-article">
                     <form id="select-question-form">
-                        <div id="selected-question">
-                            
+                        <div id="selected-question">    
                         </div>
                         <input type="button" value="upvote" id="upvote-button">
                         <input type="button" value="downvote" id="downvote-button">
                     </form>
                 </article>
             </div>
-
+            <!-- answer modal for directors -->
             <div class="modal fade" id="answerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
@@ -360,24 +330,21 @@
                     <h3>Total votes: <span id="total-vote-count"></span></h3>
                     <ol id="canvas-list">
                         <!--
-                                            <li>
-                                                <h3>Proposal number: 0, proposal name: 'bla...'</h3>    
-                                                <canvas id="voteCountCanvas"></canvas>
-                                                <div id="myLegend"></div>
-                                            </li>
-                                            -->
+                            <li>
+                                <h3>Proposal number: 0, proposal name: 'content...'</h3>    
+                                <canvas id="voteCountCanvas"></canvas>
+                                <div id="myLegend"></div>
+                            </li>
+                        -->
                     </ol>
-            
                 </section>
                 <section class="col-12">
                     <table id="shareTable">
                         <tr>
                             <th>user</th>
-                            <!--<th>selected voting options</th>-->
                             <th>shares</th>
                         </tr>
                     </table>
-            
                 </section>
             </div>
             <div id="statistic-info">
@@ -385,8 +352,7 @@
                 <strong>If the chairperson finished the AGM then the statistics will be shown in this view!</strong>
             </div>
         </template>
-
-
+        <!-- the default location for the alert messages is the footer -->
         <footer></footer>
         <noscript>
             JavaScript is required to run this app.
@@ -394,18 +360,8 @@
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
-        <!--<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>-->
-        <!--<script src="./scripts/manageSPA.js"></script>-->
-        <!--<script src="./scripts/authentication.js"></script>-->
         <script src="../../dist/polyfill.bundle.js"></script>
         <script src="../../dist/app.bundle.js"></script>
-        <!--<script src="../../dist/manageSPA.bundle.js"></script>
-        <script src="../../dist/authentication.bundle.js"></script>
-        <script src="../../dist/agmSetup.bundle.js"></script>
-        <script src="../../dist/voting.bundle.js"></script>
-        <script src="../../dist/qAndA.bundle.js"></script>-->
-        <!--<script src= "../../dist/ShareholderProvider.bundle.js"></script>
-        <script src="../../dist/app.bundle.js"></script>-->
         <script src="./scripts/multi-step-modal.js"></script>
     </body>
 </html>

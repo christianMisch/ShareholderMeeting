@@ -1,29 +1,28 @@
-import {getProposal, getNumOfProposals, hasVoted} from '../../provider/ProposalProvider';
-import {denominateVotingTokens, delegateToProxy, getVotingDenominations} from '../../provider/ShareholderProvider';
-import {getShareholder, getNumOfShareholders, vote} from '../../provider/ShareholderProvider';
-import {setUserShares, getActiveUserAddress, createAlert} from './authentication';
-import { getUser } from '../../provider/AgmOwnerProvider';
+import {getProposal, getNumOfProposals} from '../../provider/ProposalProvider';
+import {denominateVotingTokens, delegateToProxy, getShareholder, vote} from '../../provider/ShareholderProvider';
+import {getActiveUserAddress, createAlert} from './authentication';
+import {getUser} from '../../provider/AgmOwnerProvider';
 import {mapUser} from './authentication';
-import {downloadString} from '../../provider/IPFSDownloadProvider';
-//var  IPFSDownloadProvider = require('../../provider/IPFSDownloadProvider.js'); 
 
+/**
+ * @summary contains the UI logic for simple and partial delegation style, share denomination and voting on proposals
+ */
+
+// refresh the page if new proposals get added
 var votingInterval;
+// current number of proposals
 var numOfProp = 0;
-// logout and login proposals not shown
+
 $(document).ready(async function() {
-    
   
-  //console.log(getAuthorizedUsers());
+    // invokes the partial delegation: delegate a specified share block to a proxy
     $('main').on('click', 'input[id ^= "deleg-butt-"]', async function() {
         var inpButt = $(this);
-        console.log(inpButt[0].parentElement.innerText.substring(16,17));
         var delegButt = $(this)[0].id;
         var blockIndex = parseInt(delegButt.substring(11));
-        console.log(typeof(blockIndex));
-        console.log('blockIndex: ' + blockIndex);
         var delegAddr = $(`main input[id="deleg-addr-${blockIndex}"]`).val();
-        console.log('delegAddr: ' + delegAddr);
         var proxyUser = mapUser(await getUser(delegAddr));
+        // only shareholders can delegate shares to a proxy
         if (proxyUser.role === 2 && proxyUser.isReg === true) {
             var txId = await delegateToProxy(delegAddr, true, blockIndex, getActiveUserAddress());
             if (txId.charAt(1) === 'x') {
@@ -36,52 +35,40 @@ $(document).ready(async function() {
         
     });
 
+    // start the interval for updating the current proposal count 
     $('a[href="#voting"]').click(async function() {
       numOfProp = 0;
       const activeUserAdr = getActiveUserAddress();
-      //console.log(users);
-      //console.log(users[activeUser].shares);
       var user = mapShareholder(await getShareholder(activeUserAdr));
-      
       setTimeout(function() {
         $('main #refresh-proposal').css('visibility', 'hidden');
         $('main strong[id="shares"]').html(user.shares);
 
         votingInterval = setInterval(async function() {
             var proposalCount = parseInt(await getNumOfProposals());
-    
+            // check whether new proposals has been added
             if (numOfProp == proposalCount) {
-                //console.log('proposal count has not changed.');
-                //console.log('numOfProp: ' + numOfProp);
                 return;
             }
+            // if so the current proposal count is updated
             numOfProp = proposalCount;
-            //const e = new Event('click');
-            console.log($('main #refresh-proposal'));
+            // the proposal list is loaded again with all new proposals
             $('main #refresh-proposal').trigger('click');
-            //var propRefreshBut = document.getElementById('main input[id="refresh-proposal"]');
-            //console.log(propRefreshBut);
-            //propRefreshBut.dispatchEvent(e);
-            //console.log('proposalCount: ' + proposalCount);
-            //console.log('numOfProp: ' + numOfProp);
           }, 1000);
-
       }, 1000);
 
-
+        // refreshed the proposal list if the proposal related state changes
         $('main').on('click', 'input[id="refresh-proposal"]', async function() {
             $('main table tr').not('tr[id="table-header"]').empty();
-
-            //console.log('amount of tr elements: ' + $('main table tr').length);
+            // specify that different voting options belong to a single proposal
             var radioCount = 0;
-            console.log('refresh props num: ' + numOfProp);
+            // iterate over all proposals
             for (var i = 0; i < numOfProp; i++) {
                 var currProp = await getProposal(i);
                 const mappedProp = mapProposal(currProp);
-                console.log(mappedProp);
                 const splits = mappedProp.options.split(',');
                 var wrapper = $('<div></div>');
-                
+                // iterate over all voting options of a specific proposal
                 for (var j = 0; j < splits.length; j++) {
                     var optionBut = $(
                         `<div>
@@ -90,18 +77,15 @@ $(document).ready(async function() {
                     );
                     wrapper.append(optionBut);
                 }
+                // the abstain option is autmatically added
                 wrapper.append($(
                     `<div>
                         <label><input type="radio" id="abstain" name="${radioCount}">abstain</label>
                     </div>`
                 ));
-                //console.log('before download');
-                console.log('prop hash: ' + mappedProp.proposalDescription);
-                //var propDescription = await downloadString(mappedProp.proposalHash);
                 var propDescription = mappedProp.proposalDescription;
-                //console.log('after download');
-                //console.log('propDescription: ' + propDescription);
                 ++radioCount;
+                // append a proposal entry to the table including the description and all voting options
                 $('main table').append(
                     `<tr class="list-group-item-info">
                         <td>${propDescription}</td>
@@ -109,30 +93,21 @@ $(document).ready(async function() {
                     </tr>`
                 );
             }
-
-            //console.log(document.body);
         });
 
+        // invokes the voting logic in the contract and does additional validation
         $('main').on('click', 'input[id="vote-button"]', async function() {
             const activeUserAdr = getActiveUserAddress();
-            console.log($('main input[type="radio"]:checked'));
             var selectedOptions = $('main input[type="radio"]:checked');
-            console.log('length: ' + selectedOptions.length);
+            // the shareholder has to select at least one voting option
             if (selectedOptions.length === 0) {
                 createAlert('You did not choose any option.', 'danger');
-                console.log('no options selected')
                 return;
             }
-            //var hasVoted;
             var txId;
             for (var l = 0; l < selectedOptions.length; l++) {
-                /*console.log(selectedOptions[l]);
-                console.log(parseInt(selectedOptions[l].name));
-                console.log(selectedOptions[l].nextSibling.data.trim());*/
-                //hasVoted = await hasVoted(parseInt(selectedOptions[l].name));
+                // each selected radio button per proposal represents one vote including the proposal id and selected option
                 txId = await vote(parseInt(selectedOptions[l].name), selectedOptions[l].nextSibling.data.trim(), activeUserAdr);
-                console.log(txId);
-                console.log(typeof(txId));
             }
             if (txId.charAt(1) === 'x') {
                 createAlert('You successfully casted your votes!');
@@ -141,12 +116,12 @@ $(document).ready(async function() {
             }
         });
 
+        // invokes the denomination logic in the contract
         $('main').on('click', 'input[id="denominate-button"]', async function() {
             const numOfBlocks = parseInt($('#block-number').val());
             const factor = parseInt($('#factor').val());
-            console.log('typeof factor: ' + typeof(factor));
             const txId = await denominateVotingTokens(numOfBlocks, factor, getActiveUserAddress());
-            //console.log(txId);
+            // if no TX hash is returned then the TX was not successfull
             if (!(txId.charAt(1) === 'x')) {
                 createAlert('You do not own enough shares!', 'danger');
                 return;
@@ -154,6 +129,7 @@ $(document).ready(async function() {
             var shareholder = mapShareholder(await getShareholder(getActiveUserAddress()));
             $('#shares').html(shareholder.shares);
             const denomList = $('<ol class="list-group"></ol>');
+            // appends share blocks to the denomination list in the UI with a specific weight depending on the given params
             for (var i = 1; i <= numOfBlocks; i++) {
                 denomList.append($(
                     `<li class="list-group-item list-group-item-primary" id="${i}">
@@ -163,79 +139,53 @@ $(document).ready(async function() {
                     </li>`
                 ));
             }
-            /*
-              <ol>
-                <li id="first">1. shareblock:  5 <input id="deleg-butt-first"></input></li>
-                <li id="second">2. shareblock:  5</li>
-                <li>3. shareblock:  5</li>
-              <ol>
-            */
             $('main div[id="voting-denomination-list"]').append(denomList.html());
         });
 
+        // invokes the simple delegation logic in the Shareholder contract meaning that all shares get delegated
         $('main').on('click', 'input[id="delegate-button"]', async function() {
-            //const delegStyle = $('#delegation-style').val();
-            //console.log(typeof(delegStyle));
             const proxyAdr = $('#proxy-address').val();
             var shareholder = mapShareholder(await getShareholder(getActiveUserAddress()));
             var currShares = shareholder.shares;
-            //const blockIndex = parseInt($('#block-index').val());
             var proxyUser = mapUser(await getUser(proxyAdr));
+            // only registered shareholders can delegate
             if (proxyUser.role === 2 && proxyUser.isReg === true) {
                 const txId = await delegateToProxy(proxyAdr, false, 0, getActiveUserAddress());
                 if (txId.charAt(1) === 'x') {
                     shareholder = mapShareholder(await getShareholder(getActiveUserAddress()));
                     $('#shares').html(shareholder.shares);
-                    //$(`main li[id="${blockIndex}"]`).remove();
                     createAlert(`You succesfully delegated all your shares: ${currShares} to the proxy: ${proxyAdr}`)
                 }
             } else {
                 createAlert('Proxy is not a shareholder or is not a registered user!', 'danger');
-
             }
-            //console.log(getActiveUserAddress());
-            //console.log(typeof(getActiveUserAddress()));
-            //const currShares = $('main strong[id="shares"]').html();
-            //const sharesToDelegate = $(`li[id=${blockIndex}]`).html();
-            //setUserShares( activeUser, (currShares - sharesToDelegate) );
         });
     });
 
-    /*setInterval(async function() {
-        const denomArr = await getVotingDenominations();
-        console.log(denomArr);
-    }, 3000)*/
-
+    // invokes the proposal creation logic in the AgmOwner contract
     $('main').on('click', 'input[id="proposal-creator-button"]', async function() {
         const activeUserAddress = getActiveUserAddress();
-        console.log('activeUserAddress: ' + activeUserAddress);
-        //console.log('ownerAddress: ' + ownerAddress);
-        //console.log('activeUserAdr: ' + activeUserAddress);
-        //console.log('owner: ' + owner.toUpperCase());
-        /*console.log(await getOwners());
-        console.log('hasPermission: ' + (await getOwners()).includes(activeUserAddress.toLowerCase()))*/
+        // the caller should have admin rights
         if (!(await getOwners()).includes(activeUserAddress)) {
             createAlert('You have currently no permission to setup the AGM', 'danger');
             return;
         }
-        
         const propName = $('#proposal-name').val();
         const propDescription = $('#proposal-description').val();
         var propHash = await upload(propDescription);
         const propOptions = $('#proposal-options').val();
         const parts = propOptions.split(',');
         var propId = (await getPropId()).toNumber();
-        console.log('propId: ' + propId);
+        // iterate over all voting options and append them to the proposal Id => options mapping
         for (var i = 0; i < parts.length; i++) {
             await appendVotingOptionToProposal(propId, parts[i].trim(), activeUserAddress);
         }
+        // abstain is also automatically added in the contract
         await appendVotingOptionToProposal(propId, 'abstain', activeUserAddress);
         await createProposal(propName, propHash, propOptions, activeUserAddress);
+        // to ensure that the next proposal's options are not stored together with the previous proposal
         await incrementPropId(activeUserAddress);
-        // store propId in contract if proposal creation is splitted
-        //console.log(activeUserAddress, propName, propDescription, propOptions);
     });
-
 });
 
 export function mapProposal(propArr) {
@@ -261,15 +211,3 @@ function mapShareholder(shArr) {
 export function getVotingInterval() {
     return votingInterval;
 }
-
-/*
-<td>
-    <select>
-        <option value="simple">simple</option>
-        <option value="partial">partial</option>
-    </select>
-</td>
-<td>
-    <input type="text" placeholder="0x...">
-</td>
-*/

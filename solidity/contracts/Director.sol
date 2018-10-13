@@ -1,6 +1,5 @@
 pragma solidity ^0.4.23;
 
-import "./VotingStatistic.sol";
 import "./User.sol";
 import "./QandA.sol";
 

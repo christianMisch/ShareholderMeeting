@@ -4,7 +4,7 @@ import {getVotingOption, getWeightOfShareholder, getNumOfVotingShareholders, get
 import {mapProposal} from './voting';
 
 /**
- * @summary this file provides functions for the implementation of the AGM setup process and includes following features:
+ * @summary this file provides functions for the implementation of the AGM setup process in the UI and includes following features:
  *          - create a proposal
  *          - add/remove a user
  *          - transfer admin rights to another director
@@ -21,7 +21,6 @@ var shareholdersSortedByWeight = [];
 $(document).ready(function() {
 
     $('a[href="#setup"]').click(function() {
-        
         // event delegation in jquery => event handler can be registered also if the specified template is not loaded
         $('main').on('click', 'input[id="add-user-button"]', async function() {
             const activeUserAddress = getActiveUserAddress();

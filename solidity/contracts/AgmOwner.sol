@@ -242,7 +242,7 @@ contract AgmOwner is User {
     /**
     *   @dev create a new proposal
     *   @param _name name of the proposal
-    *   @param _ipfs_hash description of the proposal
+    *   @param description of the proposal
     *   @param _options different voting options of the proposal
     *   @return propId the id of the proposal  
     */

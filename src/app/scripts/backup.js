@@ -483,3 +483,131 @@ contract VotingStatistic {
         }
     } 
 }*/
+
+
+// qAndA.js
+
+/*
+
+for (var i = 0; i < questNum; i++) {
+                var currQuestArr = await getQuestion(i);
+                console.log(currQuestArr);
+                var mappQuest = mapQuestion(currQuestArr);
+                var qaWrapper = $(
+                    `<div>
+                            <a href="#question-${i+1}" class="list-group-item list-group-item-action flex-column align-items-start list-group-item-danger">
+                                <div id="${i + 1}"> Question ${i + 1}: ${mappQuest.content} </div>
+                            </a>
+                    </div>`
+                );
+
+                console.log(qaWrapper.html());
+                $('main #quest-answ-list').append(qaWrapper.html());
+                var divWrapper = $('<div></div>');
+                var ansWrapper = $('<ol class="list-group"></ol>');
+                var count = 0;
+                for (var j = 0; j < answNum; j++) {
+                    console.log(j);
+                    var currAnswArr = await getAnswer(j);
+                    console.log(currAnswArr);
+                    var mappAnsw = mapAnswer(currAnswArr);
+                    if (mappAnsw.questionId === i) {
+                        ansWrapper.append(`<li class="list-group-item list-group-item-action flex-column align-items-start list-group-item-success">Answer ${count + 1}: ${mappAnsw.content}</li>`);
+                        count++;
+                    }
+                }
+                divWrapper.append(ansWrapper);
+                console.log(divWrapper.html());
+                $(`main div[id="${i + 1}"]`).append(divWrapper.html());
+            }
+
+        //console.log(document.body);
+
+        }, 1000);
+
+*/
+
+
+/*
+for (;!allVisited; allVisited = visitedArr.filter(q => q.visited === true).length === questNum.toNumber()) {
+                priorityMetric = 0;
+                console.log(questNum);
+                console.log(visitedArr.filter(q => q.visited === true).length);
+                console.log(allVisited);
+                console.log(visitedArr);
+
+                for (var i = 0; i < questNum; i++) {
+
+                    var currQuestArr = await getQuestion(i);
+                    //console.log(currQuestArr);
+                    var mappQuest = mapQuestion(currQuestArr);
+                    var questPriority = mappQuest.upvotes - mappQuest.downvotes;
+                    console.log(mappQuest.questionId, questPriority);
+                    //console.log(mappQuest.questionId + ': ' + questPriority);
+
+                    if (questPriority >= priorityMetric
+                        && !(visitedArr.map(q => q.questId).includes(mappQuest.questionId)) ) {
+                        //console.log('inner if');
+                        priorityMetric = questPriority;
+                        visitedArr.push({questId: mappQuest.questionId, visited: true});
+                        var qaWrapper = $(
+                            `<div>
+                                    <a href="#question-${i+1}" class="list-group-item list-group-item-action flex-column align-items-start list-group-item-danger">
+                                        <div id="${i + 1}"> Question ${questCount++}: ${mappQuest.content} </div>
+                                    </a>
+                            </div>`
+                        );
+
+                        //console.log(qaWrapper.html());
+                        $('main #quest-answ-list').append(qaWrapper.html());
+                        var divWrapper = $('<div></div>');
+                        var ansWrapper = $('<ol class="list-group"></ol>');
+                        var count = 0;
+                        for (var j = 0; j < answNum; j++) {
+                            //console.log(j);
+                            var currAnswArr = await getAnswer(j);
+                            //console.log(currAnswArr);
+                            var mappAnsw = mapAnswer(currAnswArr);
+                            if (mappAnsw.questionId === i) {
+                                ansWrapper.append(`<li class="list-group-item list-group-item-action flex-column align-items-start list-group-item-success">Answer ${count + 1}: ${mappAnsw.content}</li>`);
+                                count++;
+                            }
+                        }
+                        divWrapper.append(ansWrapper);
+                        //console.log(divWrapper.html());
+                        $(`main div[id="${i + 1}"]`).append(divWrapper.html());
+                    }
+
+
+                }
+            }
+            visitedArr = [];
+            console.log('escaped for loop');
+*/
+
+// statistics.js
+
+/*import {getIsFinished} from '../../provider/AgmOwnerProvider';
+import {getNumOfVotingOptions, getVotingOption, getWeightOfShareholder, getNumOfVotingShareholders, getNumOfProposals, getTotalVoteCount, appendVotingOptionToProposal, getProposal} from '../../provider/ProposalProvider';
+import {finishAGM, createProposal, addUser, removeUser, getUser, getNumOfUsers, getOwnerAddress, transferOwnership, getOwners, hasPermission, executeProposal} from '../../provider/AgmOwnerProvider';
+import {getActiveUserAddress, createAlert, showView} from './authentication';
+import {mapProposal} from './voting';
+
+$(function() {
+
+    
+});*/
+
+// voting.js
+
+/*
+<td>
+    <select>
+        <option value="simple">simple</option>
+        <option value="partial">partial</option>
+    </select>
+</td>
+<td>
+    <input type="text" placeholder="0x...">
+</td>
+*/
