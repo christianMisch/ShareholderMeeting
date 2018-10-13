@@ -1,4 +1,4 @@
-import {finishAGM, addUser, removeUser, getNumOfUsers, transferOwnership, getOwners, executeProposal, getIsFinished, getUser} from '../../provider/AgmOwnerProvider';
+import {finishAGM, addUser, removeUser, transferOwnership, getOwners, executeProposal, getIsFinished, getUser} from '../../provider/AgmOwnerProvider';
 import {getActiveUserAddress, createAlert, showView, mapUser} from './authentication';
 import {getVotingOption, getWeightOfShareholder, getNumOfVotingShareholders, getNumOfProposals, getProposal} from '../../provider/ProposalProvider';
 import {mapProposal} from './voting';

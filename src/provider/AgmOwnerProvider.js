@@ -1,39 +1,29 @@
 import AgmOwnerJson from '../../solidity/build/contracts/AgmOwner.json';
 import QandAJson from '../../solidity/build/contracts/QandA.json';
-//import {web3} from '../app/scripts/index';
 import web3 from './web3Provider';
 import {default as contract} from 'truffle-contract'; 
 
-//const ownerAccount = web3Provider.eth.accounts[0];
+/**
+ * @summary provider component for invoking functionality of the AgmOwner contract from the frontend
+ */
 
-//console.log(web3);
+ // application binary interface (ABI) of the contract in json format
 const AgmOwnerContract = contract(AgmOwnerJson);
+// the web3 provider has to be set to interact with the contract
 AgmOwnerContract.setProvider(web3.currentProvider);
 var AgmOwner;
-
 const QandAContract = contract(QandAJson);
 QandAContract.setProvider(web3.currentProvider);
 var QandA;
-
-
-const gas = /*'220000'*/ '3000000';
+// the maximum gas limit of a TX
+const gas = '3000000';
 
 export function transferOwnership(newOwnerAdr, from) {
-    //console.log('web3 accounts: ' + web3Provider.eth.accounts);
-    //console.log('web3 default account: ' + web3Provider.eth.defaultAccount);
-    //web3Provider.eth.defaultAccount = web3Provider.eth.accounts[0];
-    //web3Provider.personal.unlockAccount(web3Provider.eth.defaultAccount);
-    //console.log('web3 default account: ' + web3Provider.eth.defaultAccount);
-    //const receiver = web3Provider.eth.accounts[2];
-
+    // the contract has already been deployed in the migrations
     AgmOwnerContract.deployed().then(function(instance) {
         AgmOwner = instance;
-        /*AgmOwner.userAddress.call().then(function(result) {
-            console.log('userAddress: ' + result); 
-        });*/
         return AgmOwner.transferOwnership.sendTransaction(newOwnerAdr, {from: from});
     }).then(function(result) {
-        console.log(result);
         alert('transferOwnership TX was successful: ' + result);
     }).catch(function(error) {
         console.log(error);
@@ -46,27 +36,11 @@ export function getOwnerAddress(from) {
         return AgmOwner.getOwnerAddress.call({from: from});
     }).then(function(result) {
         console.log(result);
-        //alert('getOwnerAddress call was successful: ' + result);
         return result;
     }).catch(function(error) {
         console.log(error);
     });   
 }
-
-export function hasPermission(from) {
-    return AgmOwnerContract.deployed().then(function(instance) {
-        AgmOwner = instance;
-        return AgmOwner.hasPermission.call({from: from});
-    }).then(function(result) {
-        console.log(result);
-        //alert('hasPermission call was successful: ' + result);
-        return result;
-    }).catch(function(error) {
-        console.log(error);
-    });   
-}
-
-
 
 export function getOwners() {
     return AgmOwnerContract.deployed().then(function(instance) {
@@ -74,7 +48,6 @@ export function getOwners() {
         return AgmOwner.getOwners.call();
     }).then(function(result) {
         console.log(result);
-        //alert('getOwners call was successful: ' + result);
         return result;
     }).catch(function(error) {
         console.log(error);
@@ -87,7 +60,6 @@ export function getIsAnnounced() {
         return AgmOwner.getIsAnnounced.call();
     }).then(function(result) {
         console.log(result);
-        //alert('getOwners call was successful: ' + result);
         return result;
     }).catch(function(error) {
         console.log(error);
@@ -100,7 +72,6 @@ export function getIsFinished() {
         return AgmOwner.getIsFinished.call();
     }).then(function(result) {
         console.log(result);
-        //alert('getOwners call was successful: ' + result);
         return result;
     }).catch(function(error) {
         console.log(error);
@@ -113,10 +84,10 @@ export function announceAGM(from) {
     }).then(function() {
         return AgmOwner.announceAGM.sendTransaction({from: from, gas: gas});
     }).then(function(result) {
-        //alert(result);
+        alert('announceAGM TX was successfull: ' + result);
         return result;
     }).catch(function(error) {
-        console.log(error);
+        console.log('Error during announceAGM TX: ' + error.message);
     })
 }
 
@@ -124,15 +95,14 @@ export function addUser(address, role, votingWeight, sender) {
     console.log('addUser sender: ' + sender);
     QandAContract.deployed().then(function(depQandA) {
         QandA = depQandA;
-        //console.log(QandA.address);
         return AgmOwnerContract.deployed();
     }).then(function(depAgmOwner) {
         AgmOwner = depAgmOwner;
         return AgmOwner.addUser.sendTransaction(address, role, votingWeight, QandA.address, {from: sender, gas: gas});
     }).then(function(result) {
-        alert('addUser transaction was successful: ' + result);
+        alert('addUser TX was successful: ' + result);
     }).catch(function(error) {
-        console.log('error during addUser TX: ' + error);
+        console.log('error during addUser TX: ' + error.message);
     })
 }
 
@@ -163,7 +133,6 @@ export function getUser(address) {
         AgmOwner = deplOwner;
         return AgmOwner.getUser.call(address);
     }).then(function(result) {
-        //alert('getUser call was successful: ' + result);
         return result;
     }).catch(function(error) {
         console.log('Error during getUser call: ' + error.message);
@@ -175,7 +144,7 @@ export function finishAGM(from) {
         AgmOwner = deplOwner;
         return AgmOwner.finishAGM.sendTransaction({gas: gas, from: from});
     }).then(function(result) {
-        //alert('finishAGM TX was successful: ' + result);
+        alert('finishAGM TX was successful: ' + result);
     }).catch(function(error) {
         console.log('Error during finishAGM TX: ' + error.message);
     });
@@ -184,9 +153,6 @@ export function finishAGM(from) {
 export function createProposal(name, hash, options, from) {   
     return AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
-        AgmOwner.userAddress.call().then(function(result) {
-            console.log('userAddress: ' + result); 
-        });
         return AgmOwner.createProposal.sendTransaction(name, hash, options, {from: from, gas: gas});
     }).then(function(result) {
         alert('createProposal TX was successful: ' + result);
@@ -201,7 +167,6 @@ export function getUserList() {
         AgmOwner = deplOwner;
         return AgmOwner.getUserList.call();
     }).then(function(result) {
-        alert('getUserList call was successful: ' + result);
         return result;
     }).catch(function(error) {
         console.log('Error during getUserList call: ' + error.message);
@@ -214,7 +179,7 @@ export function executeProposal(proposalId, from) {
     }).then(function() {
         return AgmOwner.executeProposal(proposalId, {from: from, gas: gas});
     }).then(function(result) {
-        alert('executeProposal TX was successful: ' + result);
+        console.log('executeProposal TX was successful: ' + result);
         return result;
     }).catch(function(error) {
         console.log('Error during executeProposal TX: ' + error);
@@ -226,8 +191,7 @@ export function setAgenda(agenda, from) {
         AgmOwner = deplOwner;
         return AgmOwner.setAgenda.sendTransaction(agenda, {from: from, gas: gas});
     }).then(function(result) {
-        alert('setAgenda TX was successful: ' + result);
-        //return result;
+        console.log('setAgenda TX was successful: ' + result);
     }).catch(function(error) {
         console.log('Error during setAgenda TX: ' + error.message);
     });
@@ -238,8 +202,7 @@ export function setMeetingPlace(place, from) {
         AgmOwner = deplOwner;
         return AgmOwner.setMeetingPlace.sendTransaction(place, {from: from, gas: gas});
     }).then(function(result) {
-        alert('setMeetingPlace TX was successful: ' + result);
-        //return result;
+        console.log('setMeetingPlace TX was successful: ' + result);
     }).catch(function(error) {
         console.log('Error during setMeetingPlace TX: ' + error.message);
     });
@@ -250,8 +213,7 @@ export function setMeetingStartTime(start, from) {
         AgmOwner = deplOwner;
         return AgmOwner.setMeetingStartTime.sendTransaction(start, {from: from, gas: gas});
     }).then(function(result) {
-        alert('setMeetingStartTime TX was successful: ' + result);
-        //return result;
+        console.log('setMeetingStartTime TX was successful: ' + result);
     }).catch(function(error) {
         console.log('Error during setMeetingStartTime TX: ' + error.message);
     });
@@ -262,8 +224,7 @@ export function setMeetingEndTime(end, from) {
         AgmOwner = deplOwner;
         return AgmOwner.setMeetingEndTime.sendTransaction(end, {from: from, gas: gas});
     }).then(function(result) {
-        alert('setMeetingEndTime TX was successful: ' + result);
-        //return result;
+        console.log('setMeetingEndTime TX was successful: ' + result);
     }).catch(function(error) {
         console.log('Error during setMeetingEndTime TX: ' + error.message);
     });
@@ -274,8 +235,7 @@ export function setMeetingName(name, from) {
         AgmOwner = deplOwner;
         return AgmOwner.setMeetingName.sendTransaction(name, {from: from, gas: gas});
     }).then(function(result) {
-        alert('setMeetingName TX was successful: ' + result);
-        //return result;
+        console.log('setMeetingName TX was successful: ' + result);
     }).catch(function(error) {
         console.log('Error during setMeetingName TX: ' + error.message);
     });
@@ -286,11 +246,9 @@ export function getAgenda() {
         AgmOwner = instance;
         return AgmOwner.agenda.call();
     }).then(function(result) {
-        console.log(result);
-        //alert('getAgenda call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log(error);
+        console.log('Error during getAgenda call: ' + error.message);
     });   
 }
 
@@ -299,11 +257,9 @@ export function getMeetingStartTime() {
         AgmOwner = instance;
         return AgmOwner.meetingStartTime.call();
     }).then(function(result) {
-        console.log(result);
-        //alert('getMeetingStartTime call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log(error);
+        console.log('Error during getMeetingStartTime call: ' + error.message);
     });   
 }
 
@@ -312,11 +268,9 @@ export function getMeetingEndTime() {
         AgmOwner = instance;
         return AgmOwner.meetingEndTime.call();
     }).then(function(result) {
-        console.log(result);
-        //alert('getMeetingEndTime call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log(error);
+        console.log('Error during getMeetingEndTime call: ' + error.message);
     });   
 }
 
@@ -325,11 +279,9 @@ export function getMeetingPlace() {
         AgmOwner = instance;
         return AgmOwner.meetingPlace.call();
     }).then(function(result) {
-        console.log(result);
-        //alert('getMeetingPlace call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log(error);
+        console.log('Error during getMeetingPlace call: ' + error.message);
     });   
 }
 
@@ -338,11 +290,9 @@ export function getMeetingName() {
         AgmOwner = instance;
         return AgmOwner.meetingName.call();
     }).then(function(result) {
-        console.log(result);
-        //alert('getMeetingName call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log(error);
+        console.log('Error during getMeetingName call: ' + error.message);
     });   
 }
 
@@ -352,7 +302,6 @@ export function registerUser(secretPW, from) {
         return AgmOwner.registerUser.sendTransaction(secretPW, {from: from, gas: gas});
     }).then(function(result) {
         alert('registerUser TX was successful: ' + result);
-        //return result;
     }).catch(function(error) {
         console.log('Error during registerUser TX: ' + error.message);
     });
@@ -363,11 +312,9 @@ export function getUserId(address) {
         AgmOwner = instance;
         return AgmOwner.userId.call(address);
     }).then(function(result) {
-        console.log(result);
-        //alert('getUserId call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log(error);
+        console.log('Error during getUserId call: ' + error.message);
     });   
 }
 
@@ -376,10 +323,8 @@ export function getUserPW(address) {
         AgmOwner = instance;
         return AgmOwner.secretPWs.call(address);
     }).then(function(result) {
-        console.log(result);
-        //alert('getUserPW call was successful: ' + result);
         return result;
     }).catch(function(error) {
-        console.log(error);
+        console.log('Error during getUserPW call: ' + error.message);
     });   
 }

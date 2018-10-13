@@ -611,3 +611,96 @@ $(function() {
     <input type="text" placeholder="0x...">
 </td>
 */
+
+// ownerprovider.js
+
+// export function hasPermission(from) {
+//     return AgmOwnerContract.deployed().then(function(instance) {
+//         AgmOwner = instance;
+//         return AgmOwner.hasPermission.call({from: from});
+//     }).then(function(result) {
+//         console.log(result);
+//         //alert('hasPermission call was successful: ' + result);
+//         return result;
+//     }).catch(function(error) {
+//         console.log(error);
+//     });   
+// }
+
+
+// ipfsProvider.js
+
+/*"/dns4/ams-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLer265NRgSp2LA3dPaeykiS1J6DifTC88f5uVQKNAd",
+                  "/dns4/lon-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLMeWqB7YGVLJN3pNLQpmmEk35v6wYtsMGLzSr5QBU3",
+                  "/dns4/sfo-3.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLPppuBtQSGwKDZT2M73ULpjvfd3aZ6ha4oFGL1KrGM",
+                  "/dns4/nyc-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLueR4xBeUbY9WZ9xGUUxunbKWcrNFTDAadQJmocnWm",
+                  "/dns4/nyc-2.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64"*/
+                //'/dns4/lon-1.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLMeWqB7YGVLJN3pNLQpmmEk35v6wYtsMGLzSr5QBU3',
+                    //'/dns4/nyc-2.bootstrap.libp2p.io/tcp/443/wss/ipfs/QmSoLV4Bbm51jM9C4gDYZQ9Cy3U6aXMJDAbzgu2fzaDs64',
+
+
+/*
+
+// import * as AgmOwnerArtifact from './../artifacts/contracts/AgmOwner';
+
+//console.log(AgmOwnerArtifact);
+
+const IPFS = require('ipfs');
+const series = require('async/series');
+
+
+const node = new IPFS();
+
+series([
+    (cb) => node.on('ready', cb),
+    (cb) => node.version((err, version) => {
+      if (err) { return cb(err) }
+      console.log('Version:', version.version)
+      cb()
+    }),
+    (cb) => node.files.add({
+      path: 'hello.txt',
+      content: Buffer.from('Hello World 101')
+    }, (err, filesAdded) => {
+      if (err) { return cb(err) }
+  
+      console.log('\nAdded file:', filesAdded[0].path, filesAdded[0].hash)
+      fileMultihash = filesAdded[0].hash
+      cb()
+    }),
+    (cb) => node.files.cat(fileMultihash, (err, data) => {
+      if (err) { return cb(err) }
+  
+      console.log('\nFile content:')
+      process.stdout.write(data)
+    })
+])
+ */
+
+// ProposalProvider.js
+
+/*export function appendVotingOption(opt, from) {
+    return FactoryContract.deployed().then(function(deplFac) {
+        Factory = deplFac;
+        //Factory.getNumOfProposals.estimateGas().then(function(result){console.log('estimateGas: ' + result)});
+        return Factory.appendVotingOption.sendTransaction(opt, {gas: gas, from: from});
+    }).then(function(result) {
+        //alert('getNumOfProposals call was successful: ' + result);
+    }).catch(function(error) {
+        console.log('Error during getNumOfProposals call: ' + error.message);
+    }); 
+}*/
+
+// ShareholderProvider
+
+/*export function getVotingDenominations() {
+  return ShareholderContract.deployed().then(function (deplShareh) {
+    Shareholder = deplShareh;
+    return Shareholder.getVotingDenominations.call();
+  }).then(function (result) {
+    //alert('getVotingDenominations TX was successful: ' + result);
+    return result;
+  }).catch(function (error) {
+    console.log('error during getVotingDenominations TX: ' + error.message);
+  });
+}*/
