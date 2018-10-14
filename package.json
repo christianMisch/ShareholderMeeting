@@ -16,9 +16,12 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cd config && npx webpack --config webpack.development.config.js",
+    "build": "webpack",
+    "build-dev": "cd config && npx webpack --config webpack.development.config.js",
+    "build-prod": "cd config && npx webpack --config webpack.production.config.js",
     "deploy-dev": "cd solidity && truffle compile --all && truffle migrate --reset",
-    "deploy-prod": "cd solidity && truffle compile --all && truffle migrate --network production --reset"
+    "deploy-prod": "cd solidity && truffle compile --all && truffle migrate --network production --reset",
+    "start": "webpack-dev-server --open"
   },
   "repository": {
     "type": "git",
