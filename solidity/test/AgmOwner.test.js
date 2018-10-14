@@ -3,8 +3,6 @@ const Shareholder = artifacts.require('./Shareholder.sol');
 const Factory = artifacts.require('./Factory.sol');
 const QandA = artifacts.require('./QandA.sol');
 const AgmOwnerDeployer = require('./utils/AgmOwnerDeployer.js')(AgmOwner);
-
-
 const should = require('should');
 const expect = require('expect');
 
@@ -20,10 +18,6 @@ contract('AgmOwner', async (accounts) => {
         factory = await Factory.new();
         qa = await QandA.deployed();
         contract =  await AgmOwnerDeployer(accounts[0], factory.address);
-        //contract2 = AgmOwnerDeployer(accounts[0], factory.address);
-        //console.log(contract);
-        // console.log('contract 2');
-        // console.log(contract2);
         shareholder = await Shareholder.new(accounts[9], 20, factory.address, qa.address);
         helper = await require('./utils/HelperFunctions.js')(factory,_);
         expect(+await contract.getNumOfUsers.call()).toBe(1);
@@ -153,10 +147,10 @@ contract('AgmOwner', async (accounts) => {
 
     it('should ensure that a user can only be registered once', async () => {
         await contract.addUser.sendTransaction(accounts[6], 2, 23, qa.address);
-        await contract.registerUser.sendTransaction('somePassword', {from: accounts[6]});
+        await contract.registerUser.sendTransaction({from: accounts[6]});
 
         try {
-            await contract.registerUser.sendTransaction('somePassword', {from: accounts[6]});
+            await contract.registerUser.sendTransaction({from: accounts[6]});
             should.fail('This TX raises an error'); 
         } catch (error) {
             expect(error.message).toContain('VM Exception while processing transaction: revert')

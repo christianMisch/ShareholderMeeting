@@ -15,7 +15,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "cd solidity && truffle test",
     "build": "webpack",
     "build-dev": "cd config && npx webpack --config webpack.development.config.js",
     "build-prod": "cd config && npx webpack --config webpack.production.config.js",

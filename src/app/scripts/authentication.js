@@ -1,5 +1,5 @@
 import {
-    getUser, getIsAnnounced, announceAGM, setAgenda, setMeetingEndTime, setMeetingName, setMeetingPlace, getUserPW,
+    getUser, getIsAnnounced, announceAGM, setAgenda, setMeetingEndTime, setMeetingName, setMeetingPlace,
     setMeetingStartTime, getMeetingEndTime, getMeetingStartTime, getAgenda, getMeetingName, getMeetingPlace, registerUser, getUserId
 } from "../../provider/AgmOwnerProvider";
 import {getQAInterval} from './qAndA';
@@ -28,9 +28,9 @@ $(document).ready(async function() {
         // announce-wrapper contains the place, start and end time of the AGM
         $('main #announce-wrapper').hide();
     }
-    // retrieve the input address of the user who logged in => is stored for the whole browser session
-    if ( (sessionStorage.getItem('address') && mapUser(await getUser(sessionStorage.getItem('address'))).isReg === true) 
-            || sessionStorage.getItem('address') !== web3.eth.accounts[0]) {
+    // retrieve the input address of the user who logged in => is stored permanently in the local storage
+    if ( (localStorage.getItem('address') && mapUser(await getUser(localStorage.getItem('address'))).isReg === true) 
+            || localStorage.getItem('address') !== web3.eth.accounts[0]) {
         // only registered users can enter their password for login
         $('#secret-PW').show();
         $('#filler').show();
@@ -54,7 +54,7 @@ $(document).ready(async function() {
         $('#filler').attr('class', 'col-5');
         inputAdr = $('#wallet-address').val().toLowerCase();
         // store the input address of the user in the browser
-        sessionStorage.setItem('address', inputAdr);
+        localStorage.setItem('address', inputAdr);
         var secrPassword = $('#secret-PW').val();
         computeDayDiff();
         $('#timer-link').hide();
@@ -65,11 +65,11 @@ $(document).ready(async function() {
         // a registered user and the main administrator can always login
         } else if (inputAdr === web3.eth.accounts[0] || 
             (mapUser(await getUser(inputAdr)).isReg === true 
-            && await getUserPW(inputAdr) === secrPassword && secrPassword !== '0')) {
+            && localStorage.getItem('decrPW') === secrPassword && secrPassword !== '0')) {
                 showRoleBasedView();
         // a wrong entered password fails the login process
         } else if ( (mapUser(await getUser(inputAdr))).isReg === true 
-            && await getUserPW(inputAdr) !== secrPassword ) {
+            && localStorage.getItem('decrPW') !== secrPassword ) {
                 createAlert('Please type in also your password to authenticate yourself!', 'danger');
         // users cannot register in the app if the day difference is smaller than a week till the AGM
         } else if (mapUser(await getUser(inputAdr)).isReg === false && dayDiff < 6) {
@@ -187,7 +187,8 @@ $(document).ready(async function() {
     $('main').on('click', '#finish-button', async function() {
         var secPW = $('#decrPW').html();
         // the decrypted pw is stored in the user => pw mapping in the contract
-        await registerUser(secPW, inputAdr);
+        await registerUser(inputAdr);
+        localStorage.setItem('decrPW', secPW);
         showRoleBasedView();
     });
 

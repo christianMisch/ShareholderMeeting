@@ -45,6 +45,10 @@ async function ipfsInit() {
             node.on('stop', async() => {
                 console.log('The IPFS has been stopped');
             });
+
+            node.on('error', async() => {
+                console.log('Something went terribly wrong!');
+            })
         });
     } else {
         return node;

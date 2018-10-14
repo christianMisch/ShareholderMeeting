@@ -5,12 +5,17 @@ const ProposalData = artifacts.require("./ProposalData.sol");
 const Factory = artifacts.require("./Factory.sol");
 const QandA = artifacts.require("./QandA.sol");
 const User = artifacts.require("./User.sol");
+const DevelopmentContract = artifacts.require('./DevelopmentContract.sol');
 
 /**
  * @summary deploy the core contracts to the ganache test chain
  */
 module.exports = function(deployer, network, accounts) {
 
+
+    if (network === 'development') {
+        deployer.deploy(DevelopmentContract, true);
+    }
     const lowCaseAcc = accounts.map(acc => acc.toLowerCase());
     deployer.deploy(ProposalData);
     var f, qa;

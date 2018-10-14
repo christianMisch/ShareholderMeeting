@@ -28,9 +28,9 @@ contract QandA {
     }
 
     // storing the answers of directors
-    Answer[] public answers;
+    Answer[] private answers;
     // storing the questions of shareholders
-    Question[] public questions;
+    Question[] private questions;
 
     event InvalidRatingOption(address invoker);
     event QuestionUpvote(address invoker, uint numUpvotes);
@@ -41,7 +41,7 @@ contract QandA {
     */
 
     // increments the like or dislike count of a specific question, can only be triggered by shareholders
-    function setRating(uint questionId, uint ratingOpt, address sender) public {
+    function setRating(uint questionId, uint ratingOpt, address sender) external {
         Question storage question = questions[questionId];
         if (ratingOpt == 1) {
             question.upvotes++;
@@ -95,7 +95,7 @@ contract QandA {
     *   @param sender the creator of the answer
     *   @return answId the id of the new generated answer
     */
-    function createNewAnswer(uint _questionId, string _ipfs_hash, string sender) public returns(uint answId) {
+    function createNewAnswer(uint _questionId, string _ipfs_hash, string sender) external returns(uint answId) {
         answId = answers.length++;
         Answer storage answer = answers[answId];
         answer.answerId = answId;
@@ -111,7 +111,7 @@ contract QandA {
     *   @param sender who created the question
     *   @return questId the id of the new generated question
     */
-    function createNewQuestion(string _ipfs_hash, string sender) public returns (uint questId) {
+    function createNewQuestion(string _ipfs_hash, string sender) external returns (uint questId) {
         questId = questions.length++;
         Question storage question = questions[questId];
         question.questionId = questId;

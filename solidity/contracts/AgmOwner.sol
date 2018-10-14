@@ -13,25 +13,23 @@ contract AgmOwner is User {
     // reference to proposal storage
     Factory public fac;
     // total number of users
-    uint public numberOfUsers;
+    uint private numberOfUsers;
     // stores all users
-    User[] public users;
+    User[] private users;
     // stores user's address with corresponding id
-    mapping(address => uint) public userId;
-    // stores the decrypted password for any user
-    mapping(address => string) public secretPWs;
+    mapping(address => uint) private userId;
     // stores the owners who have permission to setup the AGM
-    address[] public owners;
+    address[] private owners;
     // timers for AGM process
-    bool public isFinished = false;
-    bool public isAnnounced = false;
+    bool private isFinished = false;
+    bool private isAnnounced = false;
     
     // params for AGM setup
-    string public meetingName;
-    string public agenda;
-    string public meetingPlace;
-    string public meetingStartTime;
-    string public meetingEndTime;
+    string private meetingName;
+    string private agenda;
+    string private meetingPlace;
+    string private meetingStartTime;
+    string private meetingEndTime;
 
     /**
     *    @dev checks whether the parameter is already set
@@ -207,15 +205,13 @@ contract AgmOwner is User {
 
     /**
     *   @dev for authentication, if users are registered once they only need their private password to login
-    *   @param decrPW - the randomly generated pw of the user which is stored in the address to pw mapping
     */
-    function registerUser(string decrPW) public {
+    function registerUser() public {
         uint usID = userId[msg.sender];
         require(usID != 0, "User has not been added to the user list");
         User u = users[usID];
         require(!u.isRegistered(), "The user has already been registered!");
         u.setIsRegistered(true);
-        secretPWs[msg.sender] = decrPW;
     }
 
     /**

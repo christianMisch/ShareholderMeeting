@@ -296,10 +296,10 @@ export function getMeetingName() {
     });   
 }
 
-export function registerUser(secretPW, from) {   
+export function registerUser(from) {   
     AgmOwnerContract.deployed().then(function(deplOwner) {
         AgmOwner = deplOwner;
-        return AgmOwner.registerUser.sendTransaction(secretPW, {from: from, gas: gas});
+        return AgmOwner.registerUser.sendTransaction({from: from, gas: gas});
     }).then(function(result) {
         alert('registerUser TX was successful: ' + result);
     }).catch(function(error) {
@@ -315,16 +315,5 @@ export function getUserId(address) {
         return result;
     }).catch(function(error) {
         console.log('Error during getUserId call: ' + error.message);
-    });   
-}
-
-export function getUserPW(address) {
-    return AgmOwnerContract.deployed().then(function(instance) {
-        AgmOwner = instance;
-        return AgmOwner.secretPWs.call(address);
-    }).then(function(result) {
-        return result;
-    }).catch(function(error) {
-        console.log('Error during getUserPW call: ' + error.message);
     });   
 }

@@ -7,7 +7,6 @@ const Factory = artifacts.require("./Factory.sol");
  */
 
 module.exports = async function(deployer, network) {
-    console.log(network);
     // the following TX are only migrated to the ganache test chain if the network is specified as 'development' in the command line
     // the migration files starting from 3_xxx... provide toy data for the test chain
     // if another network is specified the whole setup has be performed in the app

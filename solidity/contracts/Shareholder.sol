@@ -16,9 +16,9 @@ contract Shareholder is User, ProposalData {
     // list of all share blocks which are created during denomination
     uint[] public votingDenominations;
     // list of all delegations to proxies
-    Delegate[] public delegations;
+    Delegate[] private delegations;
     // to remember which shareholder rated on which specific question
-    mapping (uint => address) public ratings;
+    mapping (uint => address) private ratings;
     // possible rating options
     enum RatingOption {DOWNVOTE, UPVOTE}
 

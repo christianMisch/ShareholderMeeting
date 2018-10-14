@@ -14,21 +14,21 @@ import "./AgmOwner.sol";
 contract Factory is ProposalData {
 
     // stores a shareholder object to a specific user address
-    mapping(address => Shareholder) public shareholders;
+    mapping(address => Shareholder) private shareholders;
     // stores all available voting options for a specific proposal
-    mapping(uint => string[]) public propToOptMapping;
+    mapping(uint => string[]) private propToOptMapping;
     // stores all shareholders who casted their vote
-    address[] public votingShareholders;
+    address[] private votingShareholders;
     // stores all proposals
-    Proposal[] public proposals;
+    Proposal[] private proposals;
     // stores the voting weight of every user
     mapping(address => uint) public votingWeights;
     // stores the number of votes for a specific voting option
-    VotingOption[] public votingOptions;
+    VotingOption[] private votingOptions;
     // determines the minimum number of votes per proposal which is required to compute the tally and statistic
-    uint public minimumVotingQuorum;
+    uint private minimumVotingQuorum;
     // for incrementing the proposal id to assign the options the right proposal
-    uint public propId = 0;
+    uint private propId = 0;
 
     struct VotingOption {
         string optionName;
@@ -39,7 +39,7 @@ contract Factory is ProposalData {
     *   @dev getters and setters
     */
 
-    function setVote(uint proposalId, string votingOption, address sender) public {
+    function setVote(uint proposalId, string votingOption, address sender) external {
         Proposal storage prop = proposals[proposalId];
         require(prop.votedOnProposal[sender] != true, "The shareholder already voted");
         uint voteId = prop.votes.length++;
@@ -139,7 +139,7 @@ contract Factory is ProposalData {
     *   @param qa reference to access the Q&A lists
     *   @return sh a new Shareholder object 
     */
-    function createNewShareholder(address _userAddress, uint weight, QandA qa) public returns (Shareholder) {
+    function createNewShareholder(address _userAddress, uint weight, QandA qa) external returns (Shareholder) {
         Shareholder sh = new Shareholder(_userAddress, weight, this, qa);
         shareholders[_userAddress] = sh;
         return sh;
@@ -152,7 +152,7 @@ contract Factory is ProposalData {
     *   @param qa reference to access the Q&A lists
     *   @return d a new Director object
     */
-    function createNewDirector(address _userAddress, bool isAdministrator, QandA qa) public returns (Director) {
+    function createNewDirector(address _userAddress, bool isAdministrator, QandA qa) external returns (Director) {
         if (isAdministrator) {
             return new Director(_userAddress, isAdministrator, qa, 0);
         } else {
@@ -168,7 +168,7 @@ contract Factory is ProposalData {
     *   @param _options voting options of the proposal
     *   @return proposalId the id of the new created proposal
     */
-    function createNewProposal(string _name, string _description, string _options) public returns (uint proposalId) {
+    function createNewProposal(string _name, string _description, string _options) external returns (uint proposalId) {
         proposalId = proposals.length++;
         Proposal storage proposal = proposals[propId];
         proposal.proposalId = propId;
@@ -183,7 +183,7 @@ contract Factory is ProposalData {
     /**
     *   @dev increment the proposal id 
     */
-    function incrementPropId() public view {
+    function incrementPropId() public {
         propId++;
     }
 
