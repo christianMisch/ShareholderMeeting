@@ -17,7 +17,7 @@ contract AgmOwner is User {
     // stores all users
     User[] private users;
     // stores user's address with corresponding id
-    mapping(address => uint) private userId;
+    mapping(address => uint) public userId;
     // stores the owners who have permission to setup the AGM
     address[] private owners;
     // timers for AGM process
@@ -25,11 +25,11 @@ contract AgmOwner is User {
     bool private isAnnounced = false;
     
     // params for AGM setup
-    string private meetingName;
-    string private agenda;
-    string private meetingPlace;
-    string private meetingStartTime;
-    string private meetingEndTime;
+    string public meetingName;
+    string public agenda;
+    string public meetingPlace;
+    string public meetingStartTime;
+    string public meetingEndTime;
 
     /**
     *    @dev checks whether the parameter is already set

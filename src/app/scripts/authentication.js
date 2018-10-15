@@ -16,7 +16,7 @@ import web3 from '../../provider/web3Provider';
 // the Ethereum address (!= public key) of the user who logged in 
 var inputAdr;
 // store the difference of days between the AGM and the announce date
-var dayDiff;
+var dayDiff = 14;
 // style all sections
 var sectionStyleInterv;
 
@@ -56,7 +56,7 @@ $(document).ready(async function() {
         // store the input address of the user in the browser
         localStorage.setItem('address', inputAdr);
         var secrPassword = $('#secret-PW').val();
-        computeDayDiff();
+        //computeDayDiff();
         $('#timer-link').hide();
         // forward the main administrator to the AGM setup page to set the params of the AGM
         if (inputAdr === web3.eth.accounts[0] && !(await getIsAnnounced())) {
@@ -92,16 +92,15 @@ $(document).ready(async function() {
                     from_name: 'AGM administrator',
                     to_name: 'Chris',
                     from_mail: 'service_AGM@gmail.com',
-                    to_mail: 'mischok.christian@web.de',
                     message: encryptedData
                 };
-                emailjs.send('gmail', 'authentication_template', templateParams)
+                /*emailjs.send('gmail', 'authentication_template', templateParams)
                     .then(function(response) {
                         console.log('SUCCESS!', response.status, response.text);
                     }, function(error) {
                         console.log('FAILED...', error);
                     });
-                console.log('EMAIL WAS SENT!!!');
+                console.log('EMAIL WAS SENT!!!');*/
             }
         }
     });
@@ -156,7 +155,7 @@ $(document).ready(async function() {
             await setAgenda($('main #agenda-content').val(), getActiveUserAddress());
             await setMeetingName($('main #agm-name').val(), getActiveUserAddress())
             computeDayDiff();
-            if (dayDiff >= 30 && !(await getIsAnnounced()) )  {
+            if (dayDiff >= 30 /*&& !(await getIsAnnounced())*/ )  {
                 // can only be announced 30 or more days in prior of the AGM
                 await announceAGM(inputAdr);
                 showRoleBasedView();
@@ -311,10 +310,14 @@ async function computeDayDiff() {
     const MS_PER_DAY = 1000 * 60 * 60 * 24;
     var date = new Date();
     var startDate = await getMeetingStartTime();
+    if (startDate === undefined) {
+        return;
+    }
     //console.log(startDate.substring(0,4), startDate.substring(5,7), startDate.substring(8,10));
     var utc1 = Date.UTC(startDate.substring(0, 4), startDate.substring(5, 7), startDate.substring(8, 10));
     var utc2 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
-    dayDiff = Math.floor((utc1 - utc2) / MS_PER_DAY) - 30;
+    //dayDiff = Math.floor((utc1 - utc2) / MS_PER_DAY) - 30;
+    console.log(dayDiff);
     $('main #day-diff').html(dayDiff);
 }
 

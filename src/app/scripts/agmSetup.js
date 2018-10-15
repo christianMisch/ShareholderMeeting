@@ -8,7 +8,7 @@ import {mapProposal} from './voting';
  *          - create a proposal
  *          - add/remove a user
  *          - transfer admin rights to another director
- *          - finish/announce AGM 
+ *          - finish the AGM 
  */
 
 // total voting count of all proposals
@@ -164,12 +164,10 @@ function showStatistics() {
         // get only the first 50 shareholders
         shareholdersSortedByWeight.slice(0, 50);
         for (var b = 0; b < shareholdersSortedByWeight.length; b++) {
-            var selOpt = '';
             // append the address and weight of a specific shareholder to a table entry
             $('main #shareTable').append(
                 `<tr>
                     <td>${shareholdersSortedByWeight[b].adr}</td>
-                    <!--<td>${selOpt}</td>-->
                     <td>${shareholdersSortedByWeight[b].weight}</td>
                 </tr>`
             );
@@ -219,9 +217,11 @@ var Piechart = function(options){
         for (categ in this.options.data) {
             val = this.options.data[categ];
             // to identify which voting option has most of the votes => if so the voting option is marked red
-            var isWinnOpt = occurenceOfWinnOptCountOnlyOnce(this.options.winnCount, this.options.data) && isWinningOption(val, this.options.data);
+            var isWinnOpt = occurenceOfWinnOptCountOnlyOnce(this.options.winnCount, this.options.data) 
+                && isWinningOption(val, this.options.data);
             // the legend to the corresponding voting option is created
-            legendHTML += "<div><span style='display:inline-block;width:20px;background-color:" + (isWinnOpt ? '#ff0000' : this.colors[color_index]) + ";'>&nbsp;</span> " + categ + "</div>";
+            legendHTML += "<div><span style='display:inline-block;width:20px;background-color:" 
+                + (isWinnOpt ? '#ff0000' : this.colors[color_index]) + ";'>&nbsp;</span> " + categ + "</div>";
             var slice_angle = 2 * Math.PI * val / total_value;
             drawPieSlice(
                 this.ctx,

@@ -13,8 +13,6 @@ contract User {
     // different user roles
     enum Role {AGMOWNER, DIRECTOR, SHAREHOLDER}
 
-    event UserExists(bool exists);
-
     /**
     *   @dev the role is encoded as integer and the isRegistered flag is initialized to false
     */
