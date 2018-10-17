@@ -67,9 +67,13 @@ Next if you try to login again, then you need your public address *AND* your dec
 
 **Tests**
 
-Just run `npm run test` to all tests
+Just run `npm run test` to run all tests.
 
-but I prefer to switch to the `solidity` folder and run a specific test.js file by using the `truffle test test/<FILE_NAME>.test.js`
+But I prefer to switch to the `solidity` folder and run a specific test.js file by using the 
+
+`truffle test test/<FILE_NAME>.test.js`
+
+command.
 
 
 My environment
