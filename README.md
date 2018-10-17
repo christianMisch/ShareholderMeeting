@@ -65,10 +65,13 @@ Registration and Login
 
 Next if you try to login again, then you need your public address *AND* your decrypted password.
 
+**Tests**
 
+Just run `npm run test` to all tests
+
+but I prefer to switch to the `solidity` folder and run a specific test.js file by using the `truffle test test/<FILE_NAME>.test.js`
 
 
 My environment
 
 Mac OS X, Windows 10, Chrome
-
