@@ -1,5 +1,8 @@
 pragma solidity ^0.4.23;
 
+/**
+*   @dev initial migrations contract for deploying the contracts to the ganache test chain
+*/
 contract Migrations {
     address public owner;
     uint public last_completed_migration;

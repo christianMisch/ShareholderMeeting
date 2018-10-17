@@ -1,0 +1,135 @@
+@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+
+h1 {
+    text-align: center;
+}
+
+header p {
+    display: inline;
+}
+
+#login-form {
+    display: inline;
+}
+
+#login-form label {
+    text-align: right;
+}
+
+#login-content {
+    margin-bottom: 0 !important;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1em;
+    font-weight: 300;
+    line-height: 1.7em;
+}
+
+a, a:hover, a:focus {
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+#sidebar {
+    background: #7386D5;
+    color: #fff;
+    transition: all 0.3s;
+}
+
+#sidebar .sidebar-header {
+    background: #6d7fcc;
+    margin: 0;
+}
+
+#sidebar ul.components {
+    /*padding: 20px 0;
+    border-bottom: 1px solid #47748b;*/
+}
+
+#sidebar ul li a {
+    padding: 10px;
+    font-size: 1.1em;
+    display: block;
+}
+#sidebar ul li a:hover {
+    color: #7386D5;
+    background: #fff;
+}
+
+#sidebar ul li.active > a {
+    color: white;
+    background: orange;
+}
+
+textarea {
+    display: block;
+}
+
+input[type="reset"], input[type="submit"] {
+    margin-top: 10px;
+}
+
+table {
+    width: 100%;
+}
+
+tr {
+    border: 1px solid black;
+}
+
+label {
+    display: block;
+}
+
+#shares {
+  color: red;
+}
+
+#test {
+  display: block;
+}
+
+#delegate-button {
+  margin: 10px;
+}
+
+/*form {
+  border: 1px solid black;
+  margin: 40px 0;
+}*/
+
+#refresh-section {
+  margin: 40px 0;
+}
+
+#login-button {
+  float: right;
+}
+
+#logout-button {
+  float: right;
+}
+
+#quest-answ-list {
+    margin-top: 50px;
+}
+
+main ol li {
+    list-style-type: none;
+    color:blue;
+}
+
+header {
+    margin-bottom: 0px;
+}
+
+div[class="container-fluid"] {
+    margin-left: 0px;
+}

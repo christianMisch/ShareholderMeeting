@@ -5,132 +5,364 @@
         <meta charset="utf-8">
         <title>AGM</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
-        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="./styles/styles.css">
+        <script type="text/javascript" src="https://cdn.emailjs.com/sdk/2.2.4/email.min.js"></script>
+        <script type="text/javascript">
+            // initialize the emailjs service
+            (function(){
+                emailjs.init("user_C8orQh3VVC8LorCBAAdSK");
+            })();
+        </script>
     </head>
     <body>
+        <!-- header of the app whose structure is static -->
         <header>
-            <h1>Annual General Meeting 2018</h1>
-            <div class="row">
-                <div class="col">
-                    <p>User: 0xasdfjaslkdjfasfkasdgksgkj</p>
-                    <p>Role: Director</p>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 p-3 mb-2 bg-primary text-white" id="login-content">
+                        <form id="login-form">
+                            <div class="form-group row" id="login-div">
+                                <input class="col-4 form-control" type="text" placeholder="Wallet address: 0x0..." id="wallet-address">
+                                <input id="secret-PW" class="col-2 form-control" type="text" placeholder="Type in your password">
+                                <!-- user data of a specific user -->
+                                <span class="col-6" id="user-data">
+                                    <p id="userAddress">User: </p>
+                                    <p id="userRole">Role: </p>
+                                    <p id="date">Date: </p>
+                                </span>
+                                <span class="col-7" id="filler"></span>
+                                <span class="col-1" id="header-buttons">
+                                    <input type="button" class="btn btn-success" value="login" id="login-button">
+                                    <input type="button" class="btn btn-success" value="logout" id="logout-button">    
+                                </span>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="col"></div>
-                <div class="col">
-                    <form id="login-form">
-                        <label id="password-label">
-                            Enter your Participant ID:
-                            <input type="password" id="password">
-                        </label>
-                        <input type="button" value="login" id="login-button">
-                    </form>
-                </div>
-                
             </div>
-            
         </header>
-           
-
+        <!-- main content of the app -->
         <div class="container-fluid">
             <div class="row">
-                <div class="col-xl-3">
+                <div class="col-3" id="sidebar-position">
                     <nav id="sidebar">
                         <div class="sidebar-header">
-                            <h3>AGM features</h3>
+                            <h3 id="navbar-header">AGM features</h3>
                         </div>
-                
+                        <!-- list of all sidebar links -->
                         <ul class="list-unstyled components">
                             <li class="active">
-                                <a href="#home">Home</a>
+                                <a href="#welcome" id="welcome-link">Welcome</a>
                             </li>
                             <li>
-                                <a href="#voting">Voting</a>
+                                <a href="#timer" id="timer-link">Agm Timers</a>
                             </li>
                             <li>
-                                <a href="#Q&A">Q&A</a>
+                                <a href="#material" id="material-link">Agenda</a>
                             </li>
                             <li>
-                                <a href="#list">Q&A List</a>
+                                <a href="#setup" id="setup-link">Setup</a>
+                            </li>
+                            <li>
+                                <a href="#voting" id="voting-link">Voting</a>
+                            </li>
+                            <li>
+                                <a href="#list" id="list-link">Q&A List</a>
+                            </li>
+                            <li>
+                                <a href="#statistics" id="statistics-link">Statistics</a>
                             </li>
                         </ul>
                     </nav>
                 </div>
-                
-                <div class="col-xl-9">
+
+                <div class="col-9">
+                  <h1 id="meeting-name"></h1>
                     <main class="row">
-                        <!--template content is inserted here-->
+                        <!-- template content is inserted here -->
                     </main>
                 </div>
             </div>
         </div>
+        <!-- templates are not shown in the UI unless they got instantiated -->
+        <template id="welcome-template">
+            <article class="col-xl-12">
+                <!-- is only shown after announcement through the main admin -->
+                <div id="announce-wrapper">
+                    <p>The 1st Annual General Meeting takes place in <strong id="place"></strong>. It will start on <strong id="start"></strong>
+                        and end on <strong id="end"></strong>!</p>
+                    <p>You will receive your the AGM id for participating in a seperate email. If you did not get the email please
+                        write an
+                        email to our service: serviceAGM@gmail.com
+                    </p>
+                    <p>Remaining days to the AGM: <strong id="day-diff"></strong></p>
+                    <p>You have to register minumum 6 days in prior else you will not able to register anymore!</p>
+                </div>
+                <strong>Please sign in with your Ethereum wallet address and your password</strong>
+                <p>If you are a <strong>shareholder</strong> then you receive your password via mail</p>
+            </article>
+            <!-- registration modal -->
+            <form class="modal multi-step" id="demo-modal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title step-1" data-step="1">Step 1</h4>
+                            <h4 class="modal-title step-2" data-step="2">Step 2</h4>
+                        </div>
+                        <div class="modal-body step step-1" id="step-1">
+                            <label>Please input your private key 
+                                <div><input type="text" id="privateKey" weight="48"></div>
+                            </label>
+                            <label>Please input the encrypted password 
+                                <div><input type="text" id="encrPW" weight="48"></div>
+                            </label>
+                            <div>
+                                <input type="submit" value="Decrypt" id="decr-button">
+                                <div>
+                                    The decrypted PW is <strong id="decrPW"></strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-body step step-2" id="step-2">
+                            <label>Please input the decrypted password <input type="text" id="decPassword"></label>
+                        </div>                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary step step-1" data-step="1">Continue</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <button class="btn btn-default" data-toggle="modal" data-target="#demo-modal" id="auth-modal">Show</button> 
+        </template>
+        
+        <template id="timer-template">
+            <article class="col-xl-12">
+                <!-- AGM parameters -->
+                <form>
+                    <label>Please input the name of the AGM (will be shown as headline) <input type="text" id="agm-name"></label>
+                    <label> When shall the AGM start?<input type="datetime-local" id="agm-start"></label>
+                    <label> When shall the AGM end?<input type="datetime-local" id="agm-end"></label>
+                    <label>Where shall the physical AGM take place?<input type="text" id="place"></label>
+                    <label>Please seperate the agenda parts with commas. Enumeration is not required.  <textarea id="agenda-content"></textarea></label>
+                    <label>Input the the voting quorum <strong>per</strong> proposal<input type="number" id="voting-quorum"></label>
+                    <input type="submit" id="time-submit-button" value="Announce">
+                </form>
+            </article>
+        </template>
 
-        <template id="home-template">
-            <article class="col-xl-12" style="border: 1px solid black">
-                <p>The 1st Annual General Meeting takes place in the ICC in Berlin at 3pm on 31st of august!</p>
-                <p>You will receive your the AGM id for participating in a seperate email. If you did not get the email please write an
-                    email to our service: serviceAGM@gmail.com
-                </p>
-                <p>Here you find a list of the AGM material: </p>
+        <template id="setup-template">
+            <section class="col-12">
+                <p>Here you can transfer ownership to another chairperson who will be the new administrator of the AGM</p>
+                <input type="text" placeholder="0x..." id="ownership-address">
+                <input type="submit" value="Transfer" id="transfer-ownership-button">
+            </section>
+            <section class="col-6">
+                <article>
+                    <p>Here you can create proposals</p>
+                    <label>Write the name<textarea id="proposal-name"></textarea> </label>
+                    <label>Write the description<textarea id="proposal-description"></textarea> </label>
+                    <label>Please seperate the options with a comma. The option "abstain" is generated automatically.<textarea id="proposal-options"></textarea> </label>
+                    <input type="button" value="create Proposal" id="proposal-creator-button">
+                </article>
+            </section>
+            <section class="col-6">
+                <article>
+                    <p>Here you can add and remove users to/from the AGM</p>
+                    <label>Address of new User: <input type="text" id="new-user-address"> </label>
+                    <label>Role of the new User (0=AgmOwner, 1=Director, 2=Shareholder): <input type="number" id="director-flag"></label>
+                    <label>Amount of shares he owns: <input type="number" id="num-of-shares"></label>
+                    <p>Here you can add users to the AGM</p>
+                    <input type="button" value="add User" id="add-user-button">
+                    <p>Here you can remove user from the AGM</p>
+                    <label>Type the address of the user who shall be removed: <input type="text" id="remove-user-address"></label>
+                    <input type="button" value="remove User" id="remove-user-button">
+                </article>
+            </section>
+            <section class="col-12">
+                <label>Press this button <strong>ONLY</strong> if the AGM shall be finished. Also, the calculation of the voting stastics will be triggered. 
+                    <div>
+                        <input type="button" value="Finish" id="finish-AGM-button">
+                    </div>
+                </label>
+            </section>
+        </template>
+
+        <template id="material-template">
+            <article class="col-xl-12">
+                <p>The following materials are sent via a personal<strong> e-mail</strong> to you!</p>
                 <ul>
-                    <li>Annual report from 2017</li>
+                    <li>Annual report from last year</li>
                     <li>AGM agenda</li>
                 </ul>
+                <p>Here will be announced the agenda: </p>
+                <!-- the agenda content is shown here -->
+                <ol id="agenda-list">
+                </ol>
             </article>
         </template>
 
         <template id="voting-template">
-            <article class="col-xl-4">
-                <h2>Voting</h2>
-                <p>this is a voting example</p>
-            </article>
-           
-        </template>
-
-        <template id="QandA-template">
-            <h2 class="col-xl-12">Q&A</h2>
-            <div class="col-xl-6">
-                <form id="Q&A-form">
-                    <textarea placeholder="Please write your Question or Answer here..." row="30" cols="50"></textarea>
-                    <input type="reset" value="reset">
-                    <input type="submit" value="submit">
+            <section class="col-6">
+                <strong>
+                  Number of shares you own:
+                </strong>
+                <strong id="shares">
+                </strong>
+                <!-- partial voting parameters -->
+                <form>
+                    <h3>For partial delegation only</h3>
+                    <strong>Please type in your preferred denomination of your shares for delegation!</strong>
+                    <label>Number of blocks which contain shares: <input type="number" id="block-number"></label>
+                    <label>Number of shares which are contained in one block <input type="number" id="factor"></label>
+                    <input type="button" value="denominate" id="denominate-button">
+                    <strong id="test">Your current share denomination is shown below:</strong>
+                    <strong>Please start delegation from the last share block</strong>
+                    <div id="voting-denomination-list">
+                        <!--
+                            <ol>
+                                <li id="1">1. share block:  5 <input id="deleg-butt-1"></input></li>
+                                <li id="2">2. share block:  5 <input id="deleg-butt-2"></input></li>
+                                <li id="3">3. share block:  5 <input id="deleg-butt-3"></input></li>
+                            <ol>
+                        -->
+                    </div>
                 </form>
-            </div>
-            <div id="Q&A-feed" class="col-xl-6">
-                <!--Here comes the feed-->
-            </div>
+            </section>
+            <section class="col-6">
+              <!-- simple delegation -->
+              <form>
+                <h3>For simple delegation only: ALL your shares will be delegated to the proxy.</h3>
+                <label>Please insert the proxy address: <input type="text" id="proxy-address"></label>
+                <input type="button" value="delegate" id="delegate-button">
+              </form>
+            </section>
+            <article class="col-xl-12" id="refresh-section">
+                <input type="button" value="refresh list" id="refresh-proposal">
+                <table class="list-group">
+                    <tr id="table-header" class="list-group-item-info">
+                        <th>Description</th>
+                        <th>Options</th>
+                    </tr>
+                </table>
+            </article>
+            <input type="button" id="vote-button" value="vote">
         </template>
 
         <template id="QandA-list-template">
             <article class="col-xl-12">
-                <h2>QandA list</h2> 
+                <div id="qa-info">
+                    <a href="#">Trigger the modal</a> 
+                    <span id="num-of-quest"></span>
+                    <span id="num-of-answ"></span>
+                    <div id="rating-info">Please click on the question which you want to rate!</div>
+                </div>
+                <div id="question-form-wrapper">
+                    <form id="Q&A-form">
+                        <textarea row="30" cols="50" id="qa-placeholder"></textarea>
+                        <label id="quest-id-label">Please insert the question id: <input type="number" id="question-id"></label>
+                        <input type="reset" value="reset">
+                        <input type="submit" value="submit" id="qa-submit-button">
+                    </form>
+                </div>
             </article>
-            <div class="col-5">
-                <ol id="question-list"></ol>
-            </div>
-            
-            <div class="col-5">
-                <article>
-                    <div id="selected-question">
-                        <div id="content"></div>
-                        <ol id="answer-list"></ol>
+            <div class="col-6 list-group" id="quest-answ-list">   
+                <!--
+                    <div>
+                        <a>
+                            <div>question content
+                                <ol>
+                                    <li>Answer 1 </li>
+                                    <li>Answer 2 </li>
+                                </ol>
+                            </div>
+                        </a>
                     </div>
-                    <input type="button" value="upvote">
-                    <input type="button" value="downvote">
+                -->
+            </div>
+            <div class="col-6">
+                <article id="rate-article">
+                    <form id="select-question-form">
+                        <div id="selected-question">    
+                        </div>
+                        <input type="button" value="upvote" id="upvote-button">
+                        <input type="button" value="downvote" id="downvote-button">
+                    </form>
                 </article>
             </div>
-           
-            
+            <!-- answer modal for directors -->
+            <div class="modal fade" id="answerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="modalLabel">Answer a question</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <form>
+                        <div class="form-group">
+                          <label class="col-form-label">Question:</label>
+                          <div type="text" class="form-control" id="question-content"></div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-form-label">Your answer:</label>
+                          <textarea class="form-control" id="answer-content"></textarea>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary" id="submit-question-button">Submit question</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
         </template>
-       
-        <footer>
 
-        </footer>
+        <template id="statistics-template">
+            <div id="statistic-sections">
+                <section class="col-12">
+                    <strong>Here you see proposal-wise a piechart showing the fraction in percentage of every proposal option.</strong>
+                    <strong>Under the piecharts a table will be loaded to show the voting weight of every shareholder who voted.</strong>
+                    <strong>The voting option within a proposal with most of the votes is marked red.
+                        If there is more than one voting option with the same max count then no color indicator is applied.
+                    </strong>
+                    <h3>Total votes: <span id="total-vote-count"></span></h3>
+                    <ol id="canvas-list">
+                        <!--
+                            <li>
+                                <h3>Proposal number: 0, proposal name: 'content...'</h3>    
+                                <canvas id="voteCountCanvas"></canvas>
+                                <div id="myLegend"></div>
+                            </li>
+                        -->
+                    </ol>
+                </section>
+                <section class="col-12">
+                    <table id="shareTable">
+                        <tr>
+                            <th>user</th>
+                            <th>shares</th>
+                        </tr>
+                    </table>
+                </section>
+            </div>
+            <div id="statistic-info">
+                <strong>The statistics will be only shown if the chairperson finished the AGM.</strong>
+                <strong>If the chairperson finished the AGM then the statistics will be shown in this view!</strong>
+            </div>
+        </template>
+        <!-- the default location for the alert messages is the footer -->
+        <footer></footer>
         <noscript>
             JavaScript is required to run this app.
         </noscript>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
-        <script src="scripts.js"></script>
+        <script src="../../dist/polyfill.bundle.js"></script>
+        <script src="../../dist/app.bundle.js"></script>
+        <script src="./scripts/multi-step-modal.js"></script>
     </body>
 </html>

@@ -1,11 +1,12 @@
 const Factory = artifacts.require("./Factory.sol");
 const QandA = artifacts.require('./QandA.sol');
+const AgmOwner = artifacts.require('./AgmOwner.sol');
 
 const answerFields = [
     'answerId',
     'questionId',
     'answerCreator',
-    'content',
+    'ipfs_hash',
     'timestamp' 
 ]
 
@@ -22,7 +23,7 @@ const proposalFields = [
 const questionFields = [
     'creator',
     'questionId',
-    'content',
+    'ipfs_hash',
     'timestamp',
     'upvotes',
     'downvotes'
@@ -33,12 +34,48 @@ const delegateFields = [
     'votingWeight'
 ];
 
+const userFields = [
+    'userAddress',
+    'role',
+    'isRegistered'
+];
+
+const voteFields = [
+    'userAddress',
+    'option',
+    'weight'
+];
+
 module.exports = (factory, qa) => {
 
-    async function getFormattedObj(id, type, currContract) {
+    async function getFormattedObj(id, type, currContract, voteId) {
         let rawData;
 
         switch (type) {
+            case 'vote':
+                rawData = await factory.getVote.call(id, voteId);
+                        
+                if (rawData.length != voteFields.length) {
+                    throw new Error("The proposal doesn't have the correct format. Please check the properties");
+                }
+                const voteFormatted = {};
+                for (let i = 0; i < voteFields.length; i++) {
+                    voteFormatted[voteFields[i]] = rawData[i];
+                }
+                return voteFormatted;
+                
+            case 'user':
+                rawData = await currContract.getUser.call(id);
+                    
+                if (rawData.length != userFields.length) {
+                    throw new Error("The proposal doesn't have the correct format. Please check the properties");
+                }
+                const userFormatted = {};
+                for (let i = 0; i < userFields.length; i++) {
+                    userFormatted[userFields[i]] = rawData[i];
+                }
+                return userFormatted;
+
             case 'answer':
                 rawData = await qa.getAnswer.call(id);
                 
@@ -75,7 +112,7 @@ module.exports = (factory, qa) => {
                 }
                 return questionFormatted;
             case 'delegate':
-                rawData = await currContract.getDelegate.call(id);
+                rawData = await currContract.delegations.call(id);
 
                 if (rawData.length != delegateFields.length) {
                     throw new Error("The proposal doesn't have the correct format. Please check the properties");

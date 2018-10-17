@@ -1,0 +1,836 @@
+{
+  "contractName": "ProposalData",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603580601d6000396000f3006080604052600080fd00a165627a7a7230582008c5dcf22d8cb38fe5d60a841d2ffefd57702d4a3a841a3bfa1450a5eb55b3260029",
+  "deployedBytecode": "0x6080604052600080fd00a165627a7a7230582008c5dcf22d8cb38fe5d60a841d2ffefd57702d4a3a841a3bfa1450a5eb55b3260029",
+  "sourceMap": "108:793:4:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;108:793:4;;;;;;;",
+  "deployedSourceMap": "108:793:4:-;;;;;",
+  "source": "pragma solidity^ 0.4.23;\n\n/**\n*   @dev data (model) contract to define the proposal and vote structure  \n*/\ncontract ProposalData {\n\n    struct Proposal {\n        uint proposalId;\n        string name;\n        string description;\n        string options;\n        // a proposal is passed if the vote count on a specific proposal is greater or equal than the voting quorum\n        bool proposalPassed;\n        // computed as follows: number of votes in this propsal / sum of all proposal vote counts * 100\n        uint passedPercent;\n        uint voteCount;\n        Vote[] votes;\n        // to remember who voted on this proposal\n        mapping(address => bool) votedOnProposal;\n    }\n\n    struct Vote {\n        address voterAddress;\n        // which voting option the shareholder has chosen\n        string voterDecision;\n        // number of shares the shareholder owns\n        uint voterWeight;\n    }\n}",
+  "sourcePath": "/Users/christianmischok/git/ShareholderMeeting/solidity/contracts/ProposalData.sol",
+  "ast": {
+    "absolutePath": "/Users/christianmischok/git/ShareholderMeeting/solidity/contracts/ProposalData.sol",
+    "exportedSymbols": {
+      "ProposalData": [
+        1650
+      ]
+    },
+    "id": 1651,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1620,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:4"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": "  @dev data (model) contract to define the proposal and vote structure  ",
+        "fullyImplemented": true,
+        "id": 1650,
+        "linearizedBaseContracts": [
+          1650
+        ],
+        "name": "ProposalData",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "ProposalData.Proposal",
+            "id": 1642,
+            "members": [
+              {
+                "constant": false,
+                "id": 1622,
+                "name": "proposalId",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "163:15:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 1621,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "163:4:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1624,
+                "name": "name",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "188:11:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1623,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "188:6:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1626,
+                "name": "description",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "209:18:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1625,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "209:6:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1628,
+                "name": "options",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "237:14:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1627,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "237:6:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1630,
+                "name": "proposalPassed",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "377:19:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 1629,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "377:4:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1632,
+                "name": "passedPercent",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "510:18:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 1631,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "510:4:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1634,
+                "name": "voteCount",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "538:14:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 1633,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "538:4:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1637,
+                "name": "votes",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "562:12:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_struct$_Vote_$1649_storage_$dyn_storage_ptr",
+                  "typeString": "struct ProposalData.Vote[]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "contractScope": null,
+                    "id": 1635,
+                    "name": "Vote",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 1649,
+                    "src": "562:4:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Vote_$1649_storage_ptr",
+                      "typeString": "struct ProposalData.Vote"
+                    }
+                  },
+                  "id": 1636,
+                  "length": null,
+                  "nodeType": "ArrayTypeName",
+                  "src": "562:6:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_struct$_Vote_$1649_storage_$dyn_storage_ptr",
+                    "typeString": "struct ProposalData.Vote[]"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1641,
+                "name": "votedOnProposal",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "634:40:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                  "typeString": "mapping(address => bool)"
+                },
+                "typeName": {
+                  "id": 1640,
+                  "keyType": {
+                    "id": 1638,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "642:7:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "634:24:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                    "typeString": "mapping(address => bool)"
+                  },
+                  "valueType": {
+                    "id": 1639,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "653:4:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Proposal",
+            "nodeType": "StructDefinition",
+            "scope": 1650,
+            "src": "137:544:4",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "ProposalData.Vote",
+            "id": 1649,
+            "members": [
+              {
+                "constant": false,
+                "id": 1644,
+                "name": "voterAddress",
+                "nodeType": "VariableDeclaration",
+                "scope": 1649,
+                "src": "709:20:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 1643,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "709:7:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1646,
+                "name": "voterDecision",
+                "nodeType": "VariableDeclaration",
+                "scope": 1649,
+                "src": "797:20:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1645,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "797:6:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1648,
+                "name": "voterWeight",
+                "nodeType": "VariableDeclaration",
+                "scope": 1649,
+                "src": "876:16:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 1647,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "876:4:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Vote",
+            "nodeType": "StructDefinition",
+            "scope": 1650,
+            "src": "687:212:4",
+            "visibility": "public"
+          }
+        ],
+        "scope": 1651,
+        "src": "108:793:4"
+      }
+    ],
+    "src": "0:901:4"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/christianmischok/git/ShareholderMeeting/solidity/contracts/ProposalData.sol",
+    "exportedSymbols": {
+      "ProposalData": [
+        1650
+      ]
+    },
+    "id": 1651,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1620,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".23"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:4"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": "  @dev data (model) contract to define the proposal and vote structure  ",
+        "fullyImplemented": true,
+        "id": 1650,
+        "linearizedBaseContracts": [
+          1650
+        ],
+        "name": "ProposalData",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "ProposalData.Proposal",
+            "id": 1642,
+            "members": [
+              {
+                "constant": false,
+                "id": 1622,
+                "name": "proposalId",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "163:15:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 1621,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "163:4:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1624,
+                "name": "name",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "188:11:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1623,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "188:6:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1626,
+                "name": "description",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "209:18:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1625,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "209:6:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1628,
+                "name": "options",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "237:14:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1627,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "237:6:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1630,
+                "name": "proposalPassed",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "377:19:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 1629,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "377:4:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1632,
+                "name": "passedPercent",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "510:18:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 1631,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "510:4:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1634,
+                "name": "voteCount",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "538:14:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 1633,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "538:4:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1637,
+                "name": "votes",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "562:12:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_struct$_Vote_$1649_storage_$dyn_storage_ptr",
+                  "typeString": "struct ProposalData.Vote[]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "contractScope": null,
+                    "id": 1635,
+                    "name": "Vote",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 1649,
+                    "src": "562:4:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Vote_$1649_storage_ptr",
+                      "typeString": "struct ProposalData.Vote"
+                    }
+                  },
+                  "id": 1636,
+                  "length": null,
+                  "nodeType": "ArrayTypeName",
+                  "src": "562:6:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_struct$_Vote_$1649_storage_$dyn_storage_ptr",
+                    "typeString": "struct ProposalData.Vote[]"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1641,
+                "name": "votedOnProposal",
+                "nodeType": "VariableDeclaration",
+                "scope": 1642,
+                "src": "634:40:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                  "typeString": "mapping(address => bool)"
+                },
+                "typeName": {
+                  "id": 1640,
+                  "keyType": {
+                    "id": 1638,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "642:7:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "634:24:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+                    "typeString": "mapping(address => bool)"
+                  },
+                  "valueType": {
+                    "id": 1639,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "653:4:4",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Proposal",
+            "nodeType": "StructDefinition",
+            "scope": 1650,
+            "src": "137:544:4",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "ProposalData.Vote",
+            "id": 1649,
+            "members": [
+              {
+                "constant": false,
+                "id": 1644,
+                "name": "voterAddress",
+                "nodeType": "VariableDeclaration",
+                "scope": 1649,
+                "src": "709:20:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 1643,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "709:7:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1646,
+                "name": "voterDecision",
+                "nodeType": "VariableDeclaration",
+                "scope": 1649,
+                "src": "797:20:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 1645,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "797:6:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 1648,
+                "name": "voterWeight",
+                "nodeType": "VariableDeclaration",
+                "scope": 1649,
+                "src": "876:16:4",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 1647,
+                  "name": "uint",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "876:4:4",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Vote",
+            "nodeType": "StructDefinition",
+            "scope": 1650,
+            "src": "687:212:4",
+            "visibility": "public"
+          }
+        ],
+        "scope": 1651,
+        "src": "108:793:4"
+      }
+    ],
+    "src": "0:901:4"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.24+commit.e67f0147.Emscripten.clang"
+  },
+  "networks": {
+    "5777": {
+      "events": {},
+      "links": {},
+      "address": "0xc0b6f59372e7cb3fce546843fc07bcecbe036f82",
+      "transactionHash": "0xfcc7ad7f18c3778f2842c065464ced90ffadcbb4add783424573fed5c100a8e8"
+    }
+  },
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2018-10-17T21:12:29.361Z"
+}

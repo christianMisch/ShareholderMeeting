@@ -1,30 +1,24 @@
-import web3 from './web3.js';
-//var web3 = require('web3');
+import Web3 from 'web3';
 
-function initializeWeb3() {
-    if (typeof web3 !== 'undefined') {
-        console.log('connected to web3');
-        web3 = new Web3(web3.currentProvider);
-      } else {
-        console.log('No web3? first install chrome with MetaMask');
-        // set the provider you want from Web3.providers
-        web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-    }
+/**
+ * @summary initializes a web3 provider
+ */
+
+/**
+ * @function web3Init create a new web3 provider
+ * @returns the current provider or a new one
+ */
+export function web3Init() {
+  console.log(typeof window.web3 !== 'undefined');
+  if (typeof window.web3 !== 'undefined') {
+    console.log('Connected to Web3!');
+    return new Web3(window.web3.currentProvider);
+  } else {
+    console.log('No Web 3? You should consider trying MetaMask and Chrome!');
+    var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+    return web3;
+  }
 }
 
-function notifyUser(message) {
-    console.log(message);
-}
-
-function checkAccountStatus() {
-    const accounts = web3.eth.getAccounts(); 
-    console.log(accounts);
-}
-
-console.log(notifyUser(web3));
-
-// export default initializeWeb3;
-
-
-
-
+const web3 = web3Init();
+export default web3;

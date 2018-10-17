@@ -5,104 +5,189 @@ import "./Shareholder.sol";
 import "./Director.sol";
 import "./Factory.sol";
 
+/**
+*    @title AgmOwner - is the superadmin of the AGM process and therefore, a singleton
+*/
 contract AgmOwner is User {
 
+    // reference to proposal storage
     Factory public fac;
     // total number of users
-    uint public numberOfUsers;
+    uint private numberOfUsers;
     // stores all users
-    User[] public users;
+    User[] private users;
     // stores user's address with corresponding id
     mapping(address => uint) public userId;
-    // store options to every proposal
-    VotingOption[] public votingOptions;
-
-    bool public isFinished = false;
-
-    uint public minimumVotingQuorum;
-    uint public marginOfVotesForMajority;
+    // stores the owners who have permission to setup the AGM
+    address[] private owners;
+    // timers for AGM process
+    bool private isFinished = false;
+    bool private isAnnounced = false;
+    
+    // params for AGM setup
     string public meetingName;
-    string public meetingDescription;
-    string public meetingDate;
+    string public agenda;
     string public meetingPlace;
-    uint public meetingStartTime;
-    uint public meetingEndTime;
+    string public meetingStartTime;
+    string public meetingEndTime;
 
-    struct VotingOption {
-        string optionName;
-        uint optionCount;
-    }
-
-    modifier onlyOwner {
-        require(userAddress == msg.sender);
+    /**
+    *    @dev checks whether the parameter is already set
+    */
+    modifier isSet(string param) {
+        require(bytes(param).length == 0, "The parameter has already been set");
         _;
     }
 
+    /**
+    *    @dev checks that the caller is an administrator (=AgmOwner)
+    */
+    modifier onlyOwner {
+        bool isOwner = false;
+        for (uint i = 0; i < owners.length; i++) {
+            if (owners[i] == msg.sender) {
+                isOwner = true;
+            }
+        }
+        require(isOwner == true, "Only an AGM owner can access this function!");
+        _;
+    }
+
+    /**
+    *    @dev events for testing and debugging
+    */
+    event ProposalExecuted(bool isExecuted, uint propId, uint winnOptCount);
     event ProposalCreated(uint propId, address creator);
     event Voted(address userAddress, uint proposalId, string votingOption);
     event AgmFinished(bool isFinished);
-    event ProposalExecuted(uint proposalId, bool proposalPassed, uint passedPercentage, VotingOption[] options);
-    event OwnershipTransferedTo(address newOwner);
-    event UserCreated(uint userId, address userAddress, bool isDirector);
-    event UserRemoved(uint userId, address userAddress, bool isDirector);
+    event OwnershipSharedTo(address caller, address newOwner);
+    event UserCreated(uint userId, address userAddress, string role);
+    event UserRemoved(uint userId, address userAddress, uint role);
+    event AgmAnnounced(bool isAnnounced);
+    event AgmOwnerCreated(address adr);
 
+    /**
+    *    @dev the deployer of this contract is always appended as first user to the user list
+    */
     constructor(
-        uint _minimumVotingQuorum,
-        uint _marginOfVotesForMajority,
-        string _meetingName,
-        string _meetingDescription,
-        string _meetingDate,
-        string _meetingPlace,
-        uint _meetingStartTime,
-        uint _meetingEndTime,
+        address _userAddress,
         Factory _fac
-    ) 
-            
-            User(msg.sender, true) public {
-        
-        minimumVotingQuorum = _minimumVotingQuorum;
-        marginOfVotesForMajority = _marginOfVotesForMajority;
-        meetingName = _meetingName;
-        meetingDescription = _meetingDescription;
-        meetingDate = _meetingDate;
-        meetingPlace = _meetingPlace;
-        meetingStartTime = _meetingStartTime;
-        meetingEndTime = _meetingEndTime;
+    ) User(_userAddress, Role.AGMOWNER, true) public {
+
         fac = _fac;
+        owners.push(_userAddress);
+        users.push(User(address(this)));
+        userId[_userAddress] = 0;
+
+        emit AgmOwnerCreated(_userAddress);
     }
 
-    // transfer contract ownership to another director
-    function transferOwnership(address _owner) onlyOwner public {
-        userAddress = _owner;
-
-        emit OwnershipTransferedTo(_owner);
+    /**
+    *    @dev setters for setting the AGM parameters and getters
+    */
+    function setAgenda(string _agenda) public onlyOwner isSet(agenda) {
+        agenda = _agenda;
     }
 
-    function addUser(address _userAddress, bool isDirector, uint votingTok, QandA qa) public {
-        uint id = userId[_userAddress];
-        if (id == 0) {
-            id = users.length++;
-            userId[_userAddress] = id;
+    function setMeetingPlace(string _meetingPlace) public onlyOwner isSet(meetingPlace) {
+        meetingPlace = _meetingPlace;
+    }
+
+    function setMeetingStartTime(string _meetingStartTime) public onlyOwner isSet(meetingStartTime) {
+        meetingStartTime = _meetingStartTime;
+    }
+
+    function setMeetingEndTime(string _meetingEndTime) public onlyOwner isSet(meetingEndTime) {
+        meetingEndTime = _meetingEndTime;
+    }
+
+    function setMeetingName(string _meetingName) public onlyOwner isSet(meetingName) {
+        meetingName = _meetingName;
+    }
+
+    function getOwnerAddress() public view returns (address ownerAdr) {
+        return userAddress;
+    }
+
+    function getOwners() public view returns (address[] ownerAdr) {
+        return owners;
+    }
+
+    function getIsFinished() public view returns (bool finished) {
+        return isFinished;
+    }
+
+    function getIsAnnounced() public view returns (bool announced) {
+        return isAnnounced;
+    }
+
+    function getNumOfUsers() public view returns (uint length) {
+        return users.length;
+    }
+
+    function getUser(address _userAddress) public view returns (address adr, uint role, bool isReg) {
+        uint userID = userId[_userAddress];
+        if (userID == 0 && _userAddress != userAddress) {
+            return (address(0), 3, false);
         }
+        User u = users[userID];
+        return (u.userAddress(), u.role(), u.isRegistered());
+    }
 
-        if (isDirector) {
-            Director d = fac.createNewDirector(_userAddress, qa);
-            users[id] = d;
-            
-            emit UserCreated(id, _userAddress, true);
+    function getUserList() public view returns (User[] userList) {
+        return users;
+    }
+
+    /**
+    *   @dev transfer admin rights to another user who has the AgmOwner role
+    *   @param _owner address of the user
+    */
+    function transferOwnership(address _owner) public onlyOwner {
+        require(userId[_owner] != 0, "The new user does not exist!");
+        owners.push(_owner);
+
+        emit OwnershipSharedTo(msg.sender, _owner);
+    }
+
+    /**
+    *   @dev adds a user to the user list
+    *   @param _userAddress address of the user
+    *   @param role role of the user
+    *   @param qa reference to the Q&A lists
+    */
+    function addUser(address _userAddress, Role role, uint votingWeight, QandA qa) public onlyOwner {
+        uint id = userId[_userAddress];
+        require(id == 0, "User has already been added to the AGM!");
         
-        } else {
-            Shareholder s = fac.createNewShareholder(_userAddress, votingTok, qa);
+        id = users.length++;
+        userId[_userAddress] = id;
+        if (uint(role) == 0) {
+            Director o = fac.createNewDirector(_userAddress, true, qa);
+            users[id] = o;
+
+            emit UserCreated(id, _userAddress, "AgmOwner");
+        }
+        else if (uint(role) == 1) {
+            Director d = fac.createNewDirector(_userAddress, false, qa);
+            users[id] = d;
+
+            emit UserCreated(id, _userAddress, "Director");
+
+        } else if(uint(role) == 2) {
+            Shareholder s = fac.createNewShareholder(_userAddress, votingWeight, qa);
             users[id] = s;
-            
-            emit UserCreated(id, _userAddress, false);
+
+            emit UserCreated(id, _userAddress, "Shareholder");
         }
         numberOfUsers++;
     }
 
-    function removeUser(address _userAddress) public {
-        //require(userId[_userAddress] != 0, "User does not exist");
-
+    /**
+    *   @dev remove a user from the user list thus, he cannot login into the app
+    *   @param _userAddress the address of the user who shall be removed 
+    */
+    function removeUser(address _userAddress) public onlyOwner {
+        require(userId[_userAddress] != 0, "User does not exist");
         uint i = userId[_userAddress];
         User remUser = users[i];
         delete users[i];
@@ -111,22 +196,28 @@ contract AgmOwner is User {
             users[i] = users[i+1];
             userId[users[i].userAddress()] = i;
         }
-        
+
         users.length--;
         numberOfUsers--;
 
-        emit UserRemoved(i, _userAddress, remUser.isDirector());
+        emit UserRemoved(i, _userAddress, remUser.role());
     }
 
-    function getNumOfUsers() public view returns (uint length) {
-        return users.length;
+    /**
+    *   @dev for authentication, if users are registered once they only need their private password to login
+    */
+    function registerUser() public {
+        uint usID = userId[msg.sender];
+        require(usID != 0, "User has not been added to the user list");
+        User u = users[usID];
+        require(!u.isRegistered(), "The user has already been registered!");
+        u.setIsRegistered(true);
     }
 
-    function getUser(address _userAddress) public view returns (User u) {
-        return users[userId[_userAddress]];
-    }
-
-    function finishAGM() onlyOwner public {
+    /**
+    *   @dev set the finish flag which is required to show the statistics 
+    */
+    function finishAGM() public onlyOwner {
         require(!isFinished, "AGM has already been finished");
         isFinished = true;
 
@@ -134,69 +225,42 @@ contract AgmOwner is User {
 
     }
 
-    function announceAGM() onlyOwner public view returns (string recordDate, string recordPlace) {
-        return (meetingDate, meetingPlace);
+    /**
+    *   @dev announce the AGM, then all the AGM params are visible to the other users 
+    */
+    function announceAGM() public onlyOwner {
+        require(!isAnnounced, "AGM has already been announced");
+        isAnnounced = true;
+
+        emit AgmAnnounced(isAnnounced);
     }
 
-    // only director is allowed to create a proposal
-    function createProposal(string _name, string _description, string _options) 
-        onlyOwner public returns(uint propId) {
+    /**
+    *   @dev create a new proposal
+    *   @param _name name of the proposal
+    *   @param description of the proposal
+    *   @param _options different voting options of the proposal
+    *   @return propId the id of the proposal  
+    */
+    function createProposal(string _name, string description, string _options)
+        public onlyOwner returns(uint propId) {
 
-        propId = fac.createNewProposal(_name, _description, _options);
+        propId = fac.createNewProposal(_name, description, _options);
         emit ProposalCreated(propId, msg.sender);
 
         return propId;
     }
 
-    // executes the pending proposal
-    /*function executeProposal(uint proposalId) public {
-        
-        Proposal storage prop = proposals[proposalId];
-        var optionString = proposals[proposalId].options.toSlice();
-        var delim = ";".toSlice();
-        var options = new string[](optionString.count(delim) + 1);
-        for (uint l = 0; l < options.length; l++) {
-            options[l] = optionString.split(delim).toString();
-        }
-
-        require(now > meetingEndTime, "meeting has not finished yet");
-
-        
-        // iterate over all options to store default options in the map
-        for (uint k = 0; k < options.length; k++) {
-            uint id = votingOptions.length++;
-            votingOptions[id] = VotingOption({optionName: options[k], optionCount: 0});
-
-            // iterate over all votes to check which voter voted for option k
-            for (uint i = 0; i < prop.votes.length; i++) {
-                
-                Vote storage v = prop.votes[i];
-                if (keccak256(v.voterDecision) == keccak256(options[k])) {
-                    votingOptions[k].optionCount++; 
-                } 
-            }
-        }
-        uint winningOptionCount = 0;
-        uint countSum = 0;
-        
-        for (uint j = 0; j < votingOptions.length; j++) {
-            countSum += votingOptions[j].optionCount;
-            if (winningOptionCount < votingOptions[j].optionCount) {
-                winningOptionCount = votingOptions[j].optionCount;
-            }
-        }
-
-        if (winningOptionCount > minimumVotingQuorum 
-            && (winningOptionCount * 100 / countSum) > marginOfVotesForMajority) {
-            prop.proposalPassed = true;
-        } else {
-            prop.proposalPassed = false;
-        }
-
-        prop.passedPercent = winningOptionCount * 100 / countSum;
-
-        delete votingOptions;
-
-        emit ProposalExecuted(proposalId, prop.proposalPassed, prop.passedPercent, votingOptions);
-    }*/
+    /**
+    *   @dev executes a pending proposal, required to evaluate the proposals (vote tally etc.)
+    *   @param proposalId id of the proposal
+    *   @return isExecuted is true if the execution was successfull
+    */
+    function executeProposal(uint proposalId) public onlyOwner returns (bool isExecuted) {
+        require(isFinished, "AGM has to be finished first");
+        uint winnOptCount;
+        (winnOptCount) = fac.evaluateProposal(proposalId);
+        emit ProposalExecuted(true, proposalId, winnOptCount);
+        return true;
+    }
 }
