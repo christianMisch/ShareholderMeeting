@@ -39,7 +39,7 @@ contract Factory is ProposalData {
     *   @dev getters and setters
     */
 
-    function setVote(uint proposalId, string votingOption, address sender) external {
+    function setVote(uint proposalId, string votingOption, address sender) public {
         Proposal storage prop = proposals[proposalId];
         require(prop.votedOnProposal[sender] != true, "The shareholder already voted");
         uint voteId = prop.votes.length++;
@@ -139,7 +139,7 @@ contract Factory is ProposalData {
     *   @param qa reference to access the Q&A lists
     *   @return sh a new Shareholder object 
     */
-    function createNewShareholder(address _userAddress, uint weight, QandA qa) external returns (Shareholder) {
+    function createNewShareholder(address _userAddress, uint weight, QandA qa) public returns (Shareholder) {
         Shareholder sh = new Shareholder(_userAddress, weight, this, qa);
         shareholders[_userAddress] = sh;
         return sh;
@@ -152,7 +152,7 @@ contract Factory is ProposalData {
     *   @param qa reference to access the Q&A lists
     *   @return d a new Director object
     */
-    function createNewDirector(address _userAddress, bool isAdministrator, QandA qa) external returns (Director) {
+    function createNewDirector(address _userAddress, bool isAdministrator, QandA qa) public returns (Director) {
         if (isAdministrator) {
             return new Director(_userAddress, isAdministrator, qa, 0);
         } else {
@@ -168,7 +168,7 @@ contract Factory is ProposalData {
     *   @param _options voting options of the proposal
     *   @return proposalId the id of the new created proposal
     */
-    function createNewProposal(string _name, string _description, string _options) external returns (uint proposalId) {
+    function createNewProposal(string _name, string _description, string _options) public returns (uint proposalId) {
         proposalId = proposals.length++;
         Proposal storage proposal = proposals[propId];
         proposal.proposalId = propId;

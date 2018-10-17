@@ -94,13 +94,13 @@ $(document).ready(async function() {
                     from_mail: 'service_AGM@gmail.com',
                     message: encryptedData
                 };
-                /*emailjs.send('gmail', 'authentication_template', templateParams)
+                emailjs.send('gmail', 'authentication_template', templateParams)
                     .then(function(response) {
                         console.log('SUCCESS!', response.status, response.text);
                     }, function(error) {
                         console.log('FAILED...', error);
                     });
-                console.log('EMAIL WAS SENT!!!');*/
+                console.log('EMAIL WAS SENT!!!');
             }
         }
     });

@@ -6,7 +6,7 @@ const Factory = artifacts.require("./Factory.sol");
  * @summary basic setup of the AGM is provided by the superadmin: proposal creation, add users and announce the AGM
  */
 
-module.exports = async function(deployer, network) {
+module.exports = async function(deployer, network, accounts) {
     // the following TX are only migrated to the ganache test chain if the network is specified as 'development' in the command line
     // the migration files starting from 3_xxx... provide toy data for the test chain
     // if another network is specified the whole setup has be performed in the app
@@ -15,12 +15,12 @@ module.exports = async function(deployer, network) {
         const QandAContract = await QandA.deployed();
         const FactoryContract = await Factory.deployed();
 
-        await AgmOwnerContract.addUser.sendTransaction('0xd02Dc75c5D17021a71060DeE44b12958fBa069FB'.toLowerCase(), 0, 0, QandAContract.address);
-        await AgmOwnerContract.addUser.sendTransaction('0x628FBd5a122103e8171BbB2dC70C265f9F775466'.toLowerCase(), 2, 30, QandAContract.address);
-        await AgmOwnerContract.addUser.sendTransaction('0xc179a95Ac86AAbf6baF4D97BA161152fE0cc0655'.toLowerCase(), 2, 45, QandAContract.address);
-        await AgmOwnerContract.addUser.sendTransaction('0xB78E4A88e140b9ceeC48D569d6ae0ED4F419eFb1'.toLowerCase(), 2, 12, QandAContract.address);
-        await AgmOwnerContract.addUser.sendTransaction('0x92130D033C5846d2653D088c74D844f61717794d'.toLowerCase(), 1, 0, QandAContract.address);
-        await AgmOwnerContract.addUser.sendTransaction('0x32B6D8932B2c4eE0C0D70044695Af4A036767Df7'.toLowerCase(), 1, 0, QandAContract.address);
+        await AgmOwnerContract.addUser.sendTransaction(accounts[0], 0, 0, QandAContract.address);
+        await AgmOwnerContract.addUser.sendTransaction(accounts[1], 2, 30, QandAContract.address);
+        await AgmOwnerContract.addUser.sendTransaction(accounts[2], 2, 45, QandAContract.address);
+        await AgmOwnerContract.addUser.sendTransaction(accounts[3], 2, 12, QandAContract.address);
+        await AgmOwnerContract.addUser.sendTransaction(accounts[4], 1, 0, QandAContract.address);
+        await AgmOwnerContract.addUser.sendTransaction(accounts[5], 1, 0, QandAContract.address);
 
         await AgmOwnerContract.createProposal.sendTransaction('board election', 'Who should be the new chairperson for the next year?', 'Schmidt, Mueller, Guenther');
         await FactoryContract.appendVotingOptionToProposal.sendTransaction(0, 'Schmidt');

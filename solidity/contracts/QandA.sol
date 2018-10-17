@@ -41,7 +41,7 @@ contract QandA {
     */
 
     // increments the like or dislike count of a specific question, can only be triggered by shareholders
-    function setRating(uint questionId, uint ratingOpt, address sender) external {
+    function setRating(uint questionId, uint ratingOpt, address sender) public {
         Question storage question = questions[questionId];
         if (ratingOpt == 1) {
             question.upvotes++;
