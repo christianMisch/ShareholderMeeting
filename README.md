@@ -16,7 +16,11 @@ with the following content:
 
 ![](/mdPics/initemailjs.png)
 
-5. change the `emailjs.send('gmail', <template_ID>)` and insert your template id which can be found under the template section of the email.js website
+5. change the `emailjs.send('gmail', <template_ID>)`. 
+
+![](/mdPics/sendEmailjs.png)
+
+and insert your template id which can be found under the template section of the email.js website
 
 ![](/mdPics/templId.png)
 
